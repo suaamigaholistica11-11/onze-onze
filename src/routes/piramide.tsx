@@ -29,7 +29,7 @@ const COR_BG: Record<string, string> = {
 };
 
 function PiramidePage() {
-  const [ativo, setAtivo] = useState(PIRAMIDE_TEMAS[0].id);
+  const [ativo, setAtivo] = useState<string>(PIRAMIDE_TEMAS[0].id);
   const [rating, setRating] = useState(3);
   const [passo, setPasso] = useState("");
 
