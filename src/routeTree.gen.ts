@@ -15,7 +15,6 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedPiramideRouteImport } from './routes/_authenticated/piramide'
 import { Route as AuthenticatedMapaAstralRouteImport } from './routes/_authenticated/mapa-astral'
 import { Route as AuthenticatedCeuHojeRouteImport } from './routes/_authenticated/ceu-hoje'
-import { Route as AuthenticatedMapaAstralNovoRouteImport } from './routes/_authenticated/mapa-astral.novo'
 import { Route as AuthenticatedMapaAstralIdRouteImport } from './routes/_authenticated/mapa-astral.$id'
 
 const LoginRoute = LoginRouteImport.update({
@@ -47,12 +46,6 @@ const AuthenticatedCeuHojeRoute = AuthenticatedCeuHojeRouteImport.update({
   path: '/ceu-hoje',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedMapaAstralNovoRoute =
-  AuthenticatedMapaAstralNovoRouteImport.update({
-    id: '/novo',
-    path: '/novo',
-    getParentRoute: () => AuthenticatedMapaAstralRoute,
-  } as any)
 const AuthenticatedMapaAstralIdRoute =
   AuthenticatedMapaAstralIdRouteImport.update({
     id: '/$id',
@@ -67,7 +60,6 @@ export interface FileRoutesByFullPath {
   '/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/piramide': typeof AuthenticatedPiramideRoute
   '/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
-  '/mapa-astral/novo': typeof AuthenticatedMapaAstralNovoRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
@@ -76,7 +68,6 @@ export interface FileRoutesByTo {
   '/piramide': typeof AuthenticatedPiramideRoute
   '/': typeof AuthenticatedIndexRoute
   '/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
-  '/mapa-astral/novo': typeof AuthenticatedMapaAstralNovoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -87,7 +78,6 @@ export interface FileRoutesById {
   '/_authenticated/piramide': typeof AuthenticatedPiramideRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
-  '/_authenticated/mapa-astral/novo': typeof AuthenticatedMapaAstralNovoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -98,7 +88,6 @@ export interface FileRouteTypes {
     | '/mapa-astral'
     | '/piramide'
     | '/mapa-astral/$id'
-    | '/mapa-astral/novo'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
@@ -107,7 +96,6 @@ export interface FileRouteTypes {
     | '/piramide'
     | '/'
     | '/mapa-astral/$id'
-    | '/mapa-astral/novo'
   id:
     | '__root__'
     | '/_authenticated'
@@ -117,7 +105,6 @@ export interface FileRouteTypes {
     | '/_authenticated/piramide'
     | '/_authenticated/'
     | '/_authenticated/mapa-astral/$id'
-    | '/_authenticated/mapa-astral/novo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -169,13 +156,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCeuHojeRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/mapa-astral/novo': {
-      id: '/_authenticated/mapa-astral/novo'
-      path: '/novo'
-      fullPath: '/mapa-astral/novo'
-      preLoaderRoute: typeof AuthenticatedMapaAstralNovoRouteImport
-      parentRoute: typeof AuthenticatedMapaAstralRoute
-    }
     '/_authenticated/mapa-astral/$id': {
       id: '/_authenticated/mapa-astral/$id'
       path: '/$id'
@@ -188,13 +168,11 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedMapaAstralRouteChildren {
   AuthenticatedMapaAstralIdRoute: typeof AuthenticatedMapaAstralIdRoute
-  AuthenticatedMapaAstralNovoRoute: typeof AuthenticatedMapaAstralNovoRoute
 }
 
 const AuthenticatedMapaAstralRouteChildren: AuthenticatedMapaAstralRouteChildren =
   {
     AuthenticatedMapaAstralIdRoute: AuthenticatedMapaAstralIdRoute,
-    AuthenticatedMapaAstralNovoRoute: AuthenticatedMapaAstralNovoRoute,
   }
 
 const AuthenticatedMapaAstralRouteWithChildren =
