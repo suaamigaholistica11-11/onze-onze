@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { AppShell } from "@/components/AppShell";
-import { SIGNS } from "@/lib/onze-data";
+import { getTransitsForToday, type TransitItem } from "@/lib/transits.functions";
+import { SIGN_GLYPHS } from "@/lib/transit-copy";
 
 export const Route = createFileRoute("/_authenticated/ceu-hoje")({
   head: () => ({
@@ -15,17 +17,25 @@ export const Route = createFileRoute("/_authenticated/ceu-hoje")({
   component: CeuHojePage,
 });
 
-const TRANSITOS = [
-  { planeta: "Sol", glyph: "☉", signo: SIGNS.leao, texto: "Foco e visibilidade — é dia de se mostrar." },
-  { planeta: "Lua", glyph: "☾", signo: SIGNS.cancer, texto: "Sensibilidade em alta. Ouça o que o corpo pede." },
-  { planeta: "Mercúrio", glyph: "☿", signo: SIGNS.virgem, texto: "Ótimo pra organizar listas e finalizar tarefas." },
-  { planeta: "Vênus", glyph: "♀", signo: SIGNS.libra, texto: "Charme natural. Hora boa pra conversas afetivas." },
-  { planeta: "Marte", glyph: "♂", signo: SIGNS.escorpiao, texto: "Energia profunda. Use pra transformar, não pra brigar." },
-  { planeta: "Júpiter", glyph: "♃", signo: SIGNS.gemeos, texto: "Aprenda algo novo — expande a mente." },
-];
-
 function CeuHojePage() {
   const hoje = new Date().toLocaleDateString("pt-BR", { day: "numeric", month: "long" });
+  const [transits, setTransits] = useState<TransitItem[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getTransitsForToday()
+      .then((res) => {
+        if (!cancelled) setTransits(res.transits);
+      })
+      .catch((e) => {
+        console.error(e);
+        if (!cancelled) setError("Não conseguimos consultar o céu agora.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <AppShell glyph="✦">
@@ -42,7 +52,15 @@ function CeuHojePage() {
       </header>
 
       <section className="px-6 mb-8 space-y-3 animate-oo-enter [animation-delay:120ms]">
-        {TRANSITOS.map((t) => (
+        {error && (
+          <div className="text-sm text-ink/60 italic text-center py-6">{error}</div>
+        )}
+        {!transits && !error && (
+          <div className="text-sm text-ink/40 italic text-center py-6">
+            consultando o céu…
+          </div>
+        )}
+        {transits?.map((t) => (
           <div
             key={t.planeta}
             className="bg-white p-4 rounded-2xl ring-1 ring-black/5 flex items-start gap-4"
@@ -54,8 +72,16 @@ function CeuHojePage() {
               <div className="flex items-baseline gap-2">
                 <span className="font-display font-bold">{t.planeta}</span>
                 <span className="text-xs text-ink/50">em</span>
-                <span className="text-sm font-medium">{t.signo.name}</span>
-                <span className="font-display text-base text-ink/40">{t.signo.glyph}</span>
+                <span className="text-sm font-medium">{t.signo}</span>
+                <span className="font-display text-base text-ink/40">
+                  {SIGN_GLYPHS[t.signo] ?? ""}
+                </span>
+                <span className="text-[10px] text-ink/40">{t.grau}°</span>
+                {t.retrograde && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-peach/60 text-ink/70 font-medium ml-auto">
+                    ℞ retrógrado
+                  </span>
+                )}
               </div>
               <p className="text-sm text-ink/70 mt-1 leading-snug">{t.texto}</p>
             </div>
