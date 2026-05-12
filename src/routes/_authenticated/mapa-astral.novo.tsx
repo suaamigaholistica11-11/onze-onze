@@ -139,7 +139,7 @@ function NovoMapaPage() {
           className="w-full bg-ink text-white py-4 rounded-full text-xs font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-2 hover:bg-ink/90 disabled:opacity-50 transition-colors"
         >
           <Sparkles className="size-4" />
-          {busy ? "Gerando seu mapa…" : "Gerar mapa"}
+          {busy ? "Consultando o céu…" : "Gerar mapa"}
         </button>
       </form>
     </AppShell>

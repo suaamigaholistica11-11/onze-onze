@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import type { NatalChartData } from "@/lib/natal.functions";
+import { SIGN_GLYPHS } from "@/lib/transit-copy";
 
 export const Route = createFileRoute("/_authenticated/mapa-astral/$id")({
   head: () => ({
@@ -86,7 +87,7 @@ function MapaDetailPage() {
         <section className="px-6 mb-6 animate-oo-enter [animation-delay:160ms]">
           <div className="bg-lilac/50 p-6 rounded-[28px] ring-1 ring-black/5">
             <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/60 mb-3">
-              Sol · Lua · Ascendente
+              Sua essência
             </p>
             <p className="font-display text-base leading-relaxed text-pretty">
               {data.personality}
@@ -113,7 +114,7 @@ function MapaDetailPage() {
               <li key={p.name} className="flex items-center justify-between p-4">
                 <span className="font-display font-bold">{p.name}</span>
                 <span className="text-sm text-ink/70">
-                  {p.sign} · Casa {p.house}
+                  {p.sign} {SIGN_GLYPHS[p.sign] ?? ""} · Casa {p.house}
                 </span>
               </li>
             ))}

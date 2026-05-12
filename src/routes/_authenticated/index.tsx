@@ -116,10 +116,6 @@ function HomePage() {
         <Shortcut to="/ceu-hoje" bg="peach" label="O Céu Hoje" Icon={Sparkles} />
         <Shortcut to="/piramide" bg="mint" label="Pirâmide" Icon={Triangle} />
       </section>
-
-      <p className="px-6 text-center text-[11px] text-ink/40 mt-8 italic">
-        Conteúdo para entretenimento e autoconhecimento ✨
-      </p>
     </AppShell>
   );
 }
