@@ -7,9 +7,11 @@ interface Props {
 }
 
 export function Countdown({ target, variant = "light" }: Props) {
-  const [parts, setParts] = useState(() => diffParts(target));
+  // Start with zeros to avoid SSR/CSR hydration mismatch, then update on mount.
+  const [parts, setParts] = useState({ dias: 0, horas: 0, mins: 0, segs: 0 });
 
   useEffect(() => {
+    setParts(diffParts(target));
     const id = setInterval(() => setParts(diffParts(target)), 1000);
     return () => clearInterval(id);
   }, [target]);
