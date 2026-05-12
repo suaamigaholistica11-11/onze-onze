@@ -9,9 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as PiramideRouteImport } from './routes/piramide'
 import { Route as LuaNovaRouteImport } from './routes/lua-nova'
 import { Route as IndexRouteImport } from './routes/index'
 
+const PiramideRoute = PiramideRouteImport.update({
+  id: '/piramide',
+  path: '/piramide',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LuaNovaRoute = LuaNovaRouteImport.update({
   id: '/lua-nova',
   path: '/lua-nova',
@@ -26,31 +32,42 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/lua-nova': typeof LuaNovaRoute
+  '/piramide': typeof PiramideRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/lua-nova': typeof LuaNovaRoute
+  '/piramide': typeof PiramideRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/lua-nova': typeof LuaNovaRoute
+  '/piramide': typeof PiramideRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/lua-nova'
+  fullPaths: '/' | '/lua-nova' | '/piramide'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/lua-nova'
-  id: '__root__' | '/' | '/lua-nova'
+  to: '/' | '/lua-nova' | '/piramide'
+  id: '__root__' | '/' | '/lua-nova' | '/piramide'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   LuaNovaRoute: typeof LuaNovaRoute
+  PiramideRoute: typeof PiramideRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/piramide': {
+      id: '/piramide'
+      path: '/piramide'
+      fullPath: '/piramide'
+      preLoaderRoute: typeof PiramideRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lua-nova': {
       id: '/lua-nova'
       path: '/lua-nova'
@@ -71,6 +88,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LuaNovaRoute: LuaNovaRoute,
+  PiramideRoute: PiramideRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
