@@ -9,87 +9,27 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as PiramideRouteImport } from './routes/piramide'
-import { Route as LuaNovaRouteImport } from './routes/lua-nova'
-import { Route as IndexRouteImport } from './routes/index'
 
-const PiramideRoute = PiramideRouteImport.update({
-  id: '/piramide',
-  path: '/piramide',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LuaNovaRoute = LuaNovaRouteImport.update({
-  id: '/lua-nova',
-  path: '/lua-nova',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-
-export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/lua-nova': typeof LuaNovaRoute
-  '/piramide': typeof PiramideRoute
-}
-export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/lua-nova': typeof LuaNovaRoute
-  '/piramide': typeof PiramideRoute
-}
+export interface FileRoutesByFullPath {}
+export interface FileRoutesByTo {}
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/lua-nova': typeof LuaNovaRoute
-  '/piramide': typeof PiramideRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/lua-nova' | '/piramide'
+  fullPaths: never
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/lua-nova' | '/piramide'
-  id: '__root__' | '/' | '/lua-nova' | '/piramide'
+  to: never
+  id: '__root__'
   fileRoutesById: FileRoutesById
 }
-export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  LuaNovaRoute: typeof LuaNovaRoute
-  PiramideRoute: typeof PiramideRoute
-}
+export interface RootRouteChildren {}
 
 declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/piramide': {
-      id: '/piramide'
-      path: '/piramide'
-      fullPath: '/piramide'
-      preLoaderRoute: typeof PiramideRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lua-nova': {
-      id: '/lua-nova'
-      path: '/lua-nova'
-      fullPath: '/lua-nova'
-      preLoaderRoute: typeof LuaNovaRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-  }
+  interface FileRoutesByPath {}
 }
 
-const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  LuaNovaRoute: LuaNovaRoute,
-  PiramideRoute: PiramideRoute,
-}
+const rootRouteChildren: RootRouteChildren = {}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
