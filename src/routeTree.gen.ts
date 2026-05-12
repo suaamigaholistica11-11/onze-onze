@@ -9,8 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as LuaNovaRouteImport } from './routes/lua-nova'
 import { Route as IndexRouteImport } from './routes/index'
 
+const LuaNovaRoute = LuaNovaRouteImport.update({
+  id: '/lua-nova',
+  path: '/lua-nova',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +25,39 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/lua-nova': typeof LuaNovaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/lua-nova': typeof LuaNovaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/lua-nova': typeof LuaNovaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/lua-nova'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/lua-nova'
+  id: '__root__' | '/' | '/lua-nova'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  LuaNovaRoute: typeof LuaNovaRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/lua-nova': {
+      id: '/lua-nova'
+      path: '/lua-nova'
+      fullPath: '/lua-nova'
+      preLoaderRoute: typeof LuaNovaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,6 +70,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  LuaNovaRoute: LuaNovaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
