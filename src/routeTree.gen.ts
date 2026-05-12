@@ -12,6 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedMapaAstralRouteImport } from './routes/_authenticated/mapa-astral'
+import { Route as AuthenticatedCeuHojeRouteImport } from './routes/_authenticated/ceu-hoje'
+import { Route as AuthenticatedMapaAstralNovoRouteImport } from './routes/_authenticated/mapa-astral.novo'
+import { Route as AuthenticatedMapaAstralIdRouteImport } from './routes/_authenticated/mapa-astral.$id'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -27,27 +31,81 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedMapaAstralRoute = AuthenticatedMapaAstralRouteImport.update({
+  id: '/mapa-astral',
+  path: '/mapa-astral',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedCeuHojeRoute = AuthenticatedCeuHojeRouteImport.update({
+  id: '/ceu-hoje',
+  path: '/ceu-hoje',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedMapaAstralNovoRoute =
+  AuthenticatedMapaAstralNovoRouteImport.update({
+    id: '/novo',
+    path: '/novo',
+    getParentRoute: () => AuthenticatedMapaAstralRoute,
+  } as any)
+const AuthenticatedMapaAstralIdRoute =
+  AuthenticatedMapaAstralIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedMapaAstralRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
+  '/ceu-hoje': typeof AuthenticatedCeuHojeRoute
+  '/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
+  '/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
+  '/mapa-astral/novo': typeof AuthenticatedMapaAstralNovoRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/ceu-hoje': typeof AuthenticatedCeuHojeRoute
+  '/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/': typeof AuthenticatedIndexRoute
+  '/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
+  '/mapa-astral/novo': typeof AuthenticatedMapaAstralNovoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/_authenticated/ceu-hoje': typeof AuthenticatedCeuHojeRoute
+  '/_authenticated/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
+  '/_authenticated/mapa-astral/novo': typeof AuthenticatedMapaAstralNovoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/ceu-hoje'
+    | '/mapa-astral'
+    | '/mapa-astral/$id'
+    | '/mapa-astral/novo'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/'
-  id: '__root__' | '/_authenticated' | '/login' | '/_authenticated/'
+  to:
+    | '/login'
+    | '/ceu-hoje'
+    | '/mapa-astral'
+    | '/'
+    | '/mapa-astral/$id'
+    | '/mapa-astral/novo'
+  id:
+    | '__root__'
+    | '/_authenticated'
+    | '/login'
+    | '/_authenticated/ceu-hoje'
+    | '/_authenticated/mapa-astral'
+    | '/_authenticated/'
+    | '/_authenticated/mapa-astral/$id'
+    | '/_authenticated/mapa-astral/novo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -78,14 +136,62 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/mapa-astral': {
+      id: '/_authenticated/mapa-astral'
+      path: '/mapa-astral'
+      fullPath: '/mapa-astral'
+      preLoaderRoute: typeof AuthenticatedMapaAstralRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/ceu-hoje': {
+      id: '/_authenticated/ceu-hoje'
+      path: '/ceu-hoje'
+      fullPath: '/ceu-hoje'
+      preLoaderRoute: typeof AuthenticatedCeuHojeRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/mapa-astral/novo': {
+      id: '/_authenticated/mapa-astral/novo'
+      path: '/novo'
+      fullPath: '/mapa-astral/novo'
+      preLoaderRoute: typeof AuthenticatedMapaAstralNovoRouteImport
+      parentRoute: typeof AuthenticatedMapaAstralRoute
+    }
+    '/_authenticated/mapa-astral/$id': {
+      id: '/_authenticated/mapa-astral/$id'
+      path: '/$id'
+      fullPath: '/mapa-astral/$id'
+      preLoaderRoute: typeof AuthenticatedMapaAstralIdRouteImport
+      parentRoute: typeof AuthenticatedMapaAstralRoute
+    }
   }
 }
 
+interface AuthenticatedMapaAstralRouteChildren {
+  AuthenticatedMapaAstralIdRoute: typeof AuthenticatedMapaAstralIdRoute
+  AuthenticatedMapaAstralNovoRoute: typeof AuthenticatedMapaAstralNovoRoute
+}
+
+const AuthenticatedMapaAstralRouteChildren: AuthenticatedMapaAstralRouteChildren =
+  {
+    AuthenticatedMapaAstralIdRoute: AuthenticatedMapaAstralIdRoute,
+    AuthenticatedMapaAstralNovoRoute: AuthenticatedMapaAstralNovoRoute,
+  }
+
+const AuthenticatedMapaAstralRouteWithChildren =
+  AuthenticatedMapaAstralRoute._addFileChildren(
+    AuthenticatedMapaAstralRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
+  AuthenticatedCeuHojeRoute: typeof AuthenticatedCeuHojeRoute
+  AuthenticatedMapaAstralRoute: typeof AuthenticatedMapaAstralRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedCeuHojeRoute: AuthenticatedCeuHojeRoute,
+  AuthenticatedMapaAstralRoute: AuthenticatedMapaAstralRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
@@ -100,3 +206,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
