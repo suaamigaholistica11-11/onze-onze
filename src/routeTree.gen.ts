@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedPiramideRouteImport } from './routes/_authenticated/piramide'
 import { Route as AuthenticatedMapaAstralRouteImport } from './routes/_authenticated/mapa-astral'
 import { Route as AuthenticatedCeuHojeRouteImport } from './routes/_authenticated/ceu-hoje'
 import { Route as AuthenticatedMapaAstralNovoRouteImport } from './routes/_authenticated/mapa-astral.novo'
@@ -29,6 +30,11 @@ const AuthenticatedRoute = AuthenticatedRouteImport.update({
 const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedPiramideRoute = AuthenticatedPiramideRouteImport.update({
+  id: '/piramide',
+  path: '/piramide',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
 const AuthenticatedMapaAstralRoute = AuthenticatedMapaAstralRouteImport.update({
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/ceu-hoje': typeof AuthenticatedCeuHojeRoute
   '/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
+  '/piramide': typeof AuthenticatedPiramideRoute
   '/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
   '/mapa-astral/novo': typeof AuthenticatedMapaAstralNovoRoute
 }
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/ceu-hoje': typeof AuthenticatedCeuHojeRoute
   '/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
+  '/piramide': typeof AuthenticatedPiramideRoute
   '/': typeof AuthenticatedIndexRoute
   '/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
   '/mapa-astral/novo': typeof AuthenticatedMapaAstralNovoRoute
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/_authenticated/ceu-hoje': typeof AuthenticatedCeuHojeRoute
   '/_authenticated/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
+  '/_authenticated/piramide': typeof AuthenticatedPiramideRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
   '/_authenticated/mapa-astral/novo': typeof AuthenticatedMapaAstralNovoRoute
@@ -87,6 +96,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/ceu-hoje'
     | '/mapa-astral'
+    | '/piramide'
     | '/mapa-astral/$id'
     | '/mapa-astral/novo'
   fileRoutesByTo: FileRoutesByTo
@@ -94,6 +104,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/ceu-hoje'
     | '/mapa-astral'
+    | '/piramide'
     | '/'
     | '/mapa-astral/$id'
     | '/mapa-astral/novo'
@@ -103,6 +114,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/_authenticated/ceu-hoje'
     | '/_authenticated/mapa-astral'
+    | '/_authenticated/piramide'
     | '/_authenticated/'
     | '/_authenticated/mapa-astral/$id'
     | '/_authenticated/mapa-astral/novo'
@@ -134,6 +146,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/piramide': {
+      id: '/_authenticated/piramide'
+      path: '/piramide'
+      fullPath: '/piramide'
+      preLoaderRoute: typeof AuthenticatedPiramideRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/mapa-astral': {
@@ -186,12 +205,14 @@ const AuthenticatedMapaAstralRouteWithChildren =
 interface AuthenticatedRouteChildren {
   AuthenticatedCeuHojeRoute: typeof AuthenticatedCeuHojeRoute
   AuthenticatedMapaAstralRoute: typeof AuthenticatedMapaAstralRouteWithChildren
+  AuthenticatedPiramideRoute: typeof AuthenticatedPiramideRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCeuHojeRoute: AuthenticatedCeuHojeRoute,
   AuthenticatedMapaAstralRoute: AuthenticatedMapaAstralRouteWithChildren,
+  AuthenticatedPiramideRoute: AuthenticatedPiramideRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
