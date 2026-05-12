@@ -3,6 +3,8 @@ import {
   Body,
   Ecliptic,
   GeoVector,
+  MoonPhase,
+  SearchMoonPhase,
 } from "astronomy-engine";
 import {
   PLANETS_PT,
@@ -11,6 +13,7 @@ import {
   copyFor,
   type PlanetPt,
 } from "./transit-copy";
+import { phaseFromAngle, PHASE_MILESTONES, type MoonPhaseInfo } from "./moon-phases";
 
 const BODY_MAP: Record<PlanetPt, Body> = {
   Sol: Body.Sun,
@@ -74,4 +77,52 @@ export const getTransitsForToday = createServerFn({ method: "GET" }).handler(
 
     return { date: now.toISOString(), transits };
   }
+);
+
+export type MoonNowInfo = {
+  date: string;
+  faseAngulo: number;
+  fase: MoonPhaseInfo;
+  signo: string;
+  grau: number;
+  proximas: Array<{
+    nome: string;
+    glyph: string;
+    dataISO: string;
+    diasRestantes: number;
+  }>;
+};
+
+export const getMoonForToday = createServerFn({ method: "GET" }).handler(
+  async (): Promise<MoonNowInfo> => {
+    const now = new Date();
+    const angle = MoonPhase(now); // 0..360
+    const fase = phaseFromAngle(angle);
+
+    const moonLon = eclipticLongitude(Body.Moon, now);
+    const { sign, degree } = signFromLongitude(moonLon);
+
+    // Próximas 4 mudanças de fase (Nova/Crescente/Cheia/Minguante)
+    const proximas = PHASE_MILESTONES.map((m) => {
+      const found = SearchMoonPhase(m.angle, now, 40);
+      if (!found) return null;
+      const data = found.date;
+      const dias = Math.max(
+        0,
+        Math.round((data.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)),
+      );
+      return { nome: m.nome, glyph: m.glyph, dataISO: data.toISOString(), diasRestantes: dias };
+    }).filter(Boolean) as MoonNowInfo["proximas"];
+
+    proximas.sort((a, b) => a.dataISO.localeCompare(b.dataISO));
+
+    return {
+      date: now.toISOString(),
+      faseAngulo: angle,
+      fase,
+      signo: sign,
+      grau: Math.round(degree),
+      proximas,
+    };
+  },
 );
