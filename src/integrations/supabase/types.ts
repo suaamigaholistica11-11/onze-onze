@@ -14,7 +14,114 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      natal_charts: {
+        Row: {
+          birth_date: string
+          birth_place: string
+          birth_time: string
+          chart_data: Json | null
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          birth_date: string
+          birth_place: string
+          birth_time: string
+          chart_data?: Json | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          birth_date?: string
+          birth_place?: string
+          birth_time?: string
+          chart_data?: Json | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pyramid_choices: {
+        Row: {
+          chosen_at: string
+          id: string
+          themes: string[]
+          user_id: string
+        }
+        Insert: {
+          chosen_at?: string
+          id?: string
+          themes: string[]
+          user_id: string
+        }
+        Update: {
+          chosen_at?: string
+          id?: string
+          themes?: string[]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pyramid_progress: {
+        Row: {
+          created_at: string
+          entry_date: string
+          id: string
+          theme: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          created_at?: string
+          entry_date?: string
+          id?: string
+          theme: string
+          user_id: string
+          value: number
+        }
+        Update: {
+          created_at?: string
+          entry_date?: string
+          id?: string
+          theme?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
