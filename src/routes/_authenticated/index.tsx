@@ -1,12 +1,16 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sparkles, Triangle, Star } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { Countdown } from "@/components/Countdown";
-import { ENERGIA_DO_DIA, getNextNewMoon, SIGNS } from "@/lib/onze-data";
+import { getNextNewMoon, SIGNS } from "@/lib/onze-data";
 import { getDailyMessage } from "@/lib/daily-message";
 import { getSaudacao } from "@/lib/greeting";
 import { useAuth } from "@/lib/auth";
+import { getTransitsForToday } from "@/lib/transits.functions";
+import { buildDailyEnergy } from "@/lib/daily-energy";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
@@ -41,6 +45,16 @@ function HomePage() {
   const mensagem = mounted ? getDailyMessage() : "";
   const luaNova = getNextNewMoon();
   const signoUsuario = SIGNS.leao;
+
+  const fetchTransits = useServerFn(getTransitsForToday);
+  const { data: transitsData } = useQuery({
+    queryKey: ["transits-today"],
+    queryFn: () => fetchTransits(),
+    staleTime: 1000 * 60 * 60,
+  });
+  const energia = transitsData?.transits
+    ? buildDailyEnergy(transitsData.transits)
+    : null;
 
   return (
     <AppShell glyph={signoUsuario.glyph}>
@@ -81,10 +95,10 @@ function HomePage() {
             </span>
           </div>
           <p className="font-display text-base leading-relaxed text-pretty">
-            {ENERGIA_DO_DIA.texto}
+            {energia?.texto ?? "Lendo o céu de hoje…"}
           </p>
           <div className="flex flex-wrap gap-2 mt-5">
-            {ENERGIA_DO_DIA.highlights.map((h) => (
+            {(energia?.highlights ?? []).map((h) => (
               <span
                 key={h}
                 className="text-[11px] px-3 py-1 rounded-full bg-mint/60 text-ink/70 font-medium"
