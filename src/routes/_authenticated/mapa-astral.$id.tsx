@@ -4,7 +4,15 @@ import { ArrowLeft } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import type { NatalChartData } from "@/lib/natal.functions";
-import { SIGN_GLYPHS } from "@/lib/transit-copy";
+import { SIGN_GLYPHS, PLANET_GLYPHS, type PlanetPt } from "@/lib/transit-copy";
+import { NatalMandala } from "@/components/NatalMandala";
+import {
+  calcAspects,
+  dominantElement,
+  ELEMENT_EMOJI,
+  ELEMENT_PHRASE,
+  signLongitude,
+} from "@/lib/elements";
 
 export const Route = createFileRoute("/_authenticated/mapa-astral/$id")({
   head: () => ({
@@ -63,6 +71,34 @@ function MapaDetailPage() {
 
   const data = chart.chart_data;
 
+  const num = (v: unknown, def = 0) => {
+    const n = typeof v === "number" ? v : parseFloat(String(v ?? ""));
+    return Number.isFinite(n) ? n : def;
+  };
+
+  // Build the full body list (Sun, Moon, planets) with longitudes
+  const bodies = data
+    ? [
+        { name: "Sol", sign: data.sun.sign, degree: num(data.sun.degree), house: num(data.sun.house, 1) },
+        { name: "Lua", sign: data.moon.sign, degree: num(data.moon.degree), house: num(data.moon.house, 1) },
+        ...data.planets.map((p) => ({
+          name: p.name,
+          sign: p.sign,
+          degree: num(p.degree),
+          house: num(p.house, 1),
+        })),
+      ]
+    : [];
+
+  const aspects = data
+    ? calcAspects(bodies.map((b) => ({ name: b.name, longitude: signLongitude(b.sign, b.degree) })))
+    : [];
+
+  const elementSigns = data
+    ? [data.sun.sign, data.moon.sign, data.ascendant.sign, ...data.planets.map((p) => p.sign)]
+    : [];
+  const dom = data ? dominantElement(elementSigns) : null;
+
   return (
     <AppShell glyph="✦">
       <header className="px-6 pt-10 pb-4 animate-oo-enter">
@@ -78,9 +114,40 @@ function MapaDetailPage() {
       {/* Mandala */}
       <section className="px-6 mb-6 animate-oo-enter [animation-delay:80ms]">
         <div className="bg-white rounded-[28px] p-6 ring-1 ring-black/5 flex justify-center">
-          <Mandala planets={data?.planets ?? []} />
+          {data ? (
+            <NatalMandala
+              bodies={bodies}
+              ascendantSign={data.ascendant.sign}
+              ascendantDegree={num(data.ascendant.degree)}
+              aspects={aspects}
+            />
+          ) : null}
         </div>
       </section>
+
+      {/* Elemento dominante */}
+      {dom && (
+        <section className="px-6 mb-6 animate-oo-enter [animation-delay:120ms]">
+          <div className="bg-peach/60 p-5 rounded-[28px] ring-1 ring-black/5">
+            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/60 mb-2">
+              elemento dominante
+            </p>
+            <p className="font-display text-2xl font-bold">
+              {ELEMENT_EMOJI[dom.element]} {dom.element}
+            </p>
+            <p className="text-sm text-ink/70 mt-1 leading-snug">
+              {ELEMENT_PHRASE[dom.element]}
+            </p>
+            <div className="flex gap-3 mt-3 text-[11px] text-ink/60">
+              {(Object.keys(dom.counts) as Array<keyof typeof dom.counts>).map((el) => (
+                <span key={el}>
+                  {ELEMENT_EMOJI[el]} {dom.counts[el]}
+                </span>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Personalidade */}
       {data?.personality && (
@@ -105,16 +172,53 @@ function MapaDetailPage() {
         </section>
       )}
 
-      {/* Planetas */}
-      {data?.planets && data.planets.length > 0 && (
-        <section className="px-6 mb-8 animate-oo-enter [animation-delay:320ms]">
-          <h2 className="font-display text-2xl font-bold italic mb-3">Planetas</h2>
+      {/* Tabela de planetas */}
+      {data && bodies.length > 0 && (
+        <section className="px-6 mb-6 animate-oo-enter [animation-delay:320ms]">
+          <h2 className="font-display text-2xl font-bold italic mb-3">Planetas em signos</h2>
           <ul className="bg-white rounded-2xl ring-1 ring-black/5 divide-y divide-black/5">
-            {data.planets.map((p) => (
+            {bodies.map((p) => (
               <li key={p.name} className="flex items-center justify-between p-4">
-                <span className="font-display font-bold">{p.name}</span>
+                <span className="font-display font-bold">
+                  {PLANET_GLYPHS[p.name as PlanetPt] ?? "✦"} {p.name}
+                </span>
                 <span className="text-sm text-ink/70">
-                  {p.sign} {SIGN_GLYPHS[p.sign] ?? ""} · Casa {p.house}
+                  {SIGN_GLYPHS[p.sign] ?? ""} {p.sign} · Casa {p.house}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {/* Tabela de aspectos */}
+      {aspects.length > 0 && (
+        <section className="px-6 mb-8 animate-oo-enter [animation-delay:400ms]">
+          <h2 className="font-display text-2xl font-bold italic mb-3">Aspectos</h2>
+          <ul className="bg-white rounded-2xl ring-1 ring-black/5 divide-y divide-black/5">
+            {aspects.map((a, i) => (
+              <li key={i} className="flex items-center justify-between p-3 text-sm">
+                <span className="flex items-center gap-2">
+                  <span className="font-display font-bold">
+                    {PLANET_GLYPHS[a.a as PlanetPt] ?? a.a[0]}
+                  </span>
+                  <span
+                    className={
+                      a.tone === "harm"
+                        ? "text-emerald-700"
+                        : a.tone === "tens"
+                          ? "text-rose-700"
+                          : "text-ink/60"
+                    }
+                  >
+                    {a.glyph}
+                  </span>
+                  <span className="font-display font-bold">
+                    {PLANET_GLYPHS[a.b as PlanetPt] ?? a.b[0]}
+                  </span>
+                </span>
+                <span className="text-ink/60 text-xs">
+                  {a.type} · orbe {a.orb.toFixed(1)}°
                 </span>
               </li>
             ))}
@@ -144,70 +248,5 @@ function BigCard({
       <p className="font-display text-2xl font-bold">{sign}</p>
       {desc && <p className="text-sm text-ink/70 mt-1 leading-snug">{desc}</p>}
     </div>
-  );
-}
-
-function Mandala({ planets }: { planets: Array<{ name: string; sign: string }> }) {
-  const cx = 150;
-  const cy = 150;
-  const r = 120;
-  const glyphs: Record<string, string> = {
-    "Sol": "☉", "Lua": "☾", "Mercúrio": "☿", "Vênus": "♀", "Marte": "♂",
-    "Júpiter": "♃", "Saturno": "♄", "Urano": "♅", "Netuno": "♆", "Plutão": "♇",
-  };
-
-  return (
-    <svg viewBox="0 0 300 300" className="w-full max-w-[300px]">
-      {/* outer rings */}
-      <circle cx={cx} cy={cy} r={r} fill="none" stroke="var(--ink)" strokeOpacity={0.15} />
-      <circle cx={cx} cy={cy} r={r - 20} fill="none" stroke="var(--ink)" strokeOpacity={0.1} />
-      <circle cx={cx} cy={cy} r={40} fill="var(--lilac)" fillOpacity={0.3} />
-
-      {/* 12 house dividers */}
-      {Array.from({ length: 12 }, (_, i) => {
-        const a = (i * Math.PI * 2) / 12 - Math.PI / 2;
-        const x1 = cx + (r - 20) * Math.cos(a);
-        const y1 = cy + (r - 20) * Math.sin(a);
-        const x2 = cx + r * Math.cos(a);
-        const y2 = cy + r * Math.sin(a);
-        return (
-          <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--ink)" strokeOpacity={0.2} />
-        );
-      })}
-
-      {/* planets distributed around */}
-      {planets.slice(0, 10).map((p, i) => {
-        const a = (i * Math.PI * 2) / Math.max(planets.length, 1) - Math.PI / 2;
-        const x = cx + (r - 50) * Math.cos(a);
-        const y = cy + (r - 50) * Math.sin(a);
-        return (
-          <g key={p.name}>
-            <circle cx={x} cy={y} r={14} fill="white" stroke="var(--ink)" strokeOpacity={0.3} />
-            <text
-              x={x}
-              y={y}
-              textAnchor="middle"
-              dominantBaseline="central"
-              fontSize="14"
-              fill="var(--ink)"
-            >
-              {glyphs[p.name] ?? p.name[0]}
-            </text>
-          </g>
-        );
-      })}
-
-      <text
-        x={cx}
-        y={cy}
-        textAnchor="middle"
-        dominantBaseline="central"
-        fontSize="22"
-        fontFamily="Fraunces, serif"
-        fill="var(--ink)"
-      >
-        ✦
-      </text>
-    </svg>
   );
 }

@@ -1,33 +1,60 @@
 ## Mudanças
 
-### 1. Home — "Energia do Dia" dinâmica
-Hoje o card "Energia do Dia" mostra um texto estático de `onze-data.ts`. Vou trocar por um texto curto e alegre gerado a partir dos trânsitos reais do dia (Sol + Lua, via `getTransitsForToday`).
+### 1. Mandala completa (casas + signos + planetas + aspectos)
 
-- Adicionar `useQuery` chamando `getTransitsForToday` na home.
-- Compor uma frase curta (1–2 linhas) no tom do app, ex.: *"Sol em ♌ Leão te chama pra brilhar e a Lua em ♋ Câncer pede colinho. Equilibra os dois ✨"*.
-- Helper novo em `src/lib/daily-energy.ts` que recebe os trânsitos e devolve `{ texto, highlights }` curtinho.
-- Highlights = signo do Sol + signo da Lua + 1 palavra-chave da energia.
+Substituir a `<Mandala />` simples em `src/routes/_authenticated/mapa-astral.$id.tsx` por uma mandala SVG completa em `src/components/NatalMandala.tsx`:
 
-### 2. Mapa Astral — formulário direto na aba
-Hoje `/mapa-astral` lista mapas e tem botão "+ Novo mapa" que leva pra `/mapa-astral/novo`. Vou consolidar:
+- **Roda dos signos** (anel externo): 12 setores de 30° com glifo do signo (♈♉…♓), cores sutis por elemento (fogo/terra/ar/água).
+- **Casas astrológicas** (anel interno): 12 setores numerados 1–12, começando pelo Ascendente à esquerda.
+- **Planetas**: posicionados no anel correspondente ao seu signo + casa, com o glifo (☉☾☿♀♂♃♄♅♆♇).
+- **Aspectos**: linhas no centro conectando planetas, coloridas por tipo:
+  - Conjunção (0°) — neutro
+  - Sextil (60°) / Trígono (120°) — verde/azul (harmônico)
+  - Quadratura (90°) / Oposição (180°) — vermelho/laranja (tensão)
+  - Orbe de tolerância: 6° (8° para Sol/Lua).
 
-- `/mapa-astral` passa a mostrar **direto** o formulário (data, hora, local — e nome, que é necessário pra salvar).
-- Remove o botão "+ Novo mapa".
-- Acima do formulário: lista enxuta dos mapas já salvos do usuário (até 2). Cada item clicável abre `/mapa-astral/$id`.
-- Se já tiver 2 mapas salvos: formulário desabilitado com aviso *"Você já tem seus 2 mapas salvos ✨"*.
-- Salvar continua usando `natal_charts` (limite de 2 já é validado no submit).
-- Rota `/mapa-astral/novo` deixa de ser usada — vou removê-la (e a navegação correspondente).
+### 2. Tabela de planetas + aspectos
 
-### 3. Fundo do app — constelações do zodíaco
-Hoje o `AppShell` usa um glifo gigante centralizado como fundo. Vou trocar por uma arte de constelações do zodíaco:
+Abaixo da mandala, dois blocos novos:
 
-- Gerar uma imagem (PNG transparente, fundo claro) com as 12 constelações do zodíaco em linhas finas + estrelas, estilo minimal/dreamy combinando com a paleta peach/lilac/mint.
-- Salvar em `src/assets/zodiac-constellations.png`.
-- `AppShell`: trocar o `<span>` do glifo por um `<div>` com `background-image` fixo, opacidade baixa (~0.08), `bg-center bg-no-repeat bg-contain`, animação suave de rotação/breathing já existente preservada.
-- Manter a prop `glyph` por compatibilidade, mas ela deixa de ser renderizada.
+- **Planetas → signos / casas**: tabela com colunas Planeta · Signo · Casa (incluindo Sol, Lua, Ascendente).
+- **Aspectos**: tabela com Planeta A · Tipo (com glifo ☌ ⚹ △ □ ☍) · Planeta B · Orbe.
+
+### 3. Elemento dominante
+
+Calcular no client a partir de `chart_data.planets` + Sol/Lua/Asc:
+- Conta quantos pontos caem em fogo (Áries/Leão/Sagitário), terra (Touro/Virgem/Capricórnio), ar (Gêmeos/Libra/Aquário), água (Câncer/Escorpião/Peixes).
+- Mostra um card destacado: *"Seu elemento dominante é Água 💧 — você sente antes de pensar."* (frase curta no tom do app por elemento).
+
+### 4. Geração dos aspectos
+
+A IA hoje devolve só signo/casa por planeta, sem grau. Para calcular aspectos precisos precisaríamos do grau exato. Plano:
+
+- Atualizar o prompt em `src/lib/natal.functions.ts` para também devolver `degree` (0–29.99) por planeta + Sol/Lua/Asc.
+- Ampliar `NatalChartData` com `degree`.
+- Gerar aspectos no client a partir dos graus absolutos (signo*30 + grau), com a tabela de orbes acima.
+
+### 5. Limite de exclusões + bloqueio de 24h
+
+Hoje `natal_charts` tem só os mapas ativos. Vou adicionar tracking de exclusões por usuário:
+
+- **Migration nova:** tabela `natal_chart_deletions` (`id`, `user_id`, `deleted_at`). RLS: usuário lê/insere os próprios.
+- Ao excluir um mapa: além do `delete` em `natal_charts`, registrar uma linha em `natal_chart_deletions`.
+- **Regra de bloqueio:** se o usuário já tem 5 exclusões nos últimos 24h, bloquear criação de novo mapa por 24h a partir da 5ª exclusão.
+- **UI:**
+  - Botão "Excluir" em cada card da lista de mapas em `mapa-astral.tsx` (com confirm).
+  - Antes de mostrar o formulário, query `natal_chart_deletions` das últimas 24h. Se `count >= 5`, esconde o formulário e mostra: *"ops! Acho que você já criou e excluiu muito mapas por aqui. Amanhã tem mais."*
+  - Mantém também o limite atual de até 2 mapas salvos simultaneamente.
+
+> Observação: o limite "5 exclusões por mapa" descrito não é diretamente representável (ao excluir, o mapa some). Vou implementar como **5 exclusões por usuário em janela de 24h**, que é a interpretação consistente com a mensagem de bloqueio. Se a intenção era outra (ex.: 5 recriações do "mesmo" nome), me avisa antes de implementar.
 
 ## Arquivos afetados
 
-- **novo:** `src/lib/daily-energy.ts`, `src/assets/zodiac-constellations.png`
-- **editar:** `src/routes/_authenticated/index.tsx` (energia dinâmica), `src/routes/_authenticated/mapa-astral.tsx` (form inline + lista), `src/components/AppShell.tsx` (fundo de constelações)
-- **remover:** `src/routes/_authenticated/mapa-astral.novo.tsx`
+- **novo:** `src/components/NatalMandala.tsx`, `src/lib/elements.ts` (cálculo elemento dominante + frases), migration `natal_chart_deletions`.
+- **editar:** `src/lib/natal.functions.ts` (incluir `degree`), `src/routes/_authenticated/mapa-astral.$id.tsx` (mandala nova + tabelas + elemento), `src/routes/_authenticated/mapa-astral.tsx` (botão excluir + checagem das 24h), `src/integrations/supabase/types.ts` (auto após migration).
+
+## Pergunta antes de implementar
+
+A regra "5 vezes cada um dos mapas" — você quer:
+**(a)** 5 exclusões totais por usuário em 24h (o que vou implementar), ou
+**(b)** outra contagem (ex.: por nome/slot)?
