@@ -46,18 +46,18 @@ Calcule (com base no seu conhecimento astrológico real e na data/hora/local) as
 
 Retorne EXATAMENTE este JSON, sem texto extra:
 {
-  "sun": { "sign": "${sun}", "house": "<1-12>", "description": "<1 frase curta e poética sobre como esse Sol se manifesta>" },
-  "moon": { "sign": "<signo>", "house": "<1-12>", "description": "<1 frase curta sobre essa Lua>" },
-  "ascendant": { "sign": "<signo>", "description": "<1 frase curta sobre essa Ascendente>" },
+  "sun": { "sign": "${sun}", "house": "<1-12>", "degree": "<0-29.99>", "description": "<1 frase curta e poética sobre como esse Sol se manifesta>" },
+  "moon": { "sign": "<signo>", "house": "<1-12>", "degree": "<0-29.99>", "description": "<1 frase curta sobre essa Lua>" },
+  "ascendant": { "sign": "<signo>", "degree": "<0-29.99>", "description": "<1 frase curta sobre essa Ascendente>" },
   "planets": [
-    { "name": "Mercúrio", "sign": "<signo>", "house": "<1-12>" },
-    { "name": "Vênus", "sign": "<signo>", "house": "<1-12>" },
-    { "name": "Marte", "sign": "<signo>", "house": "<1-12>" },
-    { "name": "Júpiter", "sign": "<signo>", "house": "<1-12>" },
-    { "name": "Saturno", "sign": "<signo>", "house": "<1-12>" },
-    { "name": "Urano", "sign": "<signo>", "house": "<1-12>" },
-    { "name": "Netuno", "sign": "<signo>", "house": "<1-12>" },
-    { "name": "Plutão", "sign": "<signo>", "house": "<1-12>" }
+    { "name": "Mercúrio", "sign": "<signo>", "house": "<1-12>", "degree": "<0-29.99>" },
+    { "name": "Vênus", "sign": "<signo>", "house": "<1-12>", "degree": "<0-29.99>" },
+    { "name": "Marte", "sign": "<signo>", "house": "<1-12>", "degree": "<0-29.99>" },
+    { "name": "Júpiter", "sign": "<signo>", "house": "<1-12>", "degree": "<0-29.99>" },
+    { "name": "Saturno", "sign": "<signo>", "house": "<1-12>", "degree": "<0-29.99>" },
+    { "name": "Urano", "sign": "<signo>", "house": "<1-12>", "degree": "<0-29.99>" },
+    { "name": "Netuno", "sign": "<signo>", "house": "<1-12>", "degree": "<0-29.99>" },
+    { "name": "Plutão", "sign": "<signo>", "house": "<1-12>", "degree": "<0-29.99>" }
   ],
   "personality": "<texto profundo de 5 a 7 frases costurando Sol, Lua e Ascendente. Mostre como essas três energias conversam entre si na pessoa: o que ela mostra pro mundo, o que sente por dentro, e como reage. Use linguagem afetiva, evocativa, com imagens leves (água, fogo, raiz, brisa). Sem listas, sem 'você é assim', prefira 'em você existe…', 'há uma…', 'sua forma de…'. Evite jargão técnico astrológico pesado.>"
 }`;
@@ -93,9 +93,9 @@ Retorne EXATAMENTE este JSON, sem texto extra:
   });
 
 export type NatalChartData = {
-  sun: { sign: string; house: string; description: string };
-  moon: { sign: string; house: string; description: string };
-  ascendant: { sign: string; description: string };
-  planets: Array<{ name: string; sign: string; house: string }>;
+  sun: { sign: string; house: string; degree?: string | number; description: string };
+  moon: { sign: string; house: string; degree?: string | number; description: string };
+  ascendant: { sign: string; degree?: string | number; description: string };
+  planets: Array<{ name: string; sign: string; house: string; degree?: string | number }>;
   personality: string;
 };
