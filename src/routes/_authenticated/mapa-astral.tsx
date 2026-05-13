@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
-import { Lock, Sparkles } from "lucide-react";
+import { Lock, Sparkles, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -35,6 +35,17 @@ function MapaAstralListPage() {
   const [birthTime, setBirthTime] = useState("");
   const [birthPlace, setBirthPlace] = useState("");
   const [busy, setBusy] = useState(false);
+  const [deletions24h, setDeletions24h] = useState(0);
+
+  const refreshDeletions = async () => {
+    if (!user) return;
+    const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+    const { count } = await supabase
+      .from("natal_chart_deletions")
+      .select("id", { count: "exact", head: true })
+      .gte("deleted_at", since);
+    setDeletions24h(count ?? 0);
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -46,13 +57,33 @@ function MapaAstralListPage() {
         setCharts((data as ChartRow[]) ?? []);
         setLoading(false);
       });
+    refreshDeletions();
   }, [user]);
 
   const limiteAtingido = charts.length >= 2;
+  const bloqueado24h = deletions24h >= 5;
+
+  const onDelete = async (chart: ChartRow) => {
+    if (!user) return;
+    if (!confirm(`Excluir o mapa de ${chart.name}?`)) return;
+    const { error } = await supabase.from("natal_charts").delete().eq("id", chart.id);
+    if (error) {
+      toast.error("Não foi possível excluir.");
+      return;
+    }
+    await supabase.from("natal_chart_deletions").insert({ user_id: user.id });
+    setCharts((prev) => prev.filter((c) => c.id !== chart.id));
+    await refreshDeletions();
+    toast.success("Mapa excluído");
+  };
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!user) return;
+    if (bloqueado24h) {
+      toast.error("Bloqueado por 24h");
+      return;
+    }
     if (!name || !birthDate || !birthTime || !birthPlace) {
       toast.error("Preencha todos os campos");
       return;
@@ -109,11 +140,11 @@ function MapaAstralListPage() {
           </p>
           <ul className="space-y-2">
             {charts.map((c) => (
-              <li key={c.id}>
+              <li key={c.id} className="bg-white p-3 rounded-2xl ring-1 ring-black/5 flex items-center gap-3">
                 <Link
                   to="/mapa-astral/$id"
                   params={{ id: c.id }}
-                  className="bg-white p-3 rounded-2xl ring-1 ring-black/5 flex items-center gap-3 hover:scale-[1.01] transition-transform"
+                  className="flex items-center gap-3 flex-1 min-w-0"
                 >
                   <div className="size-10 bg-yellow-candy rounded-2xl flex items-center justify-center font-display text-lg shrink-0">
                     ✧
@@ -125,6 +156,14 @@ function MapaAstralListPage() {
                     </p>
                   </div>
                 </Link>
+                <button
+                  type="button"
+                  onClick={() => onDelete(c)}
+                  className="size-9 rounded-xl flex items-center justify-center text-ink/50 hover:text-rose-700 hover:bg-rose-50 transition-colors"
+                  aria-label="Excluir mapa"
+                >
+                  <Trash2 className="size-4" />
+                </button>
               </li>
             ))}
           </ul>
@@ -132,12 +171,19 @@ function MapaAstralListPage() {
       )}
 
       <section className="px-6 pb-10 animate-oo-enter [animation-delay:160ms]">
-        {limiteAtingido ? (
+        {bloqueado24h ? (
+          <div className="bg-lilac/40 rounded-[28px] p-6 ring-1 ring-black/5 text-center">
+            <Lock className="size-6 mx-auto mb-2" />
+            <p className="font-display text-lg font-bold leading-snug">
+              ops! Acho que você já criou e excluiu muito mapas por aqui. Amanhã tem mais.
+            </p>
+          </div>
+        ) : limiteAtingido ? (
           <div className="bg-lilac/40 rounded-[28px] p-6 ring-1 ring-black/5 text-center">
             <Lock className="size-6 mx-auto mb-2" />
             <p className="font-display text-lg font-bold mb-1">Você já tem seus 2 mapas ✨</p>
             <p className="text-sm text-ink/70">
-              Toque em um mapa acima pra revisitar a leitura completa.
+              Toque em um mapa acima pra revisitar a leitura completa, ou exclua um pra abrir espaço.
             </p>
           </div>
         ) : (
