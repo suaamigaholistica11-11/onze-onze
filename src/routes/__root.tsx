@@ -74,18 +74,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
+      { title: "11:!1" },
       { name: "description", content: "Por aqui seu dia começa mais foco e termina com mais leveza" },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
+      { property: "og:title", content: "11:!1" },
       { property: "og:description", content: "Por aqui seu dia começa mais foco e termina com mais leveza" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Lovable App" },
+      { name: "twitter:title", content: "11:!1" },
       { name: "twitter:description", content: "Por aqui seu dia começa mais foco e termina com mais leveza" },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/re6QqivcKGbHohrxcaItO7koJYr2/social-images/social-1778678730783-file_00000000edd071f5a73a7bb8be8535f9.webp" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/re6QqivcKGbHohrxcaItO7koJYr2/social-images/social-1778678730783-file_00000000edd071f5a73a7bb8be8535f9.webp" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/re6QqivcKGbHohrxcaItO7koJYr2/social-images/social-1778682128888-file_00000000950c71f58a96ca8e8b66b12d.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/re6QqivcKGbHohrxcaItO7koJYr2/social-images/social-1778682128888-file_00000000950c71f58a96ca8e8b66b12d.webp" },
     ],
     links: [
       {
