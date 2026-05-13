@@ -1,6 +1,7 @@
 // Mock data + helpers para a primeira versão do onze-onze.
 // Quando o backend de astrologia estiver pronto, basta substituir essas
 // funções por chamadas reais (ex.: createServerFn -> /api/v1/sky).
+import { Body, Ecliptic, GeoVector, SearchMoonPhase } from "astronomy-engine";
 
 export type SignKey =
   | "aries" | "touro" | "gemeos" | "cancer" | "leao" | "virgem"
@@ -29,17 +30,45 @@ export const SIGNS: Record<SignKey, SignInfo> = {
   peixes:      { key: "peixes",      name: "Peixes",      glyph: "♓︎", ruler: "Netuno",  bg: "lilac" },
 };
 
-// Próxima Lua Nova mock (próximo dia da semana arredondado)
+// Ordem dos signos a partir de 0° de Áries.
+const SIGN_ORDER: SignKey[] = [
+  "aries", "touro", "gemeos", "cancer", "leao", "virgem",
+  "libra", "escorpiao", "sagitario", "capricornio", "aquario", "peixes",
+];
+
+const SUBTITLES: Record<SignKey, string> = {
+  aries: "O recomeço de tudo",
+  touro: "Plantar com pés no chão",
+  gemeos: "Novas conversas, novas ideias",
+  cancer: "Acolher o que importa",
+  leao: "Brilhar de dentro pra fora",
+  virgem: "Organizar pra florescer",
+  libra: "Recomeçar em harmonia",
+  escorpiao: "Mergulhar fundo, renascer",
+  sagitario: "Expandir horizontes",
+  capricornio: "Construir com intenção",
+  aquario: "Inventar o futuro",
+  peixes: "Sonhar e se entregar",
+};
+
+function moonSignAt(date: Date): SignKey {
+  const ecl = Ecliptic(GeoVector(Body.Moon, date, true));
+  const lon = ((ecl.elon % 360) + 360) % 360;
+  return SIGN_ORDER[Math.floor(lon / 30) % 12];
+}
+
+// Próxima Lua Nova calculada com astronomy-engine.
 export function getNextNewMoon() {
   const now = new Date();
-  const target = new Date(now);
-  target.setDate(now.getDate() + 4);
-  target.setHours(18, 32, 0, 0);
+  const found = SearchMoonPhase(0, now, 40);
+  const datetime = found ? found.date : new Date(now.getTime() + 4 * 86400000);
+  const signKey = moonSignAt(datetime);
+  const sign = SIGNS[signKey];
   return {
-    datetime: target,
-    sign: SIGNS.aries,
-    title: "Lua Nova em Áries",
-    subtitle: "O recomeço de tudo",
+    datetime,
+    sign,
+    title: `Lua Nova em ${sign.name}`,
+    subtitle: SUBTITLES[signKey],
   };
 }
 
