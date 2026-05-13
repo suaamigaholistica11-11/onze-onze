@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      natal_chart_deletions: {
+        Row: {
+          deleted_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          deleted_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          deleted_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       natal_charts: {
         Row: {
           birth_date: string
