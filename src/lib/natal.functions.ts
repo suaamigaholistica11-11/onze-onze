@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { fetchProkeralaNatal } from "./prokerala.server";
+import { geocodePlace, lookupTimezone } from "./prokerala.server";
+import { computeAscendant } from "./ascendant";
 
 const SIGNS = [
   "Capricórnio", "Aquário", "Peixes", "Áries", "Touro", "Gêmeos",
@@ -89,6 +91,35 @@ Retorne EXATAMENTE este JSON, sem texto extra:
       parsed = JSON.parse(content);
     } catch {
       throw new Error("AI returned invalid JSON");
+    }
+
+    // Override the AI-guessed ascendant with a real astronomical calculation.
+    // Requires geocoding + timezone lookup; degrades gracefully on failure.
+    try {
+      const geo = await geocodePlace(data.birthPlace);
+      if (geo) {
+        const tz = await lookupTimezone(geo.lat, geo.lng);
+        const asc = computeAscendant({
+          birthDate: data.birthDate,
+          birthTime: data.birthTime,
+          timezone: tz,
+          lat: geo.lat,
+          lng: geo.lng,
+        });
+        parsed.ascendant = {
+          sign: asc.sign,
+          degree: asc.degree.toFixed(2),
+          description: parsed.ascendant?.description ?? "",
+        };
+        parsed.ascendantMeta = {
+          longitude: asc.longitude,
+          lat: geo.lat,
+          lng: geo.lng,
+          timezone: tz,
+        };
+      }
+    } catch (err) {
+      console.error("Local ascendant calc failed:", err);
     }
 
     // Augment with Prokerala (accurate ephemeris + SVG mandala). Degrade gracefully.
