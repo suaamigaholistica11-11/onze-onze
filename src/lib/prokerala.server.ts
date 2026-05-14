@@ -168,9 +168,9 @@ export async function fetchProkeralaNatal(args: {
   };
 
   const [chart, aspectChart, planets] = await Promise.all([
-    safe(prokeralaGet("v2/astrology/western/natal-chart", baseParams)),
-    safe(prokeralaGet("v2/astrology/western/natal-aspect-chart", baseParams)),
-    safe(prokeralaGet("v2/astrology/western/natal-planet-position", baseParams)),
+    safe(prokeralaGet("v2/astrology/natal-chart", baseParams)),
+    safe(prokeralaGet("v2/astrology/natal-aspect-chart", baseParams)),
+    safe(prokeralaGet("v2/astrology/natal-planet-position", baseParams)),
   ]);
 
   // Prokerala wraps responses in { status, data: { chart: "<svg…" } } typically.
