@@ -19,7 +19,7 @@ const inputSchema = z.object({
   name: z.string().trim().min(1).max(60),
   birthDate: z.string().min(8),
   birthTime: z.string().min(4),
-  birthPlace: z.string().trim().min(1).max(120),
+  birthPlace: z.string().trim().min(1).max(300),
 });
 
 export const generateNatalChart = createServerFn({ method: "POST" })
