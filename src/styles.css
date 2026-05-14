@@ -184,3 +184,17 @@
 .animate-oo-enter { animation: oo-slide-up 0.7s var(--ease-out-expo) both; }
 .animate-oo-glyph { animation: oo-fade-glyph 1.2s var(--ease-out-expo) both; }
 .animate-oo-pulse { animation: oo-pulse-soft 2.5s ease-in-out infinite; }
+
+.pill-input {
+  width: 100%;
+  background: white;
+  border: 1px solid color-mix(in oklab, var(--ink) 10%, transparent);
+  border-radius: 9999px;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.pill-input:focus {
+  border-color: var(--lilac, #c4a8eb);
+}
