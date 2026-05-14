@@ -148,7 +148,23 @@ function MapaAstralListPage() {
         .single();
       if (error) throw error;
       toast.success("Mapa criado ✨");
-      navigate({ to: "/mapa-astral/$id", params: { id: inserted.id } });
+      // Abre o mapa em nova aba
+      window.open(`/mapa-astral/${inserted.id}`, "_blank", "noopener,noreferrer");
+      // Atualiza a lista local pra refletir o novo mapa
+      setCharts((prev) => [
+        {
+          id: inserted.id,
+          name,
+          birth_date: birthDate,
+          birth_place: birthPlace,
+          created_at: new Date().toISOString(),
+        },
+        ...prev,
+      ]);
+      setName("");
+      setBirthDate("");
+      setBirthTime("");
+      setBirthPlace("");
     } catch (err) {
       console.error(err);
       toast.error("Não foi possível gerar o mapa. Tenta de novo em instantes.");
