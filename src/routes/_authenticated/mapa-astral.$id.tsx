@@ -71,6 +71,11 @@ function MapaDetailPage() {
 
   const data = chart.chart_data;
 
+  // Format birth date without timezone drift ("2000-05-16" -> "16/05/2000")
+  const [by, bm, bd] = chart.birth_date.split("-");
+  const dateLabel = `${bd}/${bm}/${by}`;
+  const timeLabel = chart.birth_time?.slice(0, 5) ?? "";
+
   const num = (v: unknown, def = 0) => {
     const n = typeof v === "number" ? v : parseFloat(String(v ?? ""));
     return Number.isFinite(n) ? n : def;
@@ -107,7 +112,7 @@ function MapaDetailPage() {
         </Link>
         <h1 className="font-display text-4xl font-bold tracking-tight">{chart.name}</h1>
         <p className="text-sm text-ink/60 mt-2">
-          {new Date(chart.birth_date).toLocaleDateString("pt-BR")} · {chart.birth_time} · {chart.birth_place}
+          {dateLabel} · {timeLabel} · {chart.birth_place}
         </p>
       </header>
 
