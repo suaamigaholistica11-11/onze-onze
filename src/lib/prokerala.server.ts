@@ -150,6 +150,8 @@ export async function fetchProkeralaNatal(args: {
   const baseParams = {
     "profile[datetime]": datetime,
     "profile[coordinates]": coords,
+    // 0 = Sayana (zodíaco tropical). 1+ seriam ayanamsas siderais (Lahiri etc.).
+    ayanamsa: "0",
     house_system: "placidus",
     orb: "default",
     birth_time_unknown: "false",
