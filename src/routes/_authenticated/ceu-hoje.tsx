@@ -12,7 +12,7 @@ import { SIGN_GLYPHS } from "@/lib/transit-copy";
 export const Route = createFileRoute("/_authenticated/ceu-hoje")({
   head: () => ({
     meta: [
-      { title: "O Céu Hoje — onze-onze" },
+      { title: "O Céu Hoje · onze-onze" },
       {
         name: "description",
         content: "Trânsitos e energias planetárias do dia.",

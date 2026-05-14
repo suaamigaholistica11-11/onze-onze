@@ -12,7 +12,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_authenticated/mapa-astral")({
   head: () => ({
     meta: [
-      { title: "Mapa Astral — onze-onze" },
+      { title: "Mapa Astral · onze-onze" },
       { name: "description", content: "Crie e consulte seus mapas natais salvos." },
     ],
   }),
@@ -338,7 +338,7 @@ function MapaAstralListPage() {
 
             <div className="bg-yellow-candy/60 rounded-2xl p-4 text-xs text-ink/70 leading-relaxed">
               <strong className="font-display">Não tem alguma dessas informações?</strong>{" "}
-              Olha sua certidão de nascimento — lá tem tudo o que precisamos.
+              Olha sua certidão de nascimento, lá tem tudo o que precisamos.
             </div>
 
             <button

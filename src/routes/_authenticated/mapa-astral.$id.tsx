@@ -16,7 +16,7 @@ import {
 
 export const Route = createFileRoute("/_authenticated/mapa-astral/$id")({
   head: () => ({
-    meta: [{ title: "Mapa Astral — onze-onze" }],
+    meta: [{ title: "Mapa Astral · onze-onze" }],
   }),
   component: MapaDetailPage,
 });

@@ -9,7 +9,7 @@ import { toast } from "sonner";
 export const Route = createFileRoute("/_authenticated/piramide")({
   head: () => ({
     meta: [
-      { title: "Pirâmide Evolutiva — onze-onze" },
+      { title: "Pirâmide Evolutiva · onze-onze" },
       { name: "description", content: "Escolha 3 áreas para desenvolver e acompanhe sua evolução." },
     ],
   }),
@@ -143,7 +143,7 @@ function PiramidePage() {
           </p>
           <p className="text-sm text-ink/70 leading-relaxed mb-4">
             Reflita com calma sobre os 3 pontos mais importantes pra você desenvolver agora.
-            Sua escolha vale por <strong>{COOLDOWN_DAYS} dias</strong> — pense bem antes de confirmar.
+            Sua escolha vale por <strong>{COOLDOWN_DAYS} dias</strong>, pense bem antes de confirmar.
           </p>
 
           <div className="flex flex-wrap gap-2 mb-4">
