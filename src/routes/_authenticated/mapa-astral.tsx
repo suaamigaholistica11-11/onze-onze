@@ -180,6 +180,8 @@ function MapaAstralListPage() {
         </p>
       </header>
 
+      {result && <InlineMapaRender id={result.id} name={result.name} data={result.data} />}
+
       {!loading && charts.length > 0 && (
         <section className="px-6 mb-6 animate-oo-enter [animation-delay:80ms]">
           <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50 mb-2">
