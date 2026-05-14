@@ -7,8 +7,8 @@ const SIGNS = [
 ] as const;
 
 function sunSign(date: Date): string {
-  // Approximate sun sign cutoffs
-  const md = (date.getUTCMonth() + 1) * 100 + date.getUTCDate();
+  // Approximate sun sign cutoffs (use local date, matches user input)
+  const md = (date.getMonth() + 1) * 100 + date.getDate();
   const cuts = [120, 219, 320, 420, 521, 621, 722, 823, 923, 1023, 1122, 1222];
   const names = ["Capricórnio","Aquário","Peixes","Áries","Touro","Gêmeos","Câncer","Leão","Virgem","Libra","Escorpião","Sagitário"];
   for (let i = 0; i < cuts.length; i++) if (md <= cuts[i]) return names[i];

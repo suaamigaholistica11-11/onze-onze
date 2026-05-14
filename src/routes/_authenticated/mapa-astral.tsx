@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState, type FormEvent } from "react";
-import { Lock, Sparkles, Trash2 } from "lucide-react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { Lock, Sparkles, Trash2, MapPin, Loader2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -25,6 +25,17 @@ interface ChartRow {
   created_at: string;
 }
 
+interface NominatimResult {
+  display_name: string;
+  lat: string;
+  lon: string;
+}
+
+function formatBirthDate(iso: string): string {
+  const [y, m, d] = iso.split("-");
+  return `${d}/${m}/${y}`;
+}
+
 function MapaAstralListPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -36,6 +47,31 @@ function MapaAstralListPage() {
   const [birthPlace, setBirthPlace] = useState("");
   const [busy, setBusy] = useState(false);
   const [deletions24h, setDeletions24h] = useState(0);
+  const [placeResults, setPlaceResults] = useState<NominatimResult[]>([]);
+  const [searchingPlace, setSearchingPlace] = useState(false);
+  const placeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handlePlaceChange = (v: string) => {
+    setBirthPlace(v);
+    if (placeTimer.current) clearTimeout(placeTimer.current);
+    if (v.trim().length < 3) {
+      setPlaceResults([]);
+      return;
+    }
+    placeTimer.current = setTimeout(async () => {
+      setSearchingPlace(true);
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(v)}&format=json&limit=5&accept-language=pt-BR`;
+        const res = await fetch(url, { headers: { "Accept-Language": "pt-BR" } });
+        const data = (await res.json()) as NominatimResult[];
+        setPlaceResults(data);
+      } catch {
+        setPlaceResults([]);
+      } finally {
+        setSearchingPlace(false);
+      }
+    }, 400);
+  };
 
   const refreshDeletions = async () => {
     if (!user) return;
@@ -152,7 +188,7 @@ function MapaAstralListPage() {
                   <div className="flex-1 min-w-0">
                     <p className="font-display font-bold truncate">{c.name}</p>
                     <p className="text-xs text-ink/50 truncate">
-                      {new Date(c.birth_date).toLocaleDateString("pt-BR")} · {c.birth_place}
+                      {formatBirthDate(c.birth_date)} · {c.birth_place}
                     </p>
                   </div>
                 </Link>
@@ -221,16 +257,44 @@ function MapaAstralListPage() {
               />
             </Field>
             <Field label="Local de nascimento">
-              <input
-                type="text"
-                value={birthPlace}
-                onChange={(e) => setBirthPlace(e.target.value)}
-                placeholder="Ex: São Paulo, Brasil"
-                maxLength={120}
-                required
-                disabled={busy}
-                className="w-full bg-white border border-black/10 rounded-2xl px-4 py-3 text-sm outline-none focus:border-lilac"
-              />
+              <div className="relative">
+                <input
+                  type="text"
+                  value={birthPlace}
+                  onChange={(e) => handlePlaceChange(e.target.value)}
+                  placeholder="Ex: Santo André, SP"
+                  maxLength={120}
+                  required
+                  disabled={busy}
+                  autoComplete="off"
+                  className="w-full bg-white border border-black/10 rounded-2xl px-4 py-3 pr-9 text-sm outline-none focus:border-lilac"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-ink/40">
+                  {searchingPlace ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    <MapPin className="size-4" />
+                  )}
+                </span>
+                {placeResults.length > 0 && (
+                  <ul className="absolute z-10 mt-1 w-full bg-white rounded-2xl shadow-lg border border-black/5 max-h-60 overflow-y-auto">
+                    {placeResults.map((r) => (
+                      <li key={`${r.lat},${r.lon}`}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setBirthPlace(r.display_name);
+                            setPlaceResults([]);
+                          }}
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-peach/30"
+                        >
+                          {r.display_name}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </Field>
 
             <div className="bg-yellow-candy/60 rounded-2xl p-4 text-xs text-ink/70 leading-relaxed">
