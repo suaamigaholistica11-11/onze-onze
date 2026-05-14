@@ -119,12 +119,7 @@ function MapaDetailPage() {
       {/* Mandala */}
       <section className="px-6 mb-6 animate-oo-enter [animation-delay:80ms]">
         <div className="bg-white rounded-[28px] p-6 ring-1 ring-black/5 flex justify-center">
-          {data?.prokerala?.chartSvg ? (
-            <div
-              className="w-full max-w-[520px] [&>svg]:w-full [&>svg]:h-auto"
-              dangerouslySetInnerHTML={{ __html: data.prokerala.chartSvg }}
-            />
-          ) : data ? (
+          {data ? (
             <NatalMandala
               bodies={bodies}
               ascendantSign={data.ascendant.sign}
