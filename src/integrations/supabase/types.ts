@@ -70,23 +70,56 @@ export type Database = {
       }
       profiles: {
         Row: {
+          avatar_url: string | null
+          birth_city: string | null
+          birth_date: string | null
+          birth_lat: number | null
+          birth_lng: number | null
+          birth_time: string | null
+          birth_time_unknown: boolean | null
           created_at: string
+          deletion_blocked_until: string | null
+          deletion_count: number | null
           display_name: string | null
           id: string
+          lgpd_consent: boolean | null
+          lgpd_consent_at: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          avatar_url?: string | null
+          birth_city?: string | null
+          birth_date?: string | null
+          birth_lat?: number | null
+          birth_lng?: number | null
+          birth_time?: string | null
+          birth_time_unknown?: boolean | null
           created_at?: string
+          deletion_blocked_until?: string | null
+          deletion_count?: number | null
           display_name?: string | null
           id?: string
+          lgpd_consent?: boolean | null
+          lgpd_consent_at?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          avatar_url?: string | null
+          birth_city?: string | null
+          birth_date?: string | null
+          birth_lat?: number | null
+          birth_lng?: number | null
+          birth_time?: string | null
+          birth_time_unknown?: boolean | null
           created_at?: string
+          deletion_blocked_until?: string | null
+          deletion_count?: number | null
           display_name?: string | null
           id?: string
+          lgpd_consent?: boolean | null
+          lgpd_consent_at?: string | null
           updated_at?: string
           user_id?: string
         }
