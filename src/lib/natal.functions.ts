@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { fetchProkeralaNatal } from "./prokerala.server";
 
 const SIGNS = [
   "Capricórnio", "Aquário", "Peixes", "Áries", "Touro", "Gêmeos",
@@ -89,6 +90,28 @@ Retorne EXATAMENTE este JSON, sem texto extra:
     } catch {
       throw new Error("AI returned invalid JSON");
     }
+
+    // Augment with Prokerala (accurate ephemeris + SVG mandala). Degrade gracefully.
+    try {
+      const pk = await fetchProkeralaNatal({
+        birthDate: data.birthDate,
+        birthTime: data.birthTime,
+        birthPlace: data.birthPlace,
+      });
+      if (pk) {
+        parsed.prokerala = {
+          chartSvg: pk.chartSvg,
+          aspectChartSvg: pk.aspectChartSvg,
+          planetPositions: pk.planetPositions,
+          coordinates: pk.coordinates,
+          timezone: pk.timezone,
+          datetime: pk.datetime,
+        };
+      }
+    } catch (err) {
+      console.error("Prokerala augmentation failed:", err);
+    }
+
     return parsed;
   });
 
@@ -98,4 +121,12 @@ export type NatalChartData = {
   ascendant: { sign: string; degree?: string | number; description: string };
   planets: Array<{ name: string; sign: string; house: string; degree?: string | number }>;
   personality: string;
+  prokerala?: {
+    chartSvg: string | null;
+    aspectChartSvg: string | null;
+    planetPositions: any | null;
+    coordinates: { lat: number; lng: number; displayName: string };
+    timezone: string;
+    datetime: string;
+  };
 };
