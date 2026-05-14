@@ -222,7 +222,7 @@ function MoonCard({
         day: "2-digit",
         month: "2-digit",
       })
-    : "—";
+    : "···";
   return (
     <div
       className={`rounded-2xl p-2 flex flex-col items-center text-center transition-all ${
