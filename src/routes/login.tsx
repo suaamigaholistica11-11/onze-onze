@@ -64,7 +64,8 @@ function LoginPage() {
         if (error) {
           toast.error(error.message);
         } else {
-          toast.success("Conta criada! Confira seu e-mail pra confirmar.");
+          toast.success("Conta criada! ✨");
+          navigate({ to: "/completar-perfil" });
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
@@ -78,7 +79,7 @@ function LoginPage() {
     }
   };
 
-  const oauth = async (provider: "google" | "apple") => {
+  const oauth = async (provider: "google") => {
     setBusy(true);
     const result = await lovable.auth.signInWithOAuth(provider, {
       redirect_uri: window.location.origin,
@@ -86,6 +87,21 @@ function LoginPage() {
     if (result.error) {
       toast.error("Não conseguimos te autenticar. Tenta de novo.");
       setBusy(false);
+    }
+  };
+
+  const handleForgot = async () => {
+    if (!email) {
+      toast.error("Digite seu e-mail acima primeiro");
+      return;
+    }
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) {
+      toast.error("Não conseguimos enviar o e-mail. Tenta de novo.");
+    } else {
+      toast.success("Enviamos um link de recuperação pro seu e-mail 💛");
     }
   };
 
@@ -175,6 +191,16 @@ function LoginPage() {
           </button>
         </form>
 
+        {mode === "signin" && (
+          <button
+            type="button"
+            onClick={handleForgot}
+            className="w-full text-center text-xs text-ink/60 underline mt-3"
+          >
+            Esqueci minha senha
+          </button>
+        )}
+
         <div className="flex items-center gap-3 my-5">
           <div className="flex-1 h-px bg-ink/10" />
           <span className="text-[10px] uppercase tracking-[0.25em] text-ink/40">
@@ -192,14 +218,6 @@ function LoginPage() {
           >
             <GoogleIcon /> Continuar com Google
           </button>
-          <button
-            type="button"
-            onClick={() => oauth("apple")}
-            disabled={busy}
-            className="w-full bg-ink text-white py-3 rounded-full text-sm font-medium hover:bg-ink/90 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
-          >
-            <AppleIcon /> Continuar com Apple
-          </button>
         </div>
       </div>
     </div>
@@ -213,14 +231,6 @@ function GoogleIcon() {
       <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 16 19 12.5 24 12.5c2.9 0 5.6 1.1 7.6 2.9l5.7-5.7C33.6 6.3 29 4.5 24 4.5c-7.6 0-14.1 4.3-17.7 10.2z"/>
       <path fill="#4CAF50" d="M24 43.5c5 0 9.5-1.9 12.9-5l-6-5c-1.9 1.3-4.3 2.1-6.9 2.1-5.3 0-9.7-3.1-11.3-7.5l-6.6 5.1C9.8 39.2 16.4 43.5 24 43.5z"/>
       <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.3 4.1-4.3 5.4l6 5c-.4.4 6.5-4.7 6.5-14.4 0-1.2-.1-2.3-.4-3.5z"/>
-    </svg>
-  );
-}
-
-function AppleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="size-4" fill="currentColor">
-      <path d="M16.365 1.43c0 1.14-.42 2.22-1.18 3.02-.78.84-2.04 1.5-3.06 1.42-.13-1.1.42-2.22 1.13-2.96.78-.82 2.16-1.43 3.11-1.48zM20.5 17.16c-.62 1.42-.92 2.06-1.72 3.32-1.12 1.74-2.7 3.9-4.65 3.92-1.74.02-2.18-1.13-4.54-1.12-2.36.01-2.85 1.14-4.59 1.12-1.95-.02-3.45-1.97-4.57-3.71C-2.86 15.2-3.18 8.62.97 5.4c1.45-1.13 3.34-1.84 5.13-1.84 1.86 0 3.04 1.02 4.59 1.02 1.5 0 2.42-1.02 4.57-1.02 1.62 0 3.34.88 4.57 2.4-4.02 2.2-3.36 7.94.67 11.2z"/>
     </svg>
   );
 }

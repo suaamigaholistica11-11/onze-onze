@@ -9,14 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedPiramideRouteImport } from './routes/_authenticated/piramide'
 import { Route as AuthenticatedMapaAstralRouteImport } from './routes/_authenticated/mapa-astral'
+import { Route as AuthenticatedCompletarPerfilRouteImport } from './routes/_authenticated/completar-perfil'
 import { Route as AuthenticatedCeuHojeRouteImport } from './routes/_authenticated/ceu-hoje'
 import { Route as AuthenticatedMapaAstralIdRouteImport } from './routes/_authenticated/mapa-astral.$id'
 
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -41,6 +48,12 @@ const AuthenticatedMapaAstralRoute = AuthenticatedMapaAstralRouteImport.update({
   path: '/mapa-astral',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedCompletarPerfilRoute =
+  AuthenticatedCompletarPerfilRouteImport.update({
+    id: '/completar-perfil',
+    path: '/completar-perfil',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedCeuHojeRoute = AuthenticatedCeuHojeRouteImport.update({
   id: '/ceu-hoje',
   path: '/ceu-hoje',
@@ -56,14 +69,18 @@ const AuthenticatedMapaAstralIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/ceu-hoje': typeof AuthenticatedCeuHojeRoute
+  '/completar-perfil': typeof AuthenticatedCompletarPerfilRoute
   '/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/piramide': typeof AuthenticatedPiramideRoute
   '/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/ceu-hoje': typeof AuthenticatedCeuHojeRoute
+  '/completar-perfil': typeof AuthenticatedCompletarPerfilRoute
   '/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/piramide': typeof AuthenticatedPiramideRoute
   '/': typeof AuthenticatedIndexRoute
@@ -73,7 +90,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/ceu-hoje': typeof AuthenticatedCeuHojeRoute
+  '/_authenticated/completar-perfil': typeof AuthenticatedCompletarPerfilRoute
   '/_authenticated/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/_authenticated/piramide': typeof AuthenticatedPiramideRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
@@ -84,14 +103,18 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login'
+    | '/reset-password'
     | '/ceu-hoje'
+    | '/completar-perfil'
     | '/mapa-astral'
     | '/piramide'
     | '/mapa-astral/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/login'
+    | '/reset-password'
     | '/ceu-hoje'
+    | '/completar-perfil'
     | '/mapa-astral'
     | '/piramide'
     | '/'
@@ -100,7 +123,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_authenticated'
     | '/login'
+    | '/reset-password'
     | '/_authenticated/ceu-hoje'
+    | '/_authenticated/completar-perfil'
     | '/_authenticated/mapa-astral'
     | '/_authenticated/piramide'
     | '/_authenticated/'
@@ -110,10 +135,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -149,6 +182,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMapaAstralRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/completar-perfil': {
+      id: '/_authenticated/completar-perfil'
+      path: '/completar-perfil'
+      fullPath: '/completar-perfil'
+      preLoaderRoute: typeof AuthenticatedCompletarPerfilRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/ceu-hoje': {
       id: '/_authenticated/ceu-hoje'
       path: '/ceu-hoje'
@@ -182,6 +222,7 @@ const AuthenticatedMapaAstralRouteWithChildren =
 
 interface AuthenticatedRouteChildren {
   AuthenticatedCeuHojeRoute: typeof AuthenticatedCeuHojeRoute
+  AuthenticatedCompletarPerfilRoute: typeof AuthenticatedCompletarPerfilRoute
   AuthenticatedMapaAstralRoute: typeof AuthenticatedMapaAstralRouteWithChildren
   AuthenticatedPiramideRoute: typeof AuthenticatedPiramideRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
@@ -189,6 +230,7 @@ interface AuthenticatedRouteChildren {
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCeuHojeRoute: AuthenticatedCeuHojeRoute,
+  AuthenticatedCompletarPerfilRoute: AuthenticatedCompletarPerfilRoute,
   AuthenticatedMapaAstralRoute: AuthenticatedMapaAstralRouteWithChildren,
   AuthenticatedPiramideRoute: AuthenticatedPiramideRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
@@ -201,6 +243,7 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
