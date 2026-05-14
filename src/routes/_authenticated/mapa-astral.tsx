@@ -205,6 +205,13 @@ function MapaAstralListPage() {
                     </p>
                   </div>
                 </Link>
+                <Link
+                  to="/mapa-astral/$id"
+                  params={{ id: c.id }}
+                  className="px-3 py-2 rounded-full bg-ink text-white text-[10px] font-bold uppercase tracking-[0.18em] hover:bg-ink/90 transition-colors shrink-0"
+                >
+                  Ver mapa
+                </Link>
                 <button
                   type="button"
                   onClick={() => onDelete(c)}
