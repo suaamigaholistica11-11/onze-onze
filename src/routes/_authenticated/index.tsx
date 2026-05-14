@@ -5,12 +5,16 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { Countdown } from "@/components/Countdown";
-import { getNextNewMoon, SIGNS } from "@/lib/onze-data";
+import { SIGNS } from "@/lib/onze-data";
 import { getDailyMessage } from "@/lib/daily-message";
 import { getSaudacao } from "@/lib/greeting";
 import { useAuth } from "@/lib/auth";
-import { getTransitsForToday } from "@/lib/transits.functions";
+import { getTransitsForToday, getMoonForToday } from "@/lib/transits.functions";
 import { buildDailyEnergy } from "@/lib/daily-energy";
+import moonNewImg from "@/assets/moon-new.png";
+import moonCrescentImg from "@/assets/moon-crescent.png";
+import moonFullImg from "@/assets/moon-full.png";
+import moonWaningImg from "@/assets/moon-waning.png";
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
@@ -43,7 +47,6 @@ function HomePage() {
     ? getSaudacao(nome)
     : { titulo: `Oi, ${nome}!`, subtitulo: "Lindo dia pra você!", periodo: "manhã" as const };
   const mensagem = mounted ? getDailyMessage() : "";
-  const luaNova = getNextNewMoon();
   const signoUsuario = SIGNS.leao;
 
   const fetchTransits = useServerFn(getTransitsForToday);
@@ -55,6 +58,13 @@ function HomePage() {
   const energia = transitsData?.transits
     ? buildDailyEnergy(transitsData.transits)
     : null;
+
+  const fetchMoon = useServerFn(getMoonForToday);
+  const { data: moonData } = useQuery({
+    queryKey: ["moon-today"],
+    queryFn: () => fetchMoon(),
+    staleTime: 1000 * 60 * 60,
+  });
 
   return (
     <AppShell glyph={signoUsuario.glyph}>
@@ -112,16 +122,7 @@ function HomePage() {
 
       {/* Lua Nova */}
       <section className="px-6 mb-6 animate-oo-enter [animation-delay:240ms]">
-        <div className="bg-lilac/60 p-6 rounded-[28px] relative overflow-hidden ring-1 ring-black/5">
-          <div className="absolute -right-6 -top-8 size-32 bg-white/40 blur-2xl rounded-full" />
-          <div className="relative z-10">
-            <h3 className="font-display text-lg font-bold mb-1">
-              {luaNova.title}
-            </h3>
-            <p className="text-xs text-ink/60 mb-5">{luaNova.subtitle}</p>
-            <Countdown target={luaNova.datetime} />
-          </div>
-        </div>
+        <MoonPanel proximas={moonData?.proximas ?? null} />
       </section>
 
       {/* Atalhos */}
@@ -135,6 +136,133 @@ function HomePage() {
 }
 
 type ShortcutBg = "sky" | "mint" | "yellow-candy" | "peach";
+
+type MoonPhaseKey = "Lua Nova" | "Quarto Crescente" | "Lua Cheia" | "Quarto Minguante";
+
+const MOON_IMAGES: Record<MoonPhaseKey, string> = {
+  "Lua Nova": moonNewImg,
+  "Quarto Crescente": moonCrescentImg,
+  "Lua Cheia": moonFullImg,
+  "Quarto Minguante": moonWaningImg,
+};
+
+const MOON_ORDER: MoonPhaseKey[] = [
+  "Lua Nova",
+  "Quarto Crescente",
+  "Lua Cheia",
+  "Quarto Minguante",
+];
+
+function MoonPanel({
+  proximas,
+}: {
+  proximas:
+    | Array<{ nome: string; glyph: string; dataISO: string; diasRestantes: number }>
+    | null;
+}) {
+  const byName = new Map(
+    (proximas ?? []).map((p) => [p.nome, p] as const),
+  );
+  // A próxima fase é a mais próxima em dias restantes.
+  const next = proximas
+    ? [...proximas].sort((a, b) => a.diasRestantes - b.diasRestantes)[0]
+    : null;
+  const nextDate = next
+    ? new Date(next.dataISO).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "long",
+      })
+    : null;
+
+  return (
+    <div className="bg-gradient-to-br from-lilac/60 to-sky/40 p-6 rounded-[28px] relative overflow-hidden ring-1 ring-black/5">
+      <div className="absolute -right-6 -top-8 size-32 bg-white/40 blur-2xl rounded-full" />
+      <div className="relative z-10">
+        <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50 mb-1">
+          Lua
+        </p>
+        <h3 className="font-display text-lg font-bold leading-tight">
+          {next ? `Próxima: ${next.nome}` : "Ciclo lunar"}
+        </h3>
+        {nextDate && next && (
+          <p className="text-xs text-ink/60 mb-4">
+            {nextDate} · em {next.diasRestantes === 0 ? "menos de 1 dia" : `${next.diasRestantes} dia${next.diasRestantes > 1 ? "s" : ""}`}
+          </p>
+        )}
+        {next && (
+          <div className="mb-5">
+            <Countdown target={new Date(next.dataISO)} />
+          </div>
+        )}
+
+        <div className="grid grid-cols-4 gap-2">
+          {MOON_ORDER.map((nome) => {
+            const info = byName.get(nome);
+            const isNext = next?.nome === nome;
+            return <MoonCard key={nome} nome={nome} info={info} highlight={isNext} />;
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MoonCard({
+  nome,
+  info,
+  highlight,
+}: {
+  nome: MoonPhaseKey;
+  info?: { dataISO: string; diasRestantes: number };
+  highlight: boolean;
+}) {
+  const img = MOON_IMAGES[nome];
+  const dataCurta = info
+    ? new Date(info.dataISO).toLocaleDateString("pt-BR", {
+        day: "2-digit",
+        month: "2-digit",
+      })
+    : "—";
+  return (
+    <div
+      className={`rounded-2xl p-2 flex flex-col items-center text-center transition-all ${
+        highlight ? "bg-white/70 ring-1 ring-ink/10" : "bg-white/30"
+      }`}
+    >
+      <div className="relative size-12 mb-1">
+        <img
+          src={img}
+          alt={`Imagem realista de ${nome.toLowerCase()}`}
+          width={512}
+          height={512}
+          loading="lazy"
+          className="size-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.25)]"
+        />
+        {/* brilhinhos piscando dentro da lua */}
+        <span
+          aria-hidden
+          className="absolute top-1 left-2 size-1 rounded-full bg-white animate-oo-twinkle"
+        />
+        <span
+          aria-hidden
+          className="absolute top-3 right-1.5 size-[3px] rounded-full bg-white animate-oo-twinkle [animation-delay:0.6s]"
+        />
+        <span
+          aria-hidden
+          className="absolute bottom-2 left-3 size-[2px] rounded-full bg-white animate-oo-twinkle [animation-delay:1.1s]"
+        />
+        <span
+          aria-hidden
+          className="absolute bottom-1 right-3 size-[3px] rounded-full bg-white animate-oo-twinkle [animation-delay:1.7s]"
+        />
+      </div>
+      <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-ink/70 leading-tight">
+        {nome.replace("Quarto ", "")}
+      </span>
+      <span className="text-[9px] text-ink/50 mt-0.5">{dataCurta}</span>
+    </div>
+  );
+}
 
 function Shortcut({
   to,

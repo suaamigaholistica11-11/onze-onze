@@ -179,11 +179,16 @@
   0%, 100% { opacity: 0.6; }
   50% { opacity: 1; }
 }
+@keyframes oo-twinkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
 
 .animate-oo-float { animation: oo-float 6s ease-in-out infinite; }
 .animate-oo-enter { animation: oo-slide-up 0.7s var(--ease-out-expo) both; }
 .animate-oo-glyph { animation: oo-fade-glyph 1.2s var(--ease-out-expo) both; }
 .animate-oo-pulse { animation: oo-pulse-soft 2.5s ease-in-out infinite; }
+.animate-oo-twinkle { animation: oo-twinkle 2.4s ease-in-out infinite; }
 
 .pill-input {
   width: 100%;
