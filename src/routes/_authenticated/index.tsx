@@ -15,7 +15,7 @@ import { buildDailyEnergy } from "@/lib/daily-energy";
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
     meta: [
-      { title: "Home — onze-onze" },
+      { title: "Home · onze-onze" },
       {
         name: "description",
         content:

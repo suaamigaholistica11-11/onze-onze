@@ -21,7 +21,7 @@ const SIGN_SOL: Record<string, string> = {
   "Touro": "pede ritmo lento e prazer simples",
   "Gêmeos": "convida pra trocar ideia e rir",
   "Câncer": "acende o cuidado com quem você ama",
-  "Leão": "ilumina seu palco — brilha sem culpa",
+  "Leão": "ilumina seu palco, brilha sem culpa",
   "Virgem": "organiza tudo com carinho",
   "Libra": "pede beleza e bons encontros",
   "Escorpião": "vai fundo no que importa",

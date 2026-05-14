@@ -30,7 +30,7 @@ export function PrivacyPolicyModal({ trigger }: Props) {
               O app 11:11 onze-onze é operado pela equipe onze-onze, com contato
               pelo e-mail <strong>suaamigaholistica@gmail.com</strong>. Somos a
               controladora dos seus dados pessoais conforme a Lei Geral de
-              Proteção de Dados (Lei nº 13.709/2018 — LGPD).
+              Proteção de Dados (Lei nº 13.709/2018, LGPD).
             </p>
           </section>
 
@@ -107,7 +107,7 @@ export function PrivacyPolicyModal({ trigger }: Props) {
           <section>
             <h3 className="font-semibold text-ink mb-1">8. Segurança</h3>
             <p>
-              Dados criptografados com Row Level Security (RLS) — cada usuária
+              Dados criptografados com Row Level Security (RLS), cada usuária
               só acessa seus próprios dados.
             </p>
           </section>

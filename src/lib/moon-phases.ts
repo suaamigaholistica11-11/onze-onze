@@ -1,4 +1,4 @@
-// Fases da Lua — descrições no tom onze-onze (inspirado em personare e astrolink).
+// Fases da Lua, descrições no tom onze-onze (inspirado em personare e astrolink).
 // Cada fase dura ~3,7 dias dentro do ciclo lunar de ~29,5 dias.
 
 export type MoonPhaseKey =
@@ -29,7 +29,7 @@ export const MOON_PHASES: MoonPhaseInfo[] = [
     significado:
       "A Lua Nova é o instante mais escuro do ciclo, quando o céu se aquieta pra que algo novo possa nascer. É um portal pra plantar intenções, escrever desejos e abraçar o que ainda é invisível dentro de você.",
     pratica:
-      "Reserve um momento de silêncio. Escreva 3 intenções pros próximos 28 dias — sem cobrar, só pedindo.",
+      "Reserve um momento de silêncio. Escreva 3 intenções pros próximos 28 dias, sem cobrar, só pedindo.",
   },
   {
     key: "crescente_iluminante",
@@ -37,7 +37,7 @@ export const MOON_PHASES: MoonPhaseInfo[] = [
     glyph: "🌒",
     energia: "impulso · coragem · primeiros passos",
     significado:
-      "A luz começa a aparecer e suas intenções pedem ação. É hora de dar o primeiro passo — pequeno, real, possível. A semente está brotando devagar.",
+      "A luz começa a aparecer e suas intenções pedem ação. É hora de dar o primeiro passo, pequeno, real, possível. A semente está brotando devagar.",
     pratica:
       "Escolha uma intenção da Lua Nova e dê uma ação concreta hoje, mesmo que mínima.",
   },
@@ -47,7 +47,7 @@ export const MOON_PHASES: MoonPhaseInfo[] = [
     glyph: "🌓",
     energia: "decisão · ajuste · resistência",
     significado:
-      "Metade do caminho até a plenitude. Aqui aparecem os primeiros desafios e dúvidas — não pra te parar, mas pra fortalecer o que está sendo construído. É o momento de ajustar a rota.",
+      "Metade do caminho até a plenitude. Aqui aparecem os primeiros desafios e dúvidas, não pra te parar, mas pra fortalecer o que está sendo construído. É o momento de ajustar a rota.",
     pratica:
       "Olha pra suas intenções: o que precisa ser ajustado? Diga sim só pro que está alinhado.",
   },
@@ -67,7 +67,7 @@ export const MOON_PHASES: MoonPhaseInfo[] = [
     glyph: "🌕",
     energia: "plenitude · revelação · entrega",
     significado:
-      "A Lua brilha inteira e ilumina tudo o que estava escondido — emoções, verdades, encontros. É um clímax energético: tempo de colher, agradecer e também de soltar o que não cabe mais.",
+      "A Lua brilha inteira e ilumina tudo o que estava escondido, emoções, verdades, encontros. É um clímax energético: tempo de colher, agradecer e também de soltar o que não cabe mais.",
     pratica:
       "Acenda uma vela. Agradeça em voz alta. Solte por escrito o que precisa partir.",
   },
@@ -97,15 +97,15 @@ export const MOON_PHASES: MoonPhaseInfo[] = [
     glyph: "🌘",
     energia: "descanso · introspecção · escuta",
     significado:
-      "Os últimos dias antes da próxima Lua Nova. A energia está baixa, e isso é sagrado. É o vazio fértil que precede a semente — descanse, escute, sonhe.",
+      "Os últimos dias antes da próxima Lua Nova. A energia está baixa, e isso é sagrado. É o vazio fértil que precede a semente, descanse, escute, sonhe.",
     pratica:
       "Durma mais. Reduza compromissos. Permita-se não produzir nada hoje.",
   },
 ];
 
 /**
- * Recebe o ângulo de fase lunar (0-360) — onde 0 = Nova, 90 = Quarto Crescente,
- * 180 = Cheia, 270 = Quarto Minguante — e retorna a fase correspondente.
+ * Recebe o ângulo de fase lunar (0-360), onde 0 = Nova, 90 = Quarto Crescente,
+ * 180 = Cheia, 270 = Quarto Minguante, e retorna a fase correspondente.
  */
 export function phaseFromAngle(angle: number): MoonPhaseInfo {
   const a = ((angle % 360) + 360) % 360;
