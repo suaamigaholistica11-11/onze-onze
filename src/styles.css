@@ -183,12 +183,36 @@
   0%, 100% { opacity: 0.15; transform: scale(0.85); }
   50% { opacity: 1; transform: scale(1.15); }
 }
+@keyframes oo-twinkle-a {
+  0%   { opacity: 0.1;  transform: translate(0, 0) scale(0.6); }
+  50%  { opacity: 1;    transform: translate(6px, -4px) scale(1.2); }
+  100% { opacity: 0.1;  transform: translate(0, 0) scale(0.6); }
+}
+@keyframes oo-twinkle-b {
+  0%   { opacity: 0.2;  transform: translate(0, 0) scale(0.7); }
+  50%  { opacity: 1;    transform: translate(-5px, 5px) scale(1.3); }
+  100% { opacity: 0.2;  transform: translate(0, 0) scale(0.7); }
+}
+@keyframes oo-twinkle-c {
+  0%   { opacity: 0.15; transform: translate(0, 0) scale(0.8); }
+  50%  { opacity: 0.95; transform: translate(4px, 6px) scale(1.25); }
+  100% { opacity: 0.15; transform: translate(0, 0) scale(0.8); }
+}
+@keyframes oo-twinkle-d {
+  0%   { opacity: 0.2;  transform: translate(0, 0) scale(0.7); }
+  50%  { opacity: 1;    transform: translate(-6px, -5px) scale(1.2); }
+  100% { opacity: 0.2;  transform: translate(0, 0) scale(0.7); }
+}
 
 .animate-oo-float { animation: oo-float 6s ease-in-out infinite; }
 .animate-oo-enter { animation: oo-slide-up 0.7s var(--ease-out-expo) both; }
 .animate-oo-glyph { animation: oo-fade-glyph 1.2s var(--ease-out-expo) both; }
 .animate-oo-pulse { animation: oo-pulse-soft 2.5s ease-in-out infinite; }
 .animate-oo-twinkle { animation: oo-twinkle 2.4s ease-in-out infinite; }
+.animate-oo-twinkle-a { animation: oo-twinkle-a 3.2s ease-in-out infinite; }
+.animate-oo-twinkle-b { animation: oo-twinkle-b 3.8s ease-in-out infinite; }
+.animate-oo-twinkle-c { animation: oo-twinkle-c 2.9s ease-in-out infinite; }
+.animate-oo-twinkle-d { animation: oo-twinkle-d 4.1s ease-in-out infinite; }
 
 .pill-input {
   width: 100%;
