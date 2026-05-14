@@ -52,6 +52,28 @@ function MapaAstralListPage() {
   const [searchingPlace, setSearchingPlace] = useState(false);
   const placeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [result, setResult] = useState<{ id: string; name: string; data: NatalChartData } | null>(null);
+  const [loadingId, setLoadingId] = useState<string | null>(null);
+
+  const onView = async (c: ChartRow) => {
+    setLoadingId(c.id);
+    try {
+      const { data, error } = await supabase
+        .from("natal_charts")
+        .select("id,name,chart_data")
+        .eq("id", c.id)
+        .maybeSingle();
+      if (error || !data?.chart_data) {
+        toast.error("Não foi possível abrir o mapa.");
+        return;
+      }
+      setResult({ id: data.id, name: data.name, data: data.chart_data as NatalChartData });
+      setTimeout(() => {
+        document.getElementById("mapa-render")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 50);
+    } finally {
+      setLoadingId(null);
+    }
+  };
 
   const handlePlaceChange = (v: string) => {
     setBirthPlace(v);
