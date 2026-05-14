@@ -3,6 +3,7 @@ import { z } from "zod";
 import { fetchProkeralaNatal } from "./prokerala.server";
 import { geocodePlace, lookupTimezone } from "./prokerala.server";
 import { computeAscendant } from "./ascendant";
+import { computeBodies } from "./planets";
 
 const SIGNS = [
   "Capricórnio", "Aquário", "Peixes", "Áries", "Touro", "Gêmeos",
@@ -117,6 +118,37 @@ Retorne EXATAMENTE este JSON, sem texto extra:
           lng: geo.lng,
           timezone: tz,
         };
+
+        // Override AI-guessed planet positions with real ephemeris computation.
+        // Tropical zodiac, equal-house from Ascendant.
+        try {
+          const bodies = computeBodies({
+            birthDate: data.birthDate,
+            birthTime: data.birthTime,
+            timezone: tz,
+            ascendantLongitude: asc.longitude,
+          });
+          parsed.sun = {
+            sign: bodies.sun.sign,
+            house: String(bodies.sun.house),
+            degree: bodies.sun.degree.toFixed(2),
+            description: parsed.sun?.description ?? "",
+          };
+          parsed.moon = {
+            sign: bodies.moon.sign,
+            house: String(bodies.moon.house),
+            degree: bodies.moon.degree.toFixed(2),
+            description: parsed.moon?.description ?? "",
+          };
+          parsed.planets = bodies.planets.map((p) => ({
+            name: p.name,
+            sign: p.sign,
+            house: String(p.house),
+            degree: p.degree.toFixed(2),
+          }));
+        } catch (err) {
+          console.error("Local planet calc failed:", err);
+        }
       }
     } catch (err) {
       console.error("Local ascendant calc failed:", err);
