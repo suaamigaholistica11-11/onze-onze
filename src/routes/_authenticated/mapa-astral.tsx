@@ -52,6 +52,28 @@ function MapaAstralListPage() {
   const [searchingPlace, setSearchingPlace] = useState(false);
   const placeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [result, setResult] = useState<{ id: string; name: string; data: NatalChartData } | null>(null);
+  const [loadingId, setLoadingId] = useState<string | null>(null);
+
+  const onView = async (c: ChartRow) => {
+    setLoadingId(c.id);
+    try {
+      const { data, error } = await supabase
+        .from("natal_charts")
+        .select("id,name,chart_data")
+        .eq("id", c.id)
+        .maybeSingle();
+      if (error || !data?.chart_data) {
+        toast.error("Não foi possível abrir o mapa.");
+        return;
+      }
+      setResult({ id: data.id, name: data.name, data: data.chart_data as NatalChartData });
+      setTimeout(() => {
+        document.getElementById("mapa-render")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 50);
+    } finally {
+      setLoadingId(null);
+    }
+  };
 
   const handlePlaceChange = (v: string) => {
     setBirthPlace(v);
@@ -190,11 +212,7 @@ function MapaAstralListPage() {
           <ul className="space-y-2">
             {charts.map((c) => (
               <li key={c.id} className="bg-white p-3 rounded-2xl ring-1 ring-black/5 flex items-center gap-3">
-                <Link
-                  to="/mapa-astral/$id"
-                  params={{ id: c.id }}
-                  className="flex items-center gap-3 flex-1 min-w-0"
-                >
+                <div className="flex items-center gap-3 flex-1 min-w-0">
                   <div className="size-10 bg-yellow-candy rounded-2xl flex items-center justify-center font-display text-lg shrink-0">
                     ✧
                   </div>
@@ -204,14 +222,15 @@ function MapaAstralListPage() {
                       {formatBirthDate(c.birth_date)} · {c.birth_place}
                     </p>
                   </div>
-                </Link>
-                <Link
-                  to="/mapa-astral/$id"
-                  params={{ id: c.id }}
-                  className="px-3 py-2 rounded-full bg-ink text-white text-[10px] font-bold uppercase tracking-[0.18em] hover:bg-ink/90 transition-colors shrink-0"
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onView(c)}
+                  disabled={loadingId === c.id}
+                  className="px-3 py-2 rounded-full bg-ink text-white text-[10px] font-bold uppercase tracking-[0.18em] hover:bg-ink/90 disabled:opacity-50 transition-colors shrink-0"
                 >
-                  Ver mapa
-                </Link>
+                  {loadingId === c.id ? "…" : "Ver mapa"}
+                </button>
                 <button
                   type="button"
                   onClick={() => onDelete(c)}
