@@ -29,7 +29,7 @@ export const MOON_PHASES: MoonPhaseInfo[] = [
     significado:
       "A Lua Nova é o instante mais escuro do ciclo, quando o céu se aquieta pra que algo novo possa nascer. É um portal pra plantar intenções, escrever desejos e abraçar o que ainda é invisível dentro de você.",
     pratica:
-      "Reserve um momento de silêncio. Escreva 3 intenções pros próximos 28 dias, sem cobrar, só pedindo.",
+      "Reserva um momentinho de silêncio. Escreve 3 intenções pros próximos 28 dias, sem cobrança, só pedindo.",
   },
   {
     key: "crescente_iluminante",
@@ -37,9 +37,9 @@ export const MOON_PHASES: MoonPhaseInfo[] = [
     glyph: "🌒",
     energia: "impulso · coragem · primeiros passos",
     significado:
-      "A luz começa a aparecer e suas intenções pedem ação. É hora de dar o primeiro passo, pequeno, real, possível. A semente está brotando devagar.",
+      "A luz começa a aparecer e suas intenções pedem ação. É hora do primeiro passo: pequeno, real, possível. A semente tá brotando devagar.",
     pratica:
-      "Escolha uma intenção da Lua Nova e dê uma ação concreta hoje, mesmo que mínima.",
+      "Escolhe uma intenção da Lua Nova e dá uma ação concreta hoje, mesmo que mínima.",
   },
   {
     key: "quarto_crescente",
@@ -47,9 +47,9 @@ export const MOON_PHASES: MoonPhaseInfo[] = [
     glyph: "🌓",
     energia: "decisão · ajuste · resistência",
     significado:
-      "Metade do caminho até a plenitude. Aqui aparecem os primeiros desafios e dúvidas, não pra te parar, mas pra fortalecer o que está sendo construído. É o momento de ajustar a rota.",
+      "Metade do caminho até a plenitude. Aqui aparecem os primeiros desafios e dúvidas: não pra te parar, mas pra fortalecer o que tá sendo construído. É hora de ajustar a rota.",
     pratica:
-      "Olha pra suas intenções: o que precisa ser ajustado? Diga sim só pro que está alinhado.",
+      "Olha pras suas intenções: o que precisa de ajuste? Diz sim só pro que tá alinhado.",
   },
   {
     key: "gibosa_crescente",
@@ -57,9 +57,9 @@ export const MOON_PHASES: MoonPhaseInfo[] = [
     glyph: "🌔",
     energia: "refinamento · paciência · confiança",
     significado:
-      "A Lua se aproxima da Cheia e tudo amadurece. É um tempo de refinar detalhes, confiar no processo e cuidar do que já está em movimento sem querer apressar.",
+      "A Lua se aproxima da Cheia e tudo amadurece. É tempo de refinar detalhes, confiar no processo e cuidar do que já tá em movimento, sem querer apressar.",
     pratica:
-      "Reveja seu progresso com gentileza. Celebre o caminho, não só o destino.",
+      "Revisa seu progresso com gentileza. Celebra o caminho, não só o destino.",
   },
   {
     key: "cheia",
@@ -67,9 +67,9 @@ export const MOON_PHASES: MoonPhaseInfo[] = [
     glyph: "🌕",
     energia: "plenitude · revelação · entrega",
     significado:
-      "A Lua brilha inteira e ilumina tudo o que estava escondido, emoções, verdades, encontros. É um clímax energético: tempo de colher, agradecer e também de soltar o que não cabe mais.",
+      "A Lua brilha inteira e ilumina tudo o que estava escondido: emoções, verdades, encontros. É um clímax energético, tempo de colher, agradecer e também de soltar o que não cabe mais.",
     pratica:
-      "Acenda uma vela. Agradeça em voz alta. Solte por escrito o que precisa partir.",
+      "Acende uma vela. Agradece em voz alta. Solta por escrito o que precisa ir embora.",
   },
   {
     key: "gibosa_minguante",
@@ -77,9 +77,9 @@ export const MOON_PHASES: MoonPhaseInfo[] = [
     glyph: "🌖",
     energia: "integração · partilha · sabedoria",
     significado:
-      "Depois da Cheia, a Lua começa a recolher sua luz. É hora de digerir o que foi vivido, integrar aprendizados e compartilhar com quem caminha junto.",
+      "Depois da Cheia, a Lua começa a recolher a luz. É hora de digerir o que foi vivido, integrar aprendizados e compartilhar com quem caminha junto.",
     pratica:
-      "Conte pra alguém de confiança o que essa lunação te ensinou. Anote no seu caderno.",
+      "Conta pra alguém de confiança o que essa lunação te ensinou. Anota no teu caderno.",
   },
   {
     key: "quarto_minguante",
@@ -87,9 +87,9 @@ export const MOON_PHASES: MoonPhaseInfo[] = [
     glyph: "🌗",
     energia: "soltura · perdão · limpeza",
     significado:
-      "A Lua pede desapego. Tudo o que pesa, atrasa ou já cumpriu seu papel está sendo convidado a ir embora. É um tempo fértil pra perdoar (você inclusive) e abrir espaço.",
+      "A Lua pede desapego. Tudo o que pesa, atrasa ou já cumpriu seu papel tá sendo convidado a ir embora. É um tempo fértil pra perdoar (você inclusive) e abrir espaço.",
     pratica:
-      "Faça uma faxina simbólica: uma gaveta, uma conversa pendente, uma crença antiga.",
+      "Faz uma faxina simbólica: uma gaveta, uma conversa pendente, uma crença antiga.",
   },
   {
     key: "minguante_balsamica",
@@ -97,9 +97,9 @@ export const MOON_PHASES: MoonPhaseInfo[] = [
     glyph: "🌘",
     energia: "descanso · introspecção · escuta",
     significado:
-      "Os últimos dias antes da próxima Lua Nova. A energia está baixa, e isso é sagrado. É o vazio fértil que precede a semente, descanse, escute, sonhe.",
+      "Os últimos dias antes da próxima Lua Nova. A energia tá baixa, e isso é sagrado. É o vazio fértil que precede a semente. Descansa, escuta, sonha.",
     pratica:
-      "Durma mais. Reduza compromissos. Permita-se não produzir nada hoje.",
+      "Dorme mais. Reduz compromissos. Se permite não produzir nada hoje.",
   },
 ];
 

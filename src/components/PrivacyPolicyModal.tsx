@@ -107,8 +107,8 @@ export function PrivacyPolicyModal({ trigger }: Props) {
           <section>
             <h3 className="font-semibold text-ink mb-1">8. Segurança</h3>
             <p>
-              Dados criptografados com Row Level Security (RLS), cada usuária
-              só acessa seus próprios dados.
+              Dados criptografados com Row Level Security (RLS): cada usuária
+              só acessa os próprios dados.
             </p>
           </section>
 

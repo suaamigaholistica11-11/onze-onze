@@ -17,9 +17,9 @@ export const ELEMENT_EMOJI: Record<Element, string> = {
 };
 
 export const ELEMENT_PHRASE: Record<Element, string> = {
-  Fogo: "você age primeiro, sente o mundo pela coragem e pelo movimento.",
-  Terra: "você firma o pé, constrói com calma e confia no que pode tocar.",
-  Ar: "você pensa antes de tudo, ideias e troca são seu oxigênio.",
+  Fogo: "você age primeiro e sente o mundo pela coragem e pelo movimento.",
+  Terra: "você firma o pé, constrói com calma e confia no que dá pra tocar.",
+  Ar: "você pensa antes de tudo: ideias e trocas são teu oxigênio.",
   Água: "você sente antes de pensar e atravessa o mundo pela emoção.",
 };
 
