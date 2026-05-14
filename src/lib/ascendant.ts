@@ -1,4 +1,7 @@
 // Ascendant calculation per Meeus' "Astronomical Algorithms".
+// ZODÍACO TROPICAL (Sayana): a longitude eclíptica é medida a partir do
+// ponto vernal (equinócio de março) — sem aplicação de ayanamsa. É o
+// sistema usado pela astrologia ocidental moderna.
 // Pure JS, runs in Cloudflare Workers. Validated against Einstein (Câncer ~11°)
 // and JFK (Libra ~20°).
 
