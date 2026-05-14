@@ -166,7 +166,7 @@ function MapaAstralListPage() {
         </p>
         <h1 className="font-display text-4xl font-bold tracking-tight">Mapa Astral</h1>
         <p className="text-sm text-ink/60 mt-2">
-          Preencha os dados de nascimento pra gerar seu mapa. Você pode salvar até 2 mapas.
+          Preencha os dados de nascimento pra gerar seu mapa. Salve quantos quiser.
         </p>
       </header>
 
