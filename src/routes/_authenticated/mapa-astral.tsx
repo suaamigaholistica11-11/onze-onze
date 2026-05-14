@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Lock, Sparkles, Trash2, MapPin, Loader2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
@@ -38,7 +38,6 @@ function formatBirthDate(iso: string): string {
 
 function MapaAstralListPage() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [charts, setCharts] = useState<ChartRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
@@ -148,7 +147,23 @@ function MapaAstralListPage() {
         .single();
       if (error) throw error;
       toast.success("Mapa criado ✨");
-      navigate({ to: "/mapa-astral/$id", params: { id: inserted.id } });
+      // Abre o mapa em nova aba
+      window.open(`/mapa-astral/${inserted.id}`, "_blank", "noopener,noreferrer");
+      // Atualiza a lista local pra refletir o novo mapa
+      setCharts((prev) => [
+        {
+          id: inserted.id,
+          name,
+          birth_date: birthDate,
+          birth_place: birthPlace,
+          created_at: new Date().toISOString(),
+        },
+        ...prev,
+      ]);
+      setName("");
+      setBirthDate("");
+      setBirthTime("");
+      setBirthPlace("");
     } catch (err) {
       console.error(err);
       toast.error("Não foi possível gerar o mapa. Tenta de novo em instantes.");
@@ -177,9 +192,10 @@ function MapaAstralListPage() {
           <ul className="space-y-2">
             {charts.map((c) => (
               <li key={c.id} className="bg-white p-3 rounded-2xl ring-1 ring-black/5 flex items-center gap-3">
-                <Link
-                  to="/mapa-astral/$id"
-                  params={{ id: c.id }}
+                <a
+                  href={`/mapa-astral/${c.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center gap-3 flex-1 min-w-0"
                 >
                   <div className="size-10 bg-yellow-candy rounded-2xl flex items-center justify-center font-display text-lg shrink-0">
@@ -191,7 +207,7 @@ function MapaAstralListPage() {
                       {formatBirthDate(c.birth_date)} · {c.birth_place}
                     </p>
                   </div>
-                </Link>
+                </a>
                 <button
                   type="button"
                   onClick={() => onDelete(c)}
