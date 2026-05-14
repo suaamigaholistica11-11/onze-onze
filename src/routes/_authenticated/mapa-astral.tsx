@@ -375,19 +375,12 @@ function InlineMapaRender({ id, name, data }: { id: string; name: string; data: 
         seu mapa de {name}
       </p>
       <div className="bg-white rounded-[28px] p-6 ring-1 ring-black/5 flex justify-center">
-        {data?.prokerala?.chartSvg ? (
-          <div
-            className="w-full max-w-[520px] [&>svg]:w-full [&>svg]:h-auto"
-            dangerouslySetInnerHTML={{ __html: data.prokerala.chartSvg }}
-          />
-        ) : (
-          <NatalMandala
-            bodies={bodies}
-            ascendantSign={data.ascendant.sign}
-            ascendantDegree={num(data.ascendant.degree)}
-            aspects={aspects}
-          />
-        )}
+        <NatalMandala
+          bodies={bodies}
+          ascendantSign={data.ascendant.sign}
+          ascendantDegree={num(data.ascendant.degree)}
+          aspects={aspects}
+        />
       </div>
       <Link
         to="/mapa-astral/$id"
