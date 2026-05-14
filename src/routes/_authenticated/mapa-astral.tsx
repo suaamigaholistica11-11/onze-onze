@@ -96,8 +96,8 @@ function MapaAstralListPage() {
     refreshDeletions();
   }, [user]);
 
-  const limiteAtingido = charts.length >= 2;
-  const bloqueado24h = deletions24h >= 5;
+  const limiteAtingido = false;
+  const bloqueado24h = false;
 
   const onDelete = async (chart: ChartRow) => {
     if (!user) return;
@@ -122,10 +122,6 @@ function MapaAstralListPage() {
     }
     if (!name || !birthDate || !birthTime || !birthPlace) {
       toast.error("Preencha todos os campos");
-      return;
-    }
-    if (limiteAtingido) {
-      toast.error("Você já tem seus 2 mapas salvos");
       return;
     }
     setBusy(true);
@@ -313,7 +309,7 @@ function MapaAstralListPage() {
               className="w-full bg-ink text-white py-4 rounded-full text-xs font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-2 hover:bg-ink/90 disabled:opacity-50 transition-colors"
             >
               <Sparkles className="size-4" />
-              {busy ? "Consultando o céu…" : `Gerar mapa (${2 - charts.length} restante${charts.length === 1 ? "" : "s"})`}
+              {busy ? "Consultando o céu…" : "Gerar mapa"}
             </button>
           </form>
         )}
