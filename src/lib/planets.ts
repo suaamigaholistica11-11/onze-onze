@@ -54,6 +54,17 @@ export function computeBodies(args: ComputeBodiesArgs): {
   const sunLon = norm360(Astro.SunPosition(t).elon);
   const moonLon = norm360(Astro.EclipticGeoMoon(t).lon);
 
+  // Geocentric apparent ecliptic longitude for a planet.
+  // IMPORTANT: Astro.EclipticLongitude() returns HELIOCENTRIC longitude,
+  // which is wrong for a natal chart (especially for inner planets like
+  // Mercury, Venus, Mars). We need geocentric apparent positions, which
+  // requires GeoVector (with aberration) -> Ecliptic conversion.
+  const geoLon = (body: Astro.Body): number => {
+    const vec = Astro.GeoVector(body, t, true); // aberration corrected
+    const ecl = Astro.Ecliptic(vec);
+    return norm360(ecl.elon);
+  };
+
   const make = (name: string, lon: number): PlanetPos => {
     const s = signFromLongitude(lon);
     return {
@@ -68,6 +79,6 @@ export function computeBodies(args: ComputeBodiesArgs): {
   return {
     sun: make("Sol", sunLon),
     moon: make("Lua", moonLon),
-    planets: BODIES.map((b) => make(b.name, norm360(Astro.EclipticLongitude(b.key as Astro.Body, t)))),
+    planets: BODIES.map((b) => make(b.name, geoLon(b.key as Astro.Body))),
   };
 }
