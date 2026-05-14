@@ -229,31 +229,31 @@ function MoonCard({
         highlight ? "bg-white/70 ring-1 ring-ink/10" : "bg-white/30"
       }`}
     >
-      <div className="relative size-12 mb-1">
+      <div className="relative size-16 mb-1.5">
         <img
           src={img}
           alt={`Imagem realista de ${nome.toLowerCase()}`}
           width={512}
           height={512}
           loading="lazy"
-          className="size-12 object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.25)]"
+          className="size-16 object-contain drop-shadow-[0_2px_10px_rgba(0,0,0,0.3)]"
         />
         {/* brilhinhos piscando dentro da lua */}
         <span
           aria-hidden
-          className="absolute top-1 left-2 size-1 rounded-full bg-white animate-oo-twinkle"
+          className="absolute top-2 left-3 size-1.5 rounded-full bg-white shadow-[0_0_6px_2px_rgba(255,255,255,0.8)] animate-oo-twinkle-a"
         />
         <span
           aria-hidden
-          className="absolute top-3 right-1.5 size-[3px] rounded-full bg-white animate-oo-twinkle [animation-delay:0.6s]"
+          className="absolute top-4 right-2 size-1 rounded-full bg-white shadow-[0_0_5px_2px_rgba(255,255,255,0.7)] animate-oo-twinkle-b"
         />
         <span
           aria-hidden
-          className="absolute bottom-2 left-3 size-[2px] rounded-full bg-white animate-oo-twinkle [animation-delay:1.1s]"
+          className="absolute bottom-3 left-4 size-1 rounded-full bg-white shadow-[0_0_5px_2px_rgba(255,255,255,0.7)] animate-oo-twinkle-c"
         />
         <span
           aria-hidden
-          className="absolute bottom-1 right-3 size-[3px] rounded-full bg-white animate-oo-twinkle [animation-delay:1.7s]"
+          className="absolute bottom-2 right-4 size-1.5 rounded-full bg-white shadow-[0_0_6px_2px_rgba(255,255,255,0.8)] animate-oo-twinkle-d"
         />
       </div>
       <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-ink/70 leading-tight">
