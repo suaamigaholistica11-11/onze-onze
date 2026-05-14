@@ -340,3 +340,55 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     </label>
   );
 }
+
+function InlineMapaRender({ id, name, data }: { id: string; name: string; data: NatalChartData }) {
+  const num = (v: unknown, def = 0) => {
+    const n = typeof v === "number" ? v : parseFloat(String(v ?? ""));
+    return Number.isFinite(n) ? n : def;
+  };
+  const bodies = [
+    { name: "Sol", sign: data.sun.sign, degree: num(data.sun.degree), house: num(data.sun.house, 1) },
+    { name: "Lua", sign: data.moon.sign, degree: num(data.moon.degree), house: num(data.moon.house, 1) },
+    ...data.planets.map((p) => ({
+      name: p.name,
+      sign: p.sign,
+      degree: num(p.degree),
+      house: num(p.house, 1),
+    })),
+  ];
+  const aspects = calcAspects(
+    bodies.map((b) => ({ name: b.name, longitude: signLongitude(b.sign, b.degree) })),
+  );
+  return (
+    <section
+      id="mapa-render"
+      className="px-6 mb-6 animate-oo-enter"
+    >
+      <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50 mb-2">
+        seu mapa de {name}
+      </p>
+      <div className="bg-white rounded-[28px] p-6 ring-1 ring-black/5 flex justify-center">
+        {data?.prokerala?.chartSvg ? (
+          <div
+            className="w-full max-w-[520px] [&>svg]:w-full [&>svg]:h-auto"
+            dangerouslySetInnerHTML={{ __html: data.prokerala.chartSvg }}
+          />
+        ) : (
+          <NatalMandala
+            bodies={bodies}
+            ascendantSign={data.ascendant.sign}
+            ascendantDegree={num(data.ascendant.degree)}
+            aspects={aspects}
+          />
+        )}
+      </div>
+      <Link
+        to="/mapa-astral/$id"
+        params={{ id }}
+        className="mt-3 block text-center text-xs font-bold uppercase tracking-[0.2em] text-lilac"
+      >
+        Ver leitura completa →
+      </Link>
+    </section>
+  );
+}
