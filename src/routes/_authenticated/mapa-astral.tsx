@@ -1,10 +1,12 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { Lock, Sparkles, Trash2, MapPin, Loader2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { generateNatalChart } from "@/lib/natal.functions";
+import { generateNatalChart, type NatalChartData } from "@/lib/natal.functions";
+import { NatalMandala } from "@/components/NatalMandala";
+import { calcAspects, signLongitude } from "@/lib/elements";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/mapa-astral")({
@@ -38,7 +40,6 @@ function formatBirthDate(iso: string): string {
 
 function MapaAstralListPage() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [charts, setCharts] = useState<ChartRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
@@ -50,6 +51,7 @@ function MapaAstralListPage() {
   const [placeResults, setPlaceResults] = useState<NominatimResult[]>([]);
   const [searchingPlace, setSearchingPlace] = useState(false);
   const placeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [result, setResult] = useState<{ id: string; name: string; data: NatalChartData } | null>(null);
 
   const handlePlaceChange = (v: string) => {
     setBirthPlace(v);
@@ -144,12 +146,20 @@ function MapaAstralListPage() {
         .single();
       if (error) throw error;
       toast.success("Mapa criado ✨");
+      setResult({ id: inserted.id, name, data: chartData });
       setName("");
       setBirthDate("");
       setBirthTime("");
       setBirthPlace("");
-      // Mantém o usuário no app — navega para a página do mapa recém-criado
-      navigate({ to: "/mapa-astral/$id", params: { id: inserted.id } });
+      // Atualiza a lista local pra mostrar o mapa recém-criado
+      setCharts((prev) => [
+        { id: inserted.id, name, birth_date: birthDate, birth_place: birthPlace, created_at: new Date().toISOString() },
+        ...prev,
+      ]);
+      // Rola até a visualização do mapa
+      setTimeout(() => {
+        document.getElementById("mapa-render")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 50);
     } catch (err) {
       console.error(err);
       toast.error("Não foi possível gerar o mapa. Tenta de novo em instantes.");
@@ -169,6 +179,8 @@ function MapaAstralListPage() {
           Preencha os dados de nascimento pra gerar seu mapa. Salve quantos quiser.
         </p>
       </header>
+
+      {result && <InlineMapaRender id={result.id} name={result.name} data={result.data} />}
 
       {!loading && charts.length > 0 && (
         <section className="px-6 mb-6 animate-oo-enter [animation-delay:80ms]">
@@ -326,5 +338,57 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       </span>
       {children}
     </label>
+  );
+}
+
+function InlineMapaRender({ id, name, data }: { id: string; name: string; data: NatalChartData }) {
+  const num = (v: unknown, def = 0) => {
+    const n = typeof v === "number" ? v : parseFloat(String(v ?? ""));
+    return Number.isFinite(n) ? n : def;
+  };
+  const bodies = [
+    { name: "Sol", sign: data.sun.sign, degree: num(data.sun.degree), house: num(data.sun.house, 1) },
+    { name: "Lua", sign: data.moon.sign, degree: num(data.moon.degree), house: num(data.moon.house, 1) },
+    ...data.planets.map((p) => ({
+      name: p.name,
+      sign: p.sign,
+      degree: num(p.degree),
+      house: num(p.house, 1),
+    })),
+  ];
+  const aspects = calcAspects(
+    bodies.map((b) => ({ name: b.name, longitude: signLongitude(b.sign, b.degree) })),
+  );
+  return (
+    <section
+      id="mapa-render"
+      className="px-6 mb-6 animate-oo-enter"
+    >
+      <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50 mb-2">
+        seu mapa de {name}
+      </p>
+      <div className="bg-white rounded-[28px] p-6 ring-1 ring-black/5 flex justify-center">
+        {data?.prokerala?.chartSvg ? (
+          <div
+            className="w-full max-w-[520px] [&>svg]:w-full [&>svg]:h-auto"
+            dangerouslySetInnerHTML={{ __html: data.prokerala.chartSvg }}
+          />
+        ) : (
+          <NatalMandala
+            bodies={bodies}
+            ascendantSign={data.ascendant.sign}
+            ascendantDegree={num(data.ascendant.degree)}
+            aspects={aspects}
+          />
+        )}
+      </div>
+      <Link
+        to="/mapa-astral/$id"
+        params={{ id }}
+        className="mt-3 block text-center text-xs font-bold uppercase tracking-[0.2em] text-lilac"
+      >
+        Ver leitura completa →
+      </Link>
+    </section>
   );
 }
