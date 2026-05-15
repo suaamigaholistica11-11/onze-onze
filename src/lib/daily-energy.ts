@@ -135,15 +135,12 @@ export function buildDailyEnergy(transits: TransitItem[]) {
   if (!sol || !lua) {
     return {
       texto: "Hoje o céu pede que você respire fundo e siga no teu tempo ✨",
-      highlights: ["leveza", "presença"],
+      highlights: ["leveza", "presença", "respiro", "intuição"],
     };
   }
 
-  const solGlyph = SIGN_GLYPHS[sol.signo] ?? "";
-  const luaGlyph = SIGN_GLYPHS[lua.signo] ?? "";
-
-  // Abertura: pano de fundo do dia (Sol e Lua).
-  const abertura = `Hoje o céu tá com Sol em ${solGlyph} ${sol.signo} e a Lua em ${luaGlyph} ${lua.signo}.`;
+  // Abertura: pano de fundo do dia (Sol e Lua), sem glifos no corpo do texto.
+  const abertura = `Hoje o céu tá com Sol em ${sol.signo} e a Lua em ${lua.signo}.`;
   const corpo = `O Sol em ${sol.signo} ${frase("Sol", sol.signo, SOL)}, enquanto a Lua em ${lua.signo} traz uma coisa importante: ${frase("Lua", lua.signo, LUA)}.`;
 
   // Camada extra: pega o planeta pessoal mais "presente" (preferindo retrógrados, depois Mercúrio/Vênus/Marte).
@@ -164,9 +161,8 @@ export function buildDailyEnergy(transits: TransitItem[]) {
     candidatos.find((c) => c.planeta?.retrograde) ?? candidatos[0];
   if (destaque?.planeta) {
     const p = destaque.planeta;
-    const g = SIGN_GLYPHS[p.signo] ?? "";
     extras.push(
-      `${destaque.nome} tá em ${g} ${p.signo}: ${frase(destaque.nome, p.signo, destaque.mapa)}.`,
+      `${destaque.nome} tá em ${p.signo}: ${frase(destaque.nome, p.signo, destaque.mapa)}.`,
     );
   }
 
@@ -187,14 +183,31 @@ export function buildDailyEnergy(transits: TransitItem[]) {
 
   const texto = [abertura, corpo, ...extras, fechamento].join(" ");
 
-  const highlights = [
-    `Sol em ${sol.signo}`,
-    `Lua em ${lua.signo}`,
-    SIGN_VIBE[lua.signo] ?? "presença",
-  ];
-  if (retrogrados.length > 0) {
-    highlights.push(`${retrogrados[0]} ℞`);
-  }
+  // Destaque: glifos dos signos + 4 palavras-chave do dia.
+  const MODO_PALAVRA: Record<Modo, string> = {
+    agir: "ação",
+    pensar: "reflexão",
+    planejar: "plano",
+    sentir: "escuta",
+  };
+  const palavraDestaque = destaque?.planeta
+    ? SIGN_VIBE[destaque.planeta.signo]
+    : undefined;
+  const palavras = Array.from(
+    new Set(
+      [
+        SIGN_VIBE[sol.signo],
+        SIGN_VIBE[lua.signo],
+        palavraDestaque,
+        MODO_PALAVRA[SIGN_MODO[sol.signo]],
+        MODO_PALAVRA[SIGN_MODO[lua.signo]],
+      ].filter(Boolean) as string[],
+    ),
+  ).slice(0, 4);
+
+  const solGlyphChip = `${SIGN_GLYPHS[sol.signo] ?? "☉"} ${sol.signo}`;
+  const luaGlyphChip = `${SIGN_GLYPHS[lua.signo] ?? "☾"} ${lua.signo}`;
+  const highlights = [solGlyphChip, luaGlyphChip, ...palavras];
 
   return { texto, highlights };
 }
