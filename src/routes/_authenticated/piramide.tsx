@@ -66,14 +66,26 @@ interface ProgressRow {
   comment: string | null;
 }
 
-// Janela do ciclo: dias 1 a 21 do mês = foco. Dias 22 até o fim do mês = relax.
+// Janela do ciclo: 21 dias contados a partir do dia em que a pessoa escolheu seus 3 temas.
+// Depois disso, sobram 9 ou 10 dias de "modo relax" até o fim do mês em que o ciclo terminou.
 const FOCUS_DAYS = 21;
-function getCycleInfo(now = new Date()) {
-  const day = now.getDate();
-  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
-  const relaxDays = lastDay - FOCUS_DAYS; // 9 ou 10
-  const isRelax = day > FOCUS_DAYS;
-  return { day, lastDay, relaxDays, isRelax };
+function startOfDay(d: Date) {
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+function getCycleInfo(chosenAtISO: string, now = new Date()) {
+  const start = startOfDay(new Date(chosenAtISO));
+  const today = startOfDay(now);
+  const dayInCycle = Math.floor((today.getTime() - start.getTime()) / 86400000) + 1; // 1-based
+  // Fim do mês em que o foco termina (start + 20 dias).
+  const focusEnd = new Date(start);
+  focusEnd.setDate(start.getDate() + FOCUS_DAYS - 1);
+  const monthLastDay = new Date(focusEnd.getFullYear(), focusEnd.getMonth() + 1, 0).getDate();
+  const relaxDaysTotal = monthLastDay - focusEnd.getDate(); // 9 ou 10 normalmente
+  const relaxEnd = new Date(focusEnd);
+  relaxEnd.setDate(focusEnd.getDate() + relaxDaysTotal);
+  const isRelax = dayInCycle > FOCUS_DAYS && today.getTime() <= relaxEnd.getTime();
+  const relaxDaysLeft = Math.max(0, Math.ceil((relaxEnd.getTime() - today.getTime()) / 86400000));
+  return { start, dayInCycle, isRelax, relaxDaysTotal, relaxDaysLeft };
 }
 
 const BAR_COLORS = [
@@ -368,7 +380,11 @@ function PiramidePage() {
       {/* Pirâmide Evolutiva (radar) + Insights */}
       {choice && (
         <section className="px-6 mb-8 animate-oo-enter [animation-delay:240ms]">
-          <PiramideEvolutivaIntro themes={choice.themes} progress={progress} />
+          <PiramideEvolutivaIntro
+            themes={choice.themes}
+            progress={progress}
+            chosenAt={choice.chosen_at}
+          />
         </section>
       )}
 
@@ -400,12 +416,14 @@ function PiramidePage() {
 function PiramideEvolutivaIntro({
   themes,
   progress,
+  chosenAt,
 }: {
   themes: string[];
   progress: ProgressRow[];
+  chosenAt: string;
 }) {
   const mesAno = new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
-  const cycle = getCycleInfo();
+  const cycle = getCycleInfo(chosenAt);
 
   const averages = useMemo(
     () =>
@@ -438,7 +456,9 @@ function PiramideEvolutivaIntro({
           <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50">
             Seus 21 dias de foco
           </p>
-          <span className="text-[10px] text-ink/50">dia {Math.min(cycle.day, FOCUS_DAYS)}/21</span>
+          <span className="text-[10px] text-ink/50">
+            dia {Math.min(Math.max(cycle.dayInCycle, 1), FOCUS_DAYS)}/21
+          </span>
         </div>
         <div className="space-y-4">
           {themes.map((tid) => {
@@ -451,7 +471,8 @@ function PiramideEvolutivaIntro({
                 themeName={t.nome}
                 emoji={t.emoji}
                 progress={progress}
-                today={cycle.day}
+                cycleStart={cycle.start}
+                today={cycle.dayInCycle}
               />
             );
           })}
@@ -472,7 +493,7 @@ function PiramideEvolutivaIntro({
         </div>
       </div>
 
-      {/* Modo relax nos últimos 9/10 dias do mês */}
+      {/* Modo relax depois dos 21 dias de foco, até o fim do mês */}
       {cycle.isRelax && (
         <div className="bg-gradient-to-br from-mint/40 to-sky/40 rounded-[28px] ring-1 ring-black/5 p-5 mb-4">
           <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50 mb-1">
@@ -482,10 +503,9 @@ function PiramideEvolutivaIntro({
             Você completou seus 21 dias de foco. Agora respira ✨
           </p>
           <p className="text-sm text-ink/70 leading-relaxed">
-            Faltam {cycle.lastDay - cycle.day} dia
-            {cycle.lastDay - cycle.day === 1 ? "" : "s"} pro próximo ciclo. Aproveita esses dias
-            pra descansar do foco, rever o que floresceu e pensar com calma quais 3 áreas vão te
-            mover no próximo mês.
+            Faltam {cycle.relaxDaysLeft} dia{cycle.relaxDaysLeft === 1 ? "" : "s"} pro próximo
+            ciclo. Aproveita esses dias pra descansar do foco, rever o que floresceu e pensar com
+            calma quais 3 áreas vão te mover no próximo ciclo.
           </p>
         </div>
       )}
@@ -731,23 +751,25 @@ function BarsForTheme({
   themeName,
   emoji,
   progress,
+  cycleStart,
   today,
 }: {
   themeId: string;
   themeName: string;
   emoji: string;
   progress: ProgressRow[];
+  cycleStart: Date;
   today: number;
 }) {
-  // Mapeia entradas do mês corrente por dia.
-  const now = new Date();
-  const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  // Mapeia entradas pelo offset em dias desde o início do ciclo (1..21).
+  const startMs = cycleStart.getTime();
   const byDay = new Map<number, number>();
   progress
-    .filter((p) => p.theme === themeId && p.entry_date.startsWith(ym))
+    .filter((p) => p.theme === themeId)
     .forEach((p) => {
-      const d = parseInt(p.entry_date.slice(8, 10), 10);
-      if (d >= 1 && d <= FOCUS_DAYS) byDay.set(d, p.value);
+      const entry = new Date(p.entry_date + "T00:00:00").getTime();
+      const offset = Math.floor((entry - startMs) / 86400000) + 1;
+      if (offset >= 1 && offset <= FOCUS_DAYS) byDay.set(offset, p.value);
     });
 
   return (
