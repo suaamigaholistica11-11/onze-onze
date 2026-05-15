@@ -9,6 +9,7 @@ import { NatalMandala } from "@/components/NatalMandala";
 import { calcAspects, signLongitude } from "@/lib/elements";
 import { toast } from "sonner";
 import zodiacWheel from "@/assets/zodiac-wheel.png";
+import { useBgDisabled } from "@/lib/bg-preference";
 
 export const Route = createFileRoute("/_authenticated/mapa-astral")({
   head: () => ({
@@ -41,6 +42,7 @@ function formatBirthDate(iso: string): string {
 
 function MapaAstralListPage() {
   const { user } = useAuth();
+  const bgDisabled = useBgDisabled();
   const [charts, setCharts] = useState<ChartRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");

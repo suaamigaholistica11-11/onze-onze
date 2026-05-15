@@ -9,6 +9,7 @@ import {
 } from "@/lib/transits.functions";
 import { SIGN_GLYPHS } from "@/lib/transit-copy";
 import solarSystem from "@/assets/solar-system.png";
+import { useBgDisabled } from "@/lib/bg-preference";
 
 export const Route = createFileRoute("/_authenticated/ceu-hoje")({
   head: () => ({
