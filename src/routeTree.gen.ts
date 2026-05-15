@@ -13,6 +13,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedPlanoDeFundoRouteImport } from './routes/_authenticated/plano-de-fundo'
 import { Route as AuthenticatedPiramideRouteImport } from './routes/_authenticated/piramide'
 import { Route as AuthenticatedMapaAstralRouteImport } from './routes/_authenticated/mapa-astral'
 import { Route as AuthenticatedCompletarPerfilRouteImport } from './routes/_authenticated/completar-perfil'
@@ -38,6 +39,12 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedPlanoDeFundoRoute =
+  AuthenticatedPlanoDeFundoRouteImport.update({
+    id: '/plano-de-fundo',
+    path: '/plano-de-fundo',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedPiramideRoute = AuthenticatedPiramideRouteImport.update({
   id: '/piramide',
   path: '/piramide',
@@ -74,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/completar-perfil': typeof AuthenticatedCompletarPerfilRoute
   '/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/piramide': typeof AuthenticatedPiramideRoute
+  '/plano-de-fundo': typeof AuthenticatedPlanoDeFundoRoute
   '/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
 }
 export interface FileRoutesByTo {
@@ -83,6 +91,7 @@ export interface FileRoutesByTo {
   '/completar-perfil': typeof AuthenticatedCompletarPerfilRoute
   '/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/piramide': typeof AuthenticatedPiramideRoute
+  '/plano-de-fundo': typeof AuthenticatedPlanoDeFundoRoute
   '/': typeof AuthenticatedIndexRoute
   '/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
 }
@@ -95,6 +104,7 @@ export interface FileRoutesById {
   '/_authenticated/completar-perfil': typeof AuthenticatedCompletarPerfilRoute
   '/_authenticated/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/_authenticated/piramide': typeof AuthenticatedPiramideRoute
+  '/_authenticated/plano-de-fundo': typeof AuthenticatedPlanoDeFundoRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
 }
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/completar-perfil'
     | '/mapa-astral'
     | '/piramide'
+    | '/plano-de-fundo'
     | '/mapa-astral/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/completar-perfil'
     | '/mapa-astral'
     | '/piramide'
+    | '/plano-de-fundo'
     | '/'
     | '/mapa-astral/$id'
   id:
@@ -128,6 +140,7 @@ export interface FileRouteTypes {
     | '/_authenticated/completar-perfil'
     | '/_authenticated/mapa-astral'
     | '/_authenticated/piramide'
+    | '/_authenticated/plano-de-fundo'
     | '/_authenticated/'
     | '/_authenticated/mapa-astral/$id'
   fileRoutesById: FileRoutesById
@@ -166,6 +179,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/plano-de-fundo': {
+      id: '/_authenticated/plano-de-fundo'
+      path: '/plano-de-fundo'
+      fullPath: '/plano-de-fundo'
+      preLoaderRoute: typeof AuthenticatedPlanoDeFundoRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/piramide': {
@@ -225,6 +245,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCompletarPerfilRoute: typeof AuthenticatedCompletarPerfilRoute
   AuthenticatedMapaAstralRoute: typeof AuthenticatedMapaAstralRouteWithChildren
   AuthenticatedPiramideRoute: typeof AuthenticatedPiramideRoute
+  AuthenticatedPlanoDeFundoRoute: typeof AuthenticatedPlanoDeFundoRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
@@ -233,6 +254,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCompletarPerfilRoute: AuthenticatedCompletarPerfilRoute,
   AuthenticatedMapaAstralRoute: AuthenticatedMapaAstralRouteWithChildren,
   AuthenticatedPiramideRoute: AuthenticatedPiramideRoute,
+  AuthenticatedPlanoDeFundoRoute: AuthenticatedPlanoDeFundoRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 

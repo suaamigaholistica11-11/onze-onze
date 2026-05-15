@@ -9,6 +9,7 @@ import { NatalMandala } from "@/components/NatalMandala";
 import { calcAspects, signLongitude } from "@/lib/elements";
 import { toast } from "sonner";
 import zodiacWheel from "@/assets/zodiac-wheel.png";
+import { useBgDisabled } from "@/lib/bg-preference";
 
 export const Route = createFileRoute("/_authenticated/mapa-astral")({
   head: () => ({
@@ -41,6 +42,7 @@ function formatBirthDate(iso: string): string {
 
 function MapaAstralListPage() {
   const { user } = useAuth();
+  const bgDisabled = useBgDisabled();
   const [charts, setCharts] = useState<ChartRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
@@ -193,11 +195,13 @@ function MapaAstralListPage() {
 
   return (
     <AppShell glyph="✦">
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-0 bg-no-repeat bg-center bg-cover opacity-15"
-        style={{ backgroundImage: `url(${zodiacWheel})` }}
-      />
+      {!bgDisabled && (
+        <div
+          aria-hidden
+          className="pointer-events-none fixed inset-0 z-0 bg-no-repeat bg-center bg-cover opacity-15"
+          style={{ backgroundImage: `url(${zodiacWheel})` }}
+        />
+      )}
       <header className="px-6 pt-10 pb-4 animate-oo-enter">
         <p className="text-xs font-medium uppercase tracking-[0.25em] text-ink/40 mb-2">
           seus mapas
