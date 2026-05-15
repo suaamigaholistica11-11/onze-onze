@@ -8,6 +8,7 @@ import { generateNatalChart, type NatalChartData } from "@/lib/natal.functions";
 import { NatalMandala } from "@/components/NatalMandala";
 import { calcAspects, signLongitude } from "@/lib/elements";
 import { toast } from "sonner";
+import zodiacWheel from "@/assets/zodiac-wheel.png";
 
 export const Route = createFileRoute("/_authenticated/mapa-astral")({
   head: () => ({
@@ -192,6 +193,11 @@ function MapaAstralListPage() {
 
   return (
     <AppShell glyph="✦">
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-0 bg-no-repeat bg-center bg-cover opacity-15"
+        style={{ backgroundImage: `url(${zodiacWheel})` }}
+      />
       <header className="px-6 pt-10 pb-4 animate-oo-enter">
         <p className="text-xs font-medium uppercase tracking-[0.25em] text-ink/40 mb-2">
           seus mapas
