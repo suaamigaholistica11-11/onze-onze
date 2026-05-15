@@ -15,6 +15,11 @@ import moonNewImg from "@/assets/moon-new.png";
 import moonCrescentImg from "@/assets/moon-crescent.png";
 import moonFullImg from "@/assets/moon-full.png";
 import moonWaningImg from "@/assets/moon-waning.png";
+import peixesBg from "@/assets/signs/peixes.png";
+
+const SIGN_BACKGROUNDS: Record<string, string> = {
+  Peixes: peixesBg,
+};
 
 export const Route = createFileRoute("/_authenticated/")({
   head: () => ({
@@ -43,6 +48,14 @@ function HomePage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
+  const [meuSigno, setMeuSigno] = useState<string | null>(null);
+  useEffect(() => {
+    try {
+      setMeuSigno(localStorage.getItem("oo:meu-signo"));
+    } catch {}
+  }, []);
+  const signoBg = meuSigno ? SIGN_BACKGROUNDS[meuSigno] : undefined;
+
   const saudacao = mounted
     ? getSaudacao(nome)
     : { titulo: `Oi, ${nome}!`, subtitulo: "Lindo dia pra você!", periodo: "manhã" as const };
@@ -68,6 +81,13 @@ function HomePage() {
 
   return (
     <AppShell glyph={signoUsuario.glyph}>
+      {signoBg && (
+        <div
+          aria-hidden
+          className="pointer-events-none fixed inset-0 -z-10 bg-no-repeat bg-center bg-cover opacity-20"
+          style={{ backgroundImage: `url(${signoBg})` }}
+        />
+      )}
       <header className="px-6 pt-10 pb-6 animate-oo-enter">
         <p className="text-xs font-medium uppercase tracking-[0.25em] text-ink/40 mb-2">
           {saudacao.periodo}
