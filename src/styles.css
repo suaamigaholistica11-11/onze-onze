@@ -214,6 +214,23 @@
 .animate-oo-twinkle-c { animation: oo-twinkle-c 2.9s ease-in-out infinite; }
 .animate-oo-twinkle-d { animation: oo-twinkle-d 4.1s ease-in-out infinite; }
 
+/* Loader: planetas em órbita */
+@keyframes oo-orbit {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes oo-orbit-rev {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(-360deg); }
+}
+@keyframes oo-sun-glow {
+  0%, 100% { box-shadow: 0 0 18px 4px color-mix(in oklab, var(--yellow-candy) 80%, transparent); }
+  50%      { box-shadow: 0 0 28px 8px color-mix(in oklab, var(--peach) 70%, transparent); }
+}
+.animate-oo-orbit     { animation: oo-orbit 6s linear infinite; }
+.animate-oo-orbit-rev { animation: oo-orbit-rev 9s linear infinite; }
+.animate-oo-sun-glow  { animation: oo-sun-glow 2.8s ease-in-out infinite; }
+
 .pill-input {
   width: 100%;
   background: white;
