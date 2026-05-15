@@ -112,6 +112,11 @@ function CeuHojePage() {
                         day: "2-digit",
                         month: "short",
                       })}
+                      {" · "}
+                      {new Date(p.dataISO).toLocaleTimeString("pt-BR", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
                     </span>
                     <span className="text-[10px] text-ink/40 w-14 text-right">
                       {p.diasRestantes === 0 ? "hoje" : `em ${p.diasRestantes}d`}
