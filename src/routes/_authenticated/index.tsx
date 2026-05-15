@@ -95,8 +95,13 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Energia do Dia */}
+      {/* Lua */}
       <section className="px-6 mb-6 animate-oo-enter [animation-delay:160ms]">
+        <MoonPanel proximas={moonData?.proximas ?? null} />
+      </section>
+
+      {/* Energia do Dia */}
+      <section className="px-6 mb-6 animate-oo-enter [animation-delay:240ms]">
         <div className="bg-white p-6 rounded-[28px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5">
           <div className="flex items-center gap-2 mb-3">
             <span className="size-2 rounded-full bg-peach animate-oo-pulse" />
@@ -118,11 +123,6 @@ function HomePage() {
             ))}
           </div>
         </div>
-      </section>
-
-      {/* Lua Nova */}
-      <section className="px-6 mb-6 animate-oo-enter [animation-delay:240ms]">
-        <MoonPanel proximas={moonData?.proximas ?? null} />
       </section>
 
       {/* Atalhos */}
@@ -167,12 +167,6 @@ function MoonPanel({
   const next = proximas
     ? [...proximas].sort((a, b) => a.diasRestantes - b.diasRestantes)[0]
     : null;
-  const nextDate = next
-    ? new Date(next.dataISO).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "long",
-      })
-    : null;
 
   return (
     <div className="bg-gradient-to-br from-lilac/60 to-sky/40 p-6 rounded-[28px] relative overflow-hidden ring-1 ring-black/5">
@@ -182,26 +176,31 @@ function MoonPanel({
           Lua
         </p>
         <h3 className="font-display text-lg font-bold leading-tight">
-          {next ? `Próxima: ${next.nome}` : "Ciclo lunar"}
+          {next ? `${next.nome} começa em...` : "Ciclo lunar"}
         </h3>
-        {nextDate && next && (
-          <p className="text-xs text-ink/60 mb-4">
-            {nextDate} · em {next.diasRestantes === 0 ? "menos de 1 dia" : `${next.diasRestantes} dia${next.diasRestantes > 1 ? "s" : ""}`}
-          </p>
-        )}
         {next && (
-          <div className="mb-5">
+          <div className="mt-3 mb-5">
             <Countdown target={new Date(next.dataISO)} />
           </div>
         )}
 
-        <div className="grid grid-cols-4 gap-2">
+        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-ink/50 mb-2">
+          fases da lua
+        </p>
+        <div className="grid grid-cols-4 gap-2 mb-5">
           {MOON_ORDER.map((nome) => {
             const info = byName.get(nome);
             const isNext = next?.nome === nome;
             return <MoonCard key={nome} nome={nome} info={info} highlight={isNext} />;
           })}
         </div>
+
+        <button
+          type="button"
+          className="w-full bg-ink text-white py-3 rounded-full text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-ink/90 transition-colors"
+        >
+          Vem pro Ritualzinho ✨
+        </button>
       </div>
     </div>
   );
