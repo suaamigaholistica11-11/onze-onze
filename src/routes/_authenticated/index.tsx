@@ -84,7 +84,7 @@ function HomePage() {
       {signoBg && (
         <div
           aria-hidden
-          className="pointer-events-none fixed inset-0 -z-10 bg-no-repeat bg-center bg-cover opacity-20"
+          className="pointer-events-none fixed inset-0 z-0 bg-no-repeat bg-center bg-cover opacity-30"
           style={{ backgroundImage: `url(${signoBg})` }}
         />
       )}
