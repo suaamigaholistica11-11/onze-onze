@@ -8,6 +8,7 @@ import {
   type MoonNowInfo,
 } from "@/lib/transits.functions";
 import { SIGN_GLYPHS } from "@/lib/transit-copy";
+import solarSystem from "@/assets/solar-system.png";
 
 export const Route = createFileRoute("/_authenticated/ceu-hoje")({
   head: () => ({
@@ -47,6 +48,11 @@ function CeuHojePage() {
 
   return (
     <AppShell glyph="✦">
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 z-0 bg-no-repeat bg-center bg-cover opacity-15"
+        style={{ backgroundImage: `url(${solarSystem})` }}
+      />
       <header className="px-6 pt-10 pb-4 animate-oo-enter">
         <p className="text-xs font-medium uppercase tracking-[0.25em] text-ink/40 mb-2">
           {hoje}
