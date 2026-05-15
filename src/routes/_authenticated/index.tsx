@@ -206,6 +206,16 @@ function MoonPanel({
           {next ? `${next.nome} começa em...` : "Ciclo lunar"}
         </h3>
         {next && (
+          <p className="text-[11px] text-ink/60 mt-1">
+            {new Date(next.dataISO).toLocaleString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
+          </p>
+        )}
+        {next && (
           <div className="mt-3 mb-5">
             <Countdown target={new Date(next.dataISO)} />
           </div>
@@ -249,6 +259,12 @@ function MoonCard({
         month: "2-digit",
       })
     : "···";
+  const horaCurta = info
+    ? new Date(info.dataISO).toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : "";
   return (
     <div
       className={`rounded-2xl p-2 flex flex-col items-center text-center transition-all ${
@@ -286,6 +302,9 @@ function MoonCard({
         {nome.replace("Quarto ", "")}
       </span>
       <span className="text-[9px] text-ink/50 mt-0.5">{dataCurta}</span>
+      {horaCurta && (
+        <span className="text-[9px] text-ink/40">{horaCurta}</span>
+      )}
     </div>
   );
 }
