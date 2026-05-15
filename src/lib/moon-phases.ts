@@ -109,13 +109,15 @@ export const MOON_PHASES: MoonPhaseInfo[] = [
  */
 export function phaseFromAngle(angle: number): MoonPhaseInfo {
   const a = ((angle % 360) + 360) % 360;
-  if (a < 22.5 || a >= 337.5) return MOON_PHASES[0]; // Nova
-  if (a < 67.5) return MOON_PHASES[1]; // Crescente Iluminante
-  if (a < 112.5) return MOON_PHASES[2]; // Quarto Crescente
-  if (a < 157.5) return MOON_PHASES[3]; // Gibosa Crescente
-  if (a < 202.5) return MOON_PHASES[4]; // Cheia
-  if (a < 247.5) return MOON_PHASES[5]; // Gibosa Minguante
-  if (a < 292.5) return MOON_PHASES[6]; // Quarto Minguante
+  // Janelas estreitas (~±2° ≈ ±4h) para os 4 marcos exatos.
+  // Fora delas, retorna a fase de transição correspondente.
+  if (a < 2 || a >= 358) return MOON_PHASES[0]; // Nova (exata)
+  if (a < 88) return MOON_PHASES[1]; // Crescente Iluminante
+  if (a < 92) return MOON_PHASES[2]; // Quarto Crescente (exato)
+  if (a < 178) return MOON_PHASES[3]; // Gibosa Crescente
+  if (a < 182) return MOON_PHASES[4]; // Cheia (exata)
+  if (a < 268) return MOON_PHASES[5]; // Gibosa Minguante
+  if (a < 272) return MOON_PHASES[6]; // Quarto Minguante (exato)
   return MOON_PHASES[7]; // Bálsamica
 }
 
