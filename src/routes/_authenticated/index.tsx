@@ -95,8 +95,13 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Energia do Dia */}
+      {/* Lua */}
       <section className="px-6 mb-6 animate-oo-enter [animation-delay:160ms]">
+        <MoonPanel proximas={moonData?.proximas ?? null} />
+      </section>
+
+      {/* Energia do Dia */}
+      <section className="px-6 mb-6 animate-oo-enter [animation-delay:240ms]">
         <div className="bg-white p-6 rounded-[28px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5">
           <div className="flex items-center gap-2 mb-3">
             <span className="size-2 rounded-full bg-peach animate-oo-pulse" />
@@ -118,11 +123,6 @@ function HomePage() {
             ))}
           </div>
         </div>
-      </section>
-
-      {/* Lua Nova */}
-      <section className="px-6 mb-6 animate-oo-enter [animation-delay:240ms]">
-        <MoonPanel proximas={moonData?.proximas ?? null} />
       </section>
 
       {/* Atalhos */}
