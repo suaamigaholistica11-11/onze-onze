@@ -30,7 +30,7 @@ export const Route = createFileRoute("/_authenticated/piramide")({
 });
 
 const TEMAS = [
-  { id: "fisico", nome: "Físico", emoji: "🌿", cor: "bg-mint" },
+  { id: "fisico", nome: "Físico", emoji: "💪", cor: "bg-mint" },
   { id: "mental", nome: "Mental", emoji: "💭", cor: "bg-sky" },
   { id: "espiritual", nome: "Espiritual", emoji: "✨", cor: "bg-lilac" },
   { id: "emocional", nome: "Emocional", emoji: "💗", cor: "bg-peach" },
@@ -43,14 +43,14 @@ const TEMAS = [
 const COOLDOWN_DAYS = 21;
 
 const RECOMENDACOES: Record<string, string> = {
-  fisico: "Uma caminhada leve de 15 minutos",
-  mental: "Leitura ou um quebra-cabeça",
-  espiritual: "Respiração consciente",
-  emocional: "Escrever 3 sentimentos do dia num caderninho",
-  social: "Mandar uma mensagem carinhosa pra alguém querido",
-  criativo: "Rabiscar, escrever ou criar algo",
-  carreira: "Estudar algo da sua área",
-  financas: "Anotar todos os gastos do dia",
+  fisico: "dar uma caminhada leve de 15 minutinhos pra mexer o corpo?",
+  mental: "se desligar um pouco e curtir uma leitura ou um quebra-cabeça?",
+  espiritual: "pegar uns minutinhos do dia pra fazer uma pausa e respirar fundo 3 vezes?",
+  emocional: "escrever 3 sentimentos do dia num caderninho só seu?",
+  social: "mandar uma mensagem carinhosa pra alguém querido agora?",
+  criativo: "rabiscar, escrever ou criar qualquer coisinha sem compromisso?",
+  carreira: "separar 15 minutos pra estudar algo da sua área hoje?",
+  financas: "criar uma “reserva de paz”, mesmo que comece com R$10 por semana? Respira fundo que a gente vai organizar esse bolso!",
 };
 
 interface ChoiceRow {
@@ -440,9 +440,9 @@ function PiramideEvolutivaIntro({
               <p className="text-sm text-ink/70 leading-relaxed mb-3">{insight}</p>
               <div className="bg-cream/60 rounded-xl p-3 text-xs text-ink/70 space-y-1">
                 <p className="font-bold uppercase tracking-[0.15em] text-[10px] text-ink/50 mb-1">
-                  Recomendações
+                  Pega essa dica
                 </p>
-                <p>• Mini-hábito: {RECOMENDACOES[tid] ?? "Um passo pequeno"}.</p>
+                <p>Que tal {RECOMENDACOES[tid] ?? "dar um passinho pequeno hoje?"}</p>
               </div>
             </div>
           );
