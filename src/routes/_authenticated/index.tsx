@@ -16,6 +16,7 @@ import moonCrescentImg from "@/assets/moon-crescent.png";
 import moonFullImg from "@/assets/moon-full.png";
 import moonWaningImg from "@/assets/moon-waning.png";
 import peixesBg from "@/assets/signs/peixes.png";
+import zodiacWheel from "@/assets/zodiac-wheel.png";
 
 const SIGN_BACKGROUNDS: Record<string, string> = {
   Peixes: peixesBg,
@@ -54,7 +55,7 @@ function HomePage() {
       setMeuSigno(localStorage.getItem("oo:meu-signo"));
     } catch {}
   }, []);
-  const signoBg = meuSigno ? SIGN_BACKGROUNDS[meuSigno] : undefined;
+  const signoBg = meuSigno ? SIGN_BACKGROUNDS[meuSigno] : zodiacWheel;
 
   const saudacao = mounted
     ? getSaudacao(nome)
