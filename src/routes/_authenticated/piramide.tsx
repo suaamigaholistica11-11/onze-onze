@@ -380,7 +380,11 @@ function PiramidePage() {
       {/* Pirâmide Evolutiva (radar) + Insights */}
       {choice && (
         <section className="px-6 mb-8 animate-oo-enter [animation-delay:240ms]">
-          <PiramideEvolutivaIntro themes={choice.themes} progress={progress} />
+          <PiramideEvolutivaIntro
+            themes={choice.themes}
+            progress={progress}
+            chosenAt={choice.chosen_at}
+          />
         </section>
       )}
 
@@ -747,23 +751,25 @@ function BarsForTheme({
   themeName,
   emoji,
   progress,
+  cycleStart,
   today,
 }: {
   themeId: string;
   themeName: string;
   emoji: string;
   progress: ProgressRow[];
+  cycleStart: Date;
   today: number;
 }) {
-  // Mapeia entradas do mês corrente por dia.
-  const now = new Date();
-  const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  // Mapeia entradas pelo offset em dias desde o início do ciclo (1..21).
+  const startMs = cycleStart.getTime();
   const byDay = new Map<number, number>();
   progress
-    .filter((p) => p.theme === themeId && p.entry_date.startsWith(ym))
+    .filter((p) => p.theme === themeId)
     .forEach((p) => {
-      const d = parseInt(p.entry_date.slice(8, 10), 10);
-      if (d >= 1 && d <= FOCUS_DAYS) byDay.set(d, p.value);
+      const entry = new Date(p.entry_date + "T00:00:00").getTime();
+      const offset = Math.floor((entry - startMs) / 86400000) + 1;
+      if (offset >= 1 && offset <= FOCUS_DAYS) byDay.set(offset, p.value);
     });
 
   return (
