@@ -26,6 +26,7 @@ export const Route = createFileRoute("/_authenticated/ceu-hoje")({
 
 function CeuHojePage() {
   const hoje = new Date().toLocaleDateString("pt-BR", { day: "numeric", month: "long" });
+  const bgDisabled = useBgDisabled();
   const [transits, setTransits] = useState<TransitItem[] | null>(null);
   const [moon, setMoon] = useState<MoonNowInfo | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -49,11 +50,13 @@ function CeuHojePage() {
 
   return (
     <AppShell glyph="✦">
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 z-0 bg-no-repeat bg-center bg-cover opacity-15"
-        style={{ backgroundImage: `url(${solarSystem})` }}
-      />
+      {!bgDisabled && (
+        <div
+          aria-hidden
+          className="pointer-events-none fixed inset-0 z-0 bg-no-repeat bg-center bg-cover opacity-15"
+          style={{ backgroundImage: `url(${solarSystem})` }}
+        />
+      )}
       <header className="px-6 pt-10 pb-4 animate-oo-enter">
         <p className="text-xs font-medium uppercase tracking-[0.25em] text-ink/40 mb-2">
           {hoje}
