@@ -43,14 +43,14 @@ const TEMAS = [
 const COOLDOWN_DAYS = 21;
 
 const RECOMENDACOES: Record<string, string> = {
-  fisico: "uma caminhada leve de 15 minutos",
-  mental: "10 minutos de leitura ou um quebra-cabeça",
-  espiritual: "5 minutos de respiração consciente",
-  emocional: "escrever 3 sentimentos do dia num caderninho",
-  social: "mandar uma mensagem carinhosa pra alguém querido",
-  criativo: "rabiscar, escrever ou criar algo por 10 minutos",
-  carreira: "estudar 20 minutos de algo da sua área",
-  financas: "anotar todos os gastos do dia",
+  fisico: "Uma caminhada leve de 15 minutos",
+  mental: "Leitura ou um quebra-cabeça",
+  espiritual: "Respiração consciente",
+  emocional: "Escrever 3 sentimentos do dia num caderninho",
+  social: "Mandar uma mensagem carinhosa pra alguém querido",
+  criativo: "Rabiscar, escrever ou criar algo",
+  carreira: "Estudar algo da sua área",
+  financas: "Anotar todos os gastos do dia",
 };
 
 interface ChoiceRow {
@@ -442,13 +442,17 @@ function PiramideEvolutivaIntro({
                 <p className="font-bold uppercase tracking-[0.15em] text-[10px] text-ink/50 mb-1">
                   Recomendações
                 </p>
-                <p>• Mini-hábito: {RECOMENDACOES[tid] ?? "um passo pequeno"}, 5 minutos por dia.</p>
-                <p>• Ritual semanal: dedique 15 min no fim de semana só pra esse tema.</p>
-                <p>• Check-in de realidade: coloque um lembrete pra revisar progresso em 7 dias.</p>
+                <p>• Mini-hábito: {RECOMENDACOES[tid] ?? "Um passo pequeno"}.</p>
               </div>
             </div>
           );
         })}
+      </div>
+
+      <div className="bg-peach/40 rounded-2xl ring-1 ring-black/5 p-4 mt-4">
+        <p className="text-sm text-ink/80 leading-relaxed">
+          Tá precisando melhorar em algum tema? Separa 15 minutinhos no fim de semana só pra ele.
+        </p>
       </div>
     </>
   );
