@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { Lock, Sparkles, Trash2, MapPin, Loader2 } from "lucide-react";
+import { Lock, Sparkles, Trash2, MapPin, Loader2, Heart } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -372,6 +372,22 @@ function InlineMapaRender({ id, name, data }: { id: string; name: string; data: 
     const n = typeof v === "number" ? v : parseFloat(String(v ?? ""));
     return Number.isFinite(n) ? n : def;
   };
+  const sunSign = data.sun.sign;
+  const [claimed, setClaimed] = useState(false);
+  useEffect(() => {
+    try {
+      setClaimed(localStorage.getItem("oo:meu-signo") === sunSign);
+    } catch {}
+  }, [sunSign]);
+  const claimChart = () => {
+    try {
+      localStorage.setItem("oo:meu-signo", sunSign);
+      setClaimed(true);
+      toast.success(`Signo solar salvo: ${sunSign} ✨`);
+    } catch {
+      toast.error("Não foi possível salvar agora.");
+    }
+  };
   const bodies = [
     { name: "Sol", sign: data.sun.sign, degree: num(data.sun.degree), house: num(data.sun.house, 1) },
     { name: "Lua", sign: data.moon.sign, degree: num(data.moon.degree), house: num(data.moon.house, 1) },
@@ -401,6 +417,15 @@ function InlineMapaRender({ id, name, data }: { id: string; name: string; data: 
           aspects={aspects}
         />
       </div>
+      <button
+        type="button"
+        onClick={claimChart}
+        disabled={claimed}
+        className="mt-3 w-full bg-lilac/70 text-ink py-3 rounded-full text-[11px] font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-2 hover:bg-lilac disabled:opacity-70 transition-colors"
+      >
+        <Heart className="size-4" />
+        {claimed ? "Este mapa é meu ✓" : "Este mapa é meu"}
+      </button>
       <Link
         to="/mapa-astral/$id"
         params={{ id }}
