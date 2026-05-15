@@ -148,25 +148,31 @@ export type Database = {
       }
       pyramid_progress: {
         Row: {
+          comment: string | null
           created_at: string
           entry_date: string
           id: string
+          next_step: string | null
           theme: string
           user_id: string
           value: number
         }
         Insert: {
+          comment?: string | null
           created_at?: string
           entry_date?: string
           id?: string
+          next_step?: string | null
           theme: string
           user_id: string
           value: number
         }
         Update: {
+          comment?: string | null
           created_at?: string
           entry_date?: string
           id?: string
+          next_step?: string | null
           theme?: string
           user_id?: string
           value?: number
