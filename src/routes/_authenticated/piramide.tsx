@@ -1,16 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
-import { Lock } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Lock, Info, History as HistoryIcon } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Slider } from "@/components/ui/slider";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/_authenticated/piramide")({
   head: () => ({
     meta: [
       { title: "Pirâmide Evolutiva · onze-onze" },
-      { name: "description", content: "Escolha 3 áreas para desenvolver e acompanhe sua evolução." },
+      {
+        name: "description",
+        content: "Escolha 3 áreas para focar por 21 dias e acompanhe sua evolução.",
+      },
     ],
   }),
   component: PiramidePage,
@@ -27,7 +40,18 @@ const TEMAS = [
   { id: "financas", nome: "Finanças", emoji: "💰", cor: "bg-yellow-candy" },
 ] as const;
 
-const COOLDOWN_DAYS = 3;
+const COOLDOWN_DAYS = 21;
+
+const RECOMENDACOES: Record<string, string> = {
+  fisico: "uma caminhada leve de 15 minutos",
+  mental: "10 minutos de leitura ou um quebra-cabeça",
+  espiritual: "5 minutos de respiração consciente",
+  emocional: "escrever 3 sentimentos do dia num caderninho",
+  social: "mandar uma mensagem carinhosa pra alguém querido",
+  criativo: "rabiscar, escrever ou criar algo por 10 minutos",
+  carreira: "estudar 20 minutos de algo da sua área",
+  financas: "anotar todos os gastos do dia",
+};
 
 interface ChoiceRow {
   id: string;
@@ -38,6 +62,8 @@ interface ProgressRow {
   theme: string;
   value: number;
   entry_date: string;
+  next_step: string | null;
+  comment: string | null;
 }
 
 function PiramidePage() {
@@ -46,6 +72,9 @@ function PiramidePage() {
   const [progress, setProgress] = useState<ProgressRow[]>([]);
   const [selecting, setSelecting] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [howItWorksOpen, setHowItWorksOpen] = useState(false);
+  const [checkinTheme, setCheckinTheme] = useState<string | null>(null);
+  const [historyTheme, setHistoryTheme] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -56,7 +85,10 @@ function PiramidePage() {
         .order("chosen_at", { ascending: false })
         .limit(1)
         .maybeSingle(),
-      supabase.from("pyramid_progress").select("theme,value,entry_date").order("entry_date"),
+      supabase
+        .from("pyramid_progress")
+        .select("theme,value,entry_date,next_step,comment")
+        .order("entry_date"),
     ]).then(([c, p]) => {
       const cur = c.data as ChoiceRow | null;
       setChoice(cur);
@@ -72,6 +104,7 @@ function PiramidePage() {
     return Math.max(0, Math.ceil((next - Date.now()) / 86400000));
   })();
   const canChange = !choice || cooldownLeft === 0;
+  const cycleEnded = !!choice && cooldownLeft === 0;
 
   const toggle = (id: string) => {
     if (!canChange) return;
@@ -80,14 +113,15 @@ function PiramidePage() {
     );
   };
 
-  const saveChoice = async () => {
-    if (!user || selecting.length !== 3) {
+  const saveChoice = async (themes?: string[]) => {
+    const finalThemes = themes ?? selecting;
+    if (!user || finalThemes.length !== 3) {
       toast.error("Selecione exatamente 3 temas");
       return;
     }
     const { data, error } = await supabase
       .from("pyramid_choices")
-      .insert({ user_id: user.id, themes: selecting })
+      .insert({ user_id: user.id, themes: finalThemes })
       .select("*")
       .single();
     if (error) {
@@ -95,27 +129,48 @@ function PiramidePage() {
       return;
     }
     setChoice(data as ChoiceRow);
+    setSelecting(finalThemes);
     toast.success("Sua tríade foi atualizada ✨");
   };
 
-  const logProgress = async (theme: string, value: number) => {
+  const saveCheckin = async (
+    theme: string,
+    value: number,
+    nextStep: string,
+    comment: string,
+  ) => {
     if (!user) return;
     const today = new Date().toISOString().slice(0, 10);
-    const { error } = await supabase
-      .from("pyramid_progress")
-      .upsert(
-        { user_id: user.id, theme, value, entry_date: today },
-        { onConflict: "user_id,theme,entry_date" },
-      );
+    const { error } = await supabase.from("pyramid_progress").upsert(
+      {
+        user_id: user.id,
+        theme,
+        value,
+        entry_date: today,
+        next_step: nextStep || null,
+        comment: comment || null,
+      },
+      { onConflict: "user_id,theme,entry_date" },
+    );
     if (error) {
       toast.error("Erro ao registrar");
       return;
     }
     setProgress((prev) => {
       const others = prev.filter((p) => !(p.theme === theme && p.entry_date === today));
-      return [...others, { theme, value, entry_date: today }];
+      return [
+        ...others,
+        {
+          theme,
+          value,
+          entry_date: today,
+          next_step: nextStep || null,
+          comment: comment || null,
+        },
+      ];
     });
-    toast.success("Registrado!");
+    toast.success("Salvo! ✔️ Seu check-in foi registrado, nos vemos amanhã.");
+    setCheckinTheme(null);
   };
 
   if (loading) {
@@ -129,10 +184,22 @@ function PiramidePage() {
   return (
     <AppShell glyph="△">
       <header className="px-6 pt-10 pb-4 animate-oo-enter">
-        <p className="text-xs font-medium uppercase tracking-[0.25em] text-ink/40 mb-2">
-          tríade evolutiva
-        </p>
-        <h1 className="font-display text-4xl font-bold tracking-tight">Pirâmide</h1>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-[0.25em] text-ink/40 mb-2">
+              tríade evolutiva
+            </p>
+            <h1 className="font-display text-4xl font-bold tracking-tight">Pirâmide</h1>
+          </div>
+          <button
+            type="button"
+            onClick={() => setHowItWorksOpen(true)}
+            className="flex items-center gap-1.5 bg-white ring-1 ring-black/5 rounded-full px-3 py-1.5 text-xs font-medium text-ink/70 hover:bg-ink/5 transition-colors"
+          >
+            <Info className="size-3.5" />
+            Como funciona
+          </button>
+        </div>
       </header>
 
       {/* Seleção */}
@@ -142,8 +209,8 @@ function PiramidePage() {
             Suas 3 áreas
           </p>
           <p className="text-sm text-ink/70 leading-relaxed mb-4">
-            Reflita com calma sobre os 3 pontos mais importantes pra você desenvolver agora.
-            Sua escolha vale por <strong>{COOLDOWN_DAYS} dias</strong>, pense bem antes de confirmar.
+            Reflita com calma sobre os 3 pontos mais importantes pra você desenvolver agora. Sua
+            escolha vale por <strong>21 dias</strong>, pense bem antes de confirmar.
           </p>
 
           <div className="flex flex-wrap gap-2 mb-4">
@@ -168,6 +235,14 @@ function PiramidePage() {
             })}
           </div>
 
+          <div className="bg-cream/60 rounded-2xl p-4 mb-3">
+            <p className="font-display text-base font-bold mb-1">Cresça um pouquinho todo dia ✨</p>
+            <p className="text-sm text-ink/70 leading-relaxed">
+              Acompanhe seu progresso nas áreas que você escolhe, com check-ins rápidos e uma roda
+              mensal que mostra sua evolução.
+            </p>
+          </div>
+
           {!canChange && (
             <div className="flex items-center gap-2 bg-ink/5 rounded-2xl p-3 text-xs text-ink/70 mb-3">
               <Lock className="size-3" />
@@ -175,10 +250,10 @@ function PiramidePage() {
             </div>
           )}
 
-          {canChange && (
+          {canChange && !cycleEnded && (
             <button
               type="button"
-              onClick={saveChoice}
+              onClick={() => saveChoice()}
               disabled={selecting.length !== 3}
               className="w-full bg-ink text-white py-3 rounded-full text-xs font-bold uppercase tracking-[0.2em] disabled:opacity-40 hover:bg-ink/90 transition-colors"
             >
@@ -188,7 +263,44 @@ function PiramidePage() {
         </div>
       </section>
 
-      {/* Check-in */}
+      {/* Fim do ciclo */}
+      {cycleEnded && choice && (
+        <section className="px-6 mb-6 animate-oo-enter [animation-delay:120ms]">
+          <div className="bg-lilac/30 p-5 rounded-[28px] ring-1 ring-black/5">
+            <p className="font-display text-lg font-bold mb-1">
+              Ciclo finalizado, parabéns! 🎉
+            </p>
+            <p className="text-sm text-ink/70 leading-relaxed mb-4">
+              Sua Pirâmide foi gerada. Quer manter estes 3 temas, trocar 1 ou escolher novos?
+            </p>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => saveChoice(choice.themes)}
+                className="bg-ink text-white px-4 py-2 rounded-full text-xs font-bold uppercase tracking-[0.15em] hover:bg-ink/90 transition-colors"
+              >
+                Manter temas
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelecting(choice.themes.slice(0, 2))}
+                className="bg-white ring-1 ring-black/10 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-[0.15em] hover:bg-ink/5 transition-colors"
+              >
+                Trocar 1 tema
+              </button>
+              <button
+                type="button"
+                onClick={() => setSelecting([])}
+                className="bg-white ring-1 ring-black/10 px-4 py-2 rounded-full text-xs font-bold uppercase tracking-[0.15em] hover:bg-ink/5 transition-colors"
+              >
+                Escolher 3 novos
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Check-in diário */}
       {choice && (
         <section className="px-6 mb-6 animate-oo-enter [animation-delay:160ms]">
           <h2 className="font-display text-xl font-bold italic mb-3">Check-in de hoje</h2>
@@ -197,35 +309,35 @@ function PiramidePage() {
               const t = TEMAS.find((x) => x.id === tid);
               if (!t) return null;
               const today = new Date().toISOString().slice(0, 10);
-              const todayVal = progress.find(
+              const todayEntry = progress.find(
                 (p) => p.theme === tid && p.entry_date === today,
-              )?.value;
+              );
               return (
                 <div key={tid} className="bg-white p-4 rounded-2xl ring-1 ring-black/5">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="font-display font-bold">
-                      <span className="mr-2">{t.emoji}</span>
-                      {t.nome}
-                    </span>
-                    {todayVal && (
-                      <span className="text-xs text-ink/50">hoje: {todayVal}/5</span>
-                    )}
-                  </div>
-                  <div className="flex gap-2">
-                    {[1, 2, 3, 4, 5].map((n) => (
-                      <button
-                        key={n}
-                        type="button"
-                        onClick={() => logProgress(tid, n)}
-                        className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all ${
-                          todayVal === n
-                            ? "bg-ink text-white"
-                            : "bg-ink/5 text-ink/60 hover:bg-ink/10"
-                        }`}
-                      >
-                        {n}
-                      </button>
-                    ))}
+                  <div className="flex items-center justify-between gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setCheckinTheme(tid)}
+                      className="flex-1 flex items-center justify-between text-left"
+                    >
+                      <span className="font-display font-bold">
+                        <span className="mr-2">{t.emoji}</span>
+                        {t.nome}
+                      </span>
+                      {todayEntry ? (
+                        <span className="text-xs text-ink/50">hoje: {todayEntry.value}/5</span>
+                      ) : (
+                        <span className="text-xs text-ink/40 italic">toque pra fazer</span>
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setHistoryTheme(tid)}
+                      className="p-2 rounded-full hover:bg-ink/5 transition-colors"
+                      aria-label="Histórico"
+                    >
+                      <HistoryIcon className="size-4 text-ink/50" />
+                    </button>
                   </div>
                 </div>
               );
@@ -234,26 +346,301 @@ function PiramidePage() {
         </section>
       )}
 
-      {/* Tríade radar */}
+      {/* Pirâmide Evolutiva (radar) + Insights */}
       {choice && (
         <section className="px-6 mb-8 animate-oo-enter [animation-delay:240ms]">
-          <h2 className="font-display text-xl font-bold italic mb-3">Tríade Evolutiva</h2>
-          <div className="bg-white rounded-[28px] ring-1 ring-black/5 p-6 flex justify-center">
-            <TriadeRadar themes={choice.themes} progress={progress} />
-          </div>
+          <PiramideEvolutivaIntro themes={choice.themes} progress={progress} />
         </section>
       )}
+
+      {/* Modais */}
+      <HowItWorksDialog open={howItWorksOpen} onOpenChange={setHowItWorksOpen} />
+      <CheckinDialog
+        themeId={checkinTheme}
+        existing={
+          checkinTheme
+            ? progress.find(
+                (p) =>
+                  p.theme === checkinTheme &&
+                  p.entry_date === new Date().toISOString().slice(0, 10),
+              ) ?? null
+            : null
+        }
+        onClose={() => setCheckinTheme(null)}
+        onSave={saveCheckin}
+      />
+      <HistoryDialog
+        themeId={historyTheme}
+        progress={progress}
+        onClose={() => setHistoryTheme(null)}
+      />
     </AppShell>
   );
 }
 
-function TriadeRadar({
+function PiramideEvolutivaIntro({
   themes,
   progress,
 }: {
   themes: string[];
   progress: ProgressRow[];
 }) {
+  const mesAno = new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+
+  const averages = useMemo(
+    () =>
+      themes.map((tid) => {
+        const vals = progress.filter((p) => p.theme === tid).map((p) => p.value);
+        const avg = vals.length === 0 ? 0 : vals.reduce((a, b) => a + b, 0) / vals.length;
+        return { tid, avg, count: vals.length };
+      }),
+    [themes, progress],
+  );
+
+  return (
+    <>
+      <h2 className="font-display text-xl font-bold italic">
+        Pirâmide Evolutiva — <span className="capitalize">{mesAno}</span>
+      </h2>
+      <p className="text-sm text-ink/70 mt-1 mb-1">Veja como você evoluiu nas 3 áreas do ciclo.</p>
+      <p className="text-xs text-ink/50 leading-relaxed mb-4">
+        Esta pirâmide mostra a média das suas avaliações diárias por tema. Quanto mais preenchido o
+        setor, mais progresso. Use os insights pra escolher seu foco no próximo ciclo.
+      </p>
+
+      <div className="bg-white rounded-[28px] ring-1 ring-black/5 p-6 flex justify-center mb-4">
+        <TriadeRadar themes={themes} progress={progress} />
+      </div>
+
+      <div className="space-y-3">
+        {averages.map(({ tid, avg, count }) => {
+          const t = TEMAS.find((x) => x.id === tid);
+          if (!t) return null;
+          let insight = "";
+          if (count === 0) {
+            insight = "Ainda sem check-ins, comece com um pequeno passo hoje.";
+          } else if (avg >= 4) {
+            insight = `Você tá indo super bem em ${t.nome}! Que tal manter com 1 hábito simples por semana?`;
+          } else if (avg >= 3) {
+            insight = `Na média em ${t.nome}, com pequenos ajustes você sai do "ok" pro "ótimo". Tente o passo sugerido abaixo.`;
+          } else {
+            insight = `Esse tema pediu atenção. Comece com um passo bem pequeno e celebre a constância.`;
+          }
+          return (
+            <div key={tid} className="bg-white rounded-2xl ring-1 ring-black/5 p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-display font-bold">
+                  <span className="mr-2">{t.emoji}</span>
+                  {t.nome}
+                </span>
+                <span className="text-xs text-ink/50">
+                  {count > 0 ? `média ${avg.toFixed(1)}/5` : "sem dados"}
+                </span>
+              </div>
+              <p className="text-sm text-ink/70 leading-relaxed mb-3">{insight}</p>
+              <div className="bg-cream/60 rounded-xl p-3 text-xs text-ink/70 space-y-1">
+                <p className="font-bold uppercase tracking-[0.15em] text-[10px] text-ink/50 mb-1">
+                  Recomendações
+                </p>
+                <p>• Mini-hábito: {RECOMENDACOES[tid] ?? "um passo pequeno"}, 5 minutos por dia.</p>
+                <p>• Ritual semanal: dedique 15 min no fim de semana só pra esse tema.</p>
+                <p>• Check-in de realidade: coloque um lembrete pra revisar progresso em 7 dias.</p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+function HowItWorksDialog({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="rounded-[28px]">
+        <DialogHeader>
+          <DialogTitle className="font-display text-2xl">Como a Pirâmide funciona</DialogTitle>
+          <DialogDescription className="text-sm text-ink/70 leading-relaxed pt-2">
+            Todo dia você responde rapidinho como anda cada tema. No final do mês a Pirâmide
+            Evolutiva mostra sua média e insights pra te ajudar a focar no que importa. Simples,
+            rápido e transformador.
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function CheckinDialog({
+  themeId,
+  existing,
+  onClose,
+  onSave,
+}: {
+  themeId: string | null;
+  existing: ProgressRow | null;
+  onClose: () => void;
+  onSave: (theme: string, value: number, nextStep: string, comment: string) => void;
+}) {
+  const [value, setValue] = useState(3);
+  const [nextStep, setNextStep] = useState("");
+  const [comment, setComment] = useState("");
+
+  useEffect(() => {
+    if (themeId) {
+      setValue(existing?.value ?? 3);
+      setNextStep(existing?.next_step ?? "");
+      setComment(existing?.comment ?? "");
+    }
+  }, [themeId, existing]);
+
+  const tema = themeId ? TEMAS.find((x) => x.id === themeId) : null;
+
+  return (
+    <Dialog open={!!themeId} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="rounded-[28px]">
+        <DialogHeader>
+          <DialogTitle className="font-display text-2xl">
+            Check-in {tema ? `— ${tema.emoji} ${tema.nome}` : ""}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-5 pt-2">
+          <div>
+            <label className="text-sm text-ink/80 leading-relaxed block mb-3">
+              Como você avalia {tema?.nome.toLowerCase()} hoje?{" "}
+              <span className="text-ink/50">(1 = péssimo, 5 = ótimo)</span>
+            </label>
+            <Slider
+              min={1}
+              max={5}
+              step={1}
+              value={[value]}
+              onValueChange={(v) => setValue(v[0])}
+            />
+            <div className="flex justify-between text-xs text-ink/50 mt-2">
+              <span>1</span>
+              <span>2</span>
+              <span>3</span>
+              <span>4</span>
+              <span>5</span>
+            </div>
+            <p className="text-center font-display text-2xl font-bold mt-2">{value}/5</p>
+          </div>
+
+          <div>
+            <label className="text-sm text-ink/80 block mb-2">
+              Um passo que posso dar amanhã
+            </label>
+            <Input
+              value={nextStep}
+              onChange={(e) => setNextStep(e.target.value)}
+              placeholder='ex.: "Ligar pra pessoa X", "Andar 15 min", "Estudar 30 min"'
+              className="rounded-xl"
+            />
+          </div>
+
+          <div>
+            <label className="text-sm text-ink/80 block mb-2">Observações rápidas (opcional)</label>
+            <Textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Como você se sentiu hoje?"
+              className="rounded-xl min-h-[80px]"
+            />
+          </div>
+
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 bg-white ring-1 ring-black/10 py-3 rounded-full text-xs font-bold uppercase tracking-[0.2em] hover:bg-ink/5 transition-colors"
+            >
+              Pular
+            </button>
+            <button
+              type="button"
+              onClick={() => themeId && onSave(themeId, value, nextStep, comment)}
+              className="flex-1 bg-ink text-white py-3 rounded-full text-xs font-bold uppercase tracking-[0.2em] hover:bg-ink/90 transition-colors"
+            >
+              Salvar
+            </button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function HistoryDialog({
+  themeId,
+  progress,
+  onClose,
+}: {
+  themeId: string | null;
+  progress: ProgressRow[];
+  onClose: () => void;
+}) {
+  const tema = themeId ? TEMAS.find((x) => x.id === themeId) : null;
+  const items = themeId
+    ? progress
+        .filter((p) => p.theme === themeId)
+        .sort((a, b) => (a.entry_date < b.entry_date ? 1 : -1))
+    : [];
+
+  return (
+    <Dialog open={!!themeId} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="rounded-[28px] max-h-[80vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="font-display text-2xl">
+            Histórico {tema ? `— ${tema.emoji} ${tema.nome}` : ""}
+          </DialogTitle>
+          <DialogDescription className="text-sm text-ink/70">
+            Toque num dia para ver o check-in e a nota "um passo" que você deixou.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-2 pt-2">
+          {items.length === 0 && (
+            <p className="text-sm text-ink/50 italic text-center py-6">
+              Ainda sem check-ins por aqui.
+            </p>
+          )}
+          {items.map((it) => {
+            const d = new Date(it.entry_date + "T00:00:00").toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "2-digit",
+            });
+            return (
+              <div key={it.entry_date} className="bg-cream/60 rounded-2xl p-3 text-sm">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="font-bold">{d}</span>
+                  <span className="text-ink/60">— Nota: {it.value}/5</span>
+                </div>
+                {it.next_step && (
+                  <p className="text-ink/70 mt-1">
+                    <span className="text-ink/50">Passo:</span> "{it.next_step}"
+                  </p>
+                )}
+                {it.comment && (
+                  <p className="text-ink/70 mt-1">
+                    <span className="text-ink/50">Comentário:</span> "{it.comment}"
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function TriadeRadar({ themes, progress }: { themes: string[]; progress: ProgressRow[] }) {
   const cx = 120;
   const cy = 120;
   const r = 80;
