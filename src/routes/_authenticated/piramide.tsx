@@ -723,6 +723,80 @@ function HistoryDialog({
 }
 
 function TriadeRadar({ themes, progress }: { themes: string[]; progress: ProgressRow[] }) {
+  return <TriadeRadarImpl themes={themes} progress={progress} />;
+}
+
+function BarsForTheme({
+  themeId,
+  themeName,
+  emoji,
+  progress,
+  today,
+}: {
+  themeId: string;
+  themeName: string;
+  emoji: string;
+  progress: ProgressRow[];
+  today: number;
+}) {
+  // Mapeia entradas do mês corrente por dia.
+  const now = new Date();
+  const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const byDay = new Map<number, number>();
+  progress
+    .filter((p) => p.theme === themeId && p.entry_date.startsWith(ym))
+    .forEach((p) => {
+      const d = parseInt(p.entry_date.slice(8, 10), 10);
+      if (d >= 1 && d <= FOCUS_DAYS) byDay.set(d, p.value);
+    });
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-xs font-display font-bold">
+          <span className="mr-1">{emoji}</span>
+          {themeName}
+        </span>
+      </div>
+      <div className="flex items-end gap-[3px] h-12">
+        {Array.from({ length: FOCUS_DAYS }, (_, i) => {
+          const day = i + 1;
+          const value = byDay.get(day);
+          const isToday = day === today;
+          const isFuture = day > today;
+          const heightPct = value ? 20 + value * 16 : 14;
+          const bg = value ? BAR_COLORS[value - 1] : "var(--ink)";
+          return (
+            <div
+              key={day}
+              className="flex-1 flex flex-col items-center gap-0.5"
+              title={value ? `Dia ${day}: ${value}/5` : isFuture ? `Dia ${day}` : `Dia ${day}: sem check-in`}
+            >
+              <div
+                className={`w-full rounded-sm transition-all ${
+                  isToday ? "ring-1 ring-ink/40" : ""
+                }`}
+                style={{
+                  height: `${heightPct}px`,
+                  backgroundColor: bg,
+                  opacity: value ? 1 : isFuture ? 0.08 : 0.18,
+                }}
+              />
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex justify-between text-[8px] text-ink/40 mt-1">
+        <span>1</span>
+        <span>7</span>
+        <span>14</span>
+        <span>21</span>
+      </div>
+    </div>
+  );
+}
+
+function TriadeRadarImpl({ themes, progress }: { themes: string[]; progress: ProgressRow[] }) {
   const cx = 120;
   const cy = 120;
   const r = 80;
