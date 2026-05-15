@@ -116,7 +116,7 @@ function HomePage() {
           <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50 mb-3">
             Mensagem do dia
           </p>
-          <p className="font-display text-lg leading-relaxed text-pretty min-h-[3rem]">
+          <p className="font-display text-lg leading-relaxed text-pretty min-h-[3rem] whitespace-pre-line">
             {mensagem || "\u00A0"}
           </p>
         </div>
