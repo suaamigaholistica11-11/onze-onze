@@ -43,14 +43,14 @@ const TEMAS = [
 const COOLDOWN_DAYS = 21;
 
 const RECOMENDACOES: Record<string, string> = {
-  fisico: "dar uma caminhada leve de 15 minutinhos pra mexer o corpo?",
-  mental: "se desligar um pouco e curtir uma leitura ou um quebra-cabeça?",
-  espiritual: "pegar uns minutinhos do dia pra fazer uma pausa e respirar fundo 3 vezes?",
-  emocional: "escrever 3 sentimentos do dia num caderninho só seu?",
-  social: "mandar uma mensagem carinhosa pra alguém querido agora?",
-  criativo: "rabiscar, escrever ou criar qualquer coisinha sem compromisso?",
-  carreira: "separar 15 minutos pra estudar algo da sua área hoje?",
-  financas: "criar uma “reserva de paz”, mesmo que comece com R$10 por semana? Respira fundo que a gente vai organizar esse bolso!",
+  fisico: "fazer 20 minutos de movimento gostoso, uma caminhada, alongamento ou dancinha na sala?",
+  mental: "tirar pausas curtas de 5 minutos ao longo do dia pra desligar a tela e respirar?",
+  espiritual: "reservar 10 minutos pra meditar, respirar fundo ou só observar o silêncio?",
+  emocional: "escrever por 10 minutos sobre como você tá se sentindo hoje, sem filtro?",
+  social: "tirar 5 minutos pra mandar uma mensagem carinhosa pra alguém querido?",
+  criativo: "abrir 15 minutos no dia pra rabiscar, escrever ou criar algo só por prazer?",
+  carreira: "investir 25 minutos focada em estudar ou avançar num projeto da sua área?",
+  financas: "passar 10 minutos olhando seus gastos da semana e começando uma “reserva de paz”?",
 };
 
 interface ChoiceRow {
@@ -65,6 +65,25 @@ interface ProgressRow {
   next_step: string | null;
   comment: string | null;
 }
+
+// Janela do ciclo: dias 1 a 21 do mês = foco. Dias 22 até o fim do mês = relax.
+const FOCUS_DAYS = 21;
+function getCycleInfo(now = new Date()) {
+  const day = now.getDate();
+  const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  const relaxDays = lastDay - FOCUS_DAYS; // 9 ou 10
+  const isRelax = day > FOCUS_DAYS;
+  return { day, lastDay, relaxDays, isRelax };
+}
+
+const BAR_COLORS = [
+  "var(--bar-1)",
+  "var(--bar-2)",
+  "var(--bar-3)",
+  "var(--bar-4)",
+  "var(--bar-5)",
+] as const;
+const BAR_LABELS = ["Ruim", "Pouco", "Ok", "Bom", "Ótimo"] as const;
 
 function PiramidePage() {
   const { user } = useAuth();
@@ -386,6 +405,7 @@ function PiramideEvolutivaIntro({
   progress: ProgressRow[];
 }) {
   const mesAno = new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+  const cycle = getCycleInfo();
 
   const averages = useMemo(
     () =>
@@ -411,6 +431,64 @@ function PiramideEvolutivaIntro({
       <div className="bg-white rounded-[28px] ring-1 ring-black/5 p-6 flex justify-center mb-4">
         <TriadeRadar themes={themes} progress={progress} />
       </div>
+
+      {/* Gráfico em barras 1 a 21 por tema */}
+      <div className="bg-white rounded-[28px] ring-1 ring-black/5 p-5 mb-4">
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50">
+            Seus 21 dias de foco
+          </p>
+          <span className="text-[10px] text-ink/50">dia {Math.min(cycle.day, FOCUS_DAYS)}/21</span>
+        </div>
+        <div className="space-y-4">
+          {themes.map((tid) => {
+            const t = TEMAS.find((x) => x.id === tid);
+            if (!t) return null;
+            return (
+              <BarsForTheme
+                key={tid}
+                themeId={tid}
+                themeName={t.nome}
+                emoji={t.emoji}
+                progress={progress}
+                today={cycle.day}
+              />
+            );
+          })}
+        </div>
+        <div className="flex flex-wrap gap-2 mt-4 pt-3 border-t border-ink/5">
+          {BAR_COLORS.map((c, i) => (
+            <div key={i} className="flex items-center gap-1.5">
+              <span
+                className="size-3 rounded-sm"
+                style={{ backgroundColor: c }}
+                aria-hidden
+              />
+              <span className="text-[10px] text-ink/60">
+                {i + 1} {BAR_LABELS[i]}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Modo relax nos últimos 9/10 dias do mês */}
+      {cycle.isRelax && (
+        <div className="bg-gradient-to-br from-mint/40 to-sky/40 rounded-[28px] ring-1 ring-black/5 p-5 mb-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50 mb-1">
+            Modo relax desbloqueado
+          </p>
+          <p className="font-display text-lg font-bold mb-2">
+            Você completou seus 21 dias de foco. Agora respira ✨
+          </p>
+          <p className="text-sm text-ink/70 leading-relaxed">
+            Faltam {cycle.lastDay - cycle.day} dia
+            {cycle.lastDay - cycle.day === 1 ? "" : "s"} pro próximo ciclo. Aproveita esses dias
+            pra descansar do foco, rever o que floresceu e pensar com calma quais 3 áreas vão te
+            mover no próximo mês.
+          </p>
+        </div>
+      )}
 
       <div className="space-y-3">
         {averages.map(({ tid, avg, count }) => {
@@ -645,6 +723,80 @@ function HistoryDialog({
 }
 
 function TriadeRadar({ themes, progress }: { themes: string[]; progress: ProgressRow[] }) {
+  return <TriadeRadarImpl themes={themes} progress={progress} />;
+}
+
+function BarsForTheme({
+  themeId,
+  themeName,
+  emoji,
+  progress,
+  today,
+}: {
+  themeId: string;
+  themeName: string;
+  emoji: string;
+  progress: ProgressRow[];
+  today: number;
+}) {
+  // Mapeia entradas do mês corrente por dia.
+  const now = new Date();
+  const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  const byDay = new Map<number, number>();
+  progress
+    .filter((p) => p.theme === themeId && p.entry_date.startsWith(ym))
+    .forEach((p) => {
+      const d = parseInt(p.entry_date.slice(8, 10), 10);
+      if (d >= 1 && d <= FOCUS_DAYS) byDay.set(d, p.value);
+    });
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-xs font-display font-bold">
+          <span className="mr-1">{emoji}</span>
+          {themeName}
+        </span>
+      </div>
+      <div className="flex items-end gap-[3px] h-12">
+        {Array.from({ length: FOCUS_DAYS }, (_, i) => {
+          const day = i + 1;
+          const value = byDay.get(day);
+          const isToday = day === today;
+          const isFuture = day > today;
+          const heightPct = value ? 20 + value * 16 : 14;
+          const bg = value ? BAR_COLORS[value - 1] : "var(--ink)";
+          return (
+            <div
+              key={day}
+              className="flex-1 flex flex-col items-center gap-0.5"
+              title={value ? `Dia ${day}: ${value}/5` : isFuture ? `Dia ${day}` : `Dia ${day}: sem check-in`}
+            >
+              <div
+                className={`w-full rounded-sm transition-all ${
+                  isToday ? "ring-1 ring-ink/40" : ""
+                }`}
+                style={{
+                  height: `${heightPct}px`,
+                  backgroundColor: bg,
+                  opacity: value ? 1 : isFuture ? 0.08 : 0.18,
+                }}
+              />
+            </div>
+          );
+        })}
+      </div>
+      <div className="flex justify-between text-[8px] text-ink/40 mt-1">
+        <span>1</span>
+        <span>7</span>
+        <span>14</span>
+        <span>21</span>
+      </div>
+    </div>
+  );
+}
+
+function TriadeRadarImpl({ themes, progress }: { themes: string[]; progress: ProgressRow[] }) {
   const cx = 120;
   const cy = 120;
   const r = 80;
