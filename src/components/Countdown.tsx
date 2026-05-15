@@ -33,7 +33,7 @@ export function Countdown({ target, variant = "light" }: Props) {
         <div key={label} className="flex items-center">
           <div className="flex flex-col items-center min-w-[44px]">
             <span
-              className={`font-mono text-3xl font-medium tracking-tighter tabular-nums ${numColor} ${
+              className={`font-display text-4xl font-normal tracking-tight tabular-nums ${numColor} ${
                 label === "Segs" ? "animate-oo-pulse" : ""
               }`}
             >
@@ -46,7 +46,7 @@ export function Countdown({ target, variant = "light" }: Props) {
             </span>
           </div>
           {i < items.length - 1 && (
-            <span className={`text-2xl font-mono ${sepColor} mx-1`}>:</span>
+            <span className={`text-2xl font-display font-light ${sepColor} mx-1`}>:</span>
           )}
         </div>
       ))}
