@@ -441,7 +441,7 @@ function InlineMapaRender({ id, name, data }: { id: string; name: string; data: 
         params={{ id }}
         className="mt-3 block text-center text-xs font-bold uppercase tracking-[0.2em] text-lilac"
       >
-        Ver leitura completa →
+        Me conta mais sobre mim →
       </Link>
     </section>
   );
