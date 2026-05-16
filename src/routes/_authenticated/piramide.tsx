@@ -828,12 +828,6 @@ function BarsForTheme({
           );
         })}
       </div>
-      <div className="flex justify-between text-[8px] text-ink/40 mt-1">
-        <span>1</span>
-        <span>7</span>
-        <span>14</span>
-        <span>21</span>
-      </div>
     </div>
   );
 }
