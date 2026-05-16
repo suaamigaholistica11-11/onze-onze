@@ -173,13 +173,6 @@ const MOON_IMAGES: Record<MoonPhaseKey, string> = {
   "Quarto Minguante": moonWaningImg,
 };
 
-const MOON_ORDER: MoonPhaseKey[] = [
-  "Lua Nova",
-  "Quarto Crescente",
-  "Lua Cheia",
-  "Quarto Minguante",
-];
-
 function MoonPanel({
   proximas,
 }: {
@@ -235,72 +228,6 @@ function MoonPanel({
           </>
         )}
       </div>
-    </div>
-  );
-}
-
-function MoonCard({
-  nome,
-  info,
-  highlight,
-}: {
-  nome: MoonPhaseKey;
-  info?: { dataISO: string; diasRestantes: number };
-  highlight: boolean;
-}) {
-  const img = MOON_IMAGES[nome];
-  const dataCurta = info
-    ? new Date(info.dataISO).toLocaleDateString("pt-BR", {
-        day: "2-digit",
-        month: "2-digit",
-      })
-    : "···";
-  const horaCurta = info
-    ? new Date(info.dataISO).toLocaleTimeString("pt-BR", {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : "";
-  return (
-    <div
-      className={`rounded-2xl p-2 flex flex-col items-center text-center transition-all ${
-        highlight ? "bg-white/70 ring-1 ring-ink/10" : "bg-white/30"
-      }`}
-    >
-      <div className="relative size-16 mb-1.5">
-        <img
-          src={img}
-          alt={`Imagem realista de ${nome.toLowerCase()}`}
-          width={512}
-          height={512}
-          loading="lazy"
-          className="size-16 object-contain drop-shadow-[0_2px_10px_rgba(0,0,0,0.3)]"
-        />
-        {/* brilhinhos piscando dentro da lua */}
-        <span
-          aria-hidden
-          className="absolute top-2 left-3 size-1.5 rounded-full bg-white shadow-[0_0_6px_2px_rgba(255,255,255,0.8)] animate-oo-twinkle-a"
-        />
-        <span
-          aria-hidden
-          className="absolute top-4 right-2 size-1 rounded-full bg-white shadow-[0_0_5px_2px_rgba(255,255,255,0.7)] animate-oo-twinkle-b"
-        />
-        <span
-          aria-hidden
-          className="absolute bottom-3 left-4 size-1 rounded-full bg-white shadow-[0_0_5px_2px_rgba(255,255,255,0.7)] animate-oo-twinkle-c"
-        />
-        <span
-          aria-hidden
-          className="absolute bottom-2 right-4 size-1.5 rounded-full bg-white shadow-[0_0_6px_2px_rgba(255,255,255,0.8)] animate-oo-twinkle-d"
-        />
-      </div>
-      <span className="text-[9px] font-bold uppercase tracking-[0.12em] text-ink/70 leading-tight">
-        {nome.replace("Quarto ", "")}
-      </span>
-      <span className="text-[9px] text-ink/50 mt-0.5">{dataCurta}</span>
-      {horaCurta && (
-        <span className="text-[9px] text-ink/40">{horaCurta}</span>
-      )}
     </div>
   );
 }
