@@ -192,4 +192,74 @@ export type NatalChartData = {
     timezone: string;
     datetime: string;
   };
+  interpretation?: {
+    text: string;
+    cacheKey: string;
+    generatedAt: string;
+  };
 };
+
+const interpInputSchema = z.object({
+  sunSign: z.string().min(1).max(40),
+  sunHouse: z.string().min(1).max(4),
+  moonSign: z.string().min(1).max(40),
+  moonHouse: z.string().min(1).max(4),
+  ascSign: z.string().min(1).max(40),
+  aspects: z.array(z.string().min(1).max(120)).max(8),
+});
+
+export const generateBigThreeReading = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => interpInputSchema.parse(data))
+  .handler(async ({ data }) => {
+    const apiKey = process.env.LOVABLE_API_KEY;
+    if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
+
+    const aspectsLine = data.aspects.length
+      ? data.aspects.join("; ")
+      : "nenhum aspecto principal relevante";
+
+    const prompt = `Você é uma redatora de astrologia para um app jovem de autoconhecimento, com tom leve, acolhedor, divertido e simples, parecido com uma revista jovem brasileira (estilo Capricho). Gere uma interpretação personalizada entre 250 e 300 palavras, em português do Brasil, usando linguagem próxima e sem termos técnicos difíceis. Não use travessão (—, –) em nenhum momento.
+
+Dados do mapa:
+Sol em: ${data.sunSign}
+Casa do Sol: ${data.sunHouse}
+Lua em: ${data.moonSign}
+Casa da Lua: ${data.moonHouse}
+Ascendente em: ${data.ascSign}
+Aspectos principais: ${aspectsLine}
+
+Regras:
+- Texto entre 250 e 300 palavras, em 4 parágrafos curtos, sem listas e sem tópicos.
+- Não use linguagem técnica demais nem mística pesada.
+- Não faça previsões, não seja fatalista, não diga que algo é bom ou ruim.
+- Fale de tendências, potenciais, desafios e autoconhecimento.
+- Evite "você sempre", "você nunca", "seu destino é", "isso vai acontecer", "essa posição é ruim/negativa".
+- Use construções como "você tende a", "seu mapa mostra", "essa energia pode aparecer como", "seu coração precisa de", "seu desafio é", "quando essa energia está bem vivida".
+- Parágrafo 1: Sol no signo e na casa (essência, brilho, identidade, vitalidade, caminho de crescimento).
+- Parágrafo 2: Lua no signo e na casa (emoções, segurança emocional, necessidades afetivas, jeito de reagir).
+- Parágrafo 3: Ascendente no signo (primeira impressão, jeito de chegar no mundo).
+- Parágrafo 4: Conecte Sol, Lua e Ascendente; cite os aspectos principais de forma simples se forem relevantes; termine com uma frase positiva e acolhedora.
+- O texto deve soar como uma amiga explicando o mapa da pessoa.
+
+Retorne APENAS o texto interpretativo, sem títulos, sem JSON, sem aspas ao redor.`;
+
+    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+    if (!res.ok) {
+      const txt = await res.text();
+      console.error("AI error", res.status, txt);
+      throw new Error(`AI gateway error ${res.status}`);
+    }
+    const json = await res.json();
+    const text: string = (json.choices?.[0]?.message?.content ?? "").trim();
+    return { text };
+  });

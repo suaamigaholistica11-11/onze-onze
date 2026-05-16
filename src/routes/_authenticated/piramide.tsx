@@ -97,6 +97,17 @@ const BAR_COLORS = [
 ] as const;
 const BAR_LABELS = ["Ruim", "Pouco", "Ok", "Bom", "Ótimo"] as const;
 
+const DICA_INTROS = [
+  "Que tal",
+  "A dica de amiga que eu posso te dar é",
+  "Pensei aqui e acho que pra você seria interessante",
+] as const;
+function dicaIntroFor(themeId: string) {
+  let h = 0;
+  for (let i = 0; i < themeId.length; i++) h = (h * 31 + themeId.charCodeAt(i)) >>> 0;
+  return DICA_INTROS[h % DICA_INTROS.length];
+}
+
 function PiramidePage() {
   const { user } = useAuth();
   const [choice, setChoice] = useState<ChoiceRow | null>(null);
@@ -136,6 +147,10 @@ function PiramidePage() {
   })();
   const canChange = !choice || cooldownLeft === 0;
   const cycleEnded = !!choice && cooldownLeft === 0;
+  // Durante o ciclo ativo (1..21), escondemos o card de seleção pra a pessoa
+  // focar só nos check-ins. Volta a aparecer depois dos 21 dias (cycleEnded)
+  // ou se ainda não há escolha.
+  const showSelection = !choice || cycleEnded;
 
   const toggle = (id: string) => {
     if (!canChange) return;
@@ -233,7 +248,8 @@ function PiramidePage() {
         </div>
       </header>
 
-      {/* Seleção */}
+      {/* Seleção (oculta durante os 21 dias de foco) */}
+      {showSelection && (
       <section className="px-6 mb-6 animate-oo-enter [animation-delay:80ms]">
         <div className="bg-white p-5 rounded-[28px] ring-1 ring-black/5">
           <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50 mb-2">
@@ -293,6 +309,7 @@ function PiramidePage() {
           )}
         </div>
       </section>
+      )}
 
       {/* Fim do ciclo */}
       {cycleEnded && choice && (
@@ -540,7 +557,10 @@ function PiramideEvolutivaIntro({
                 <p className="font-bold uppercase tracking-[0.15em] text-[10px] text-ink/50 mb-1">
                   Pega essa dica
                 </p>
-                <p>Que tal {RECOMENDACOES[tid] ?? "dar um passinho pequeno hoje?"}</p>
+                <p>
+                  {dicaIntroFor(tid)}{" "}
+                  {RECOMENDACOES[tid] ?? "dar um passinho pequeno hoje?"}
+                </p>
               </div>
             </div>
           );
@@ -780,39 +800,33 @@ function BarsForTheme({
           {themeName}
         </span>
       </div>
-      <div className="flex items-end gap-[3px] h-12">
+      <div className="flex flex-wrap items-center gap-1.5">
         {Array.from({ length: FOCUS_DAYS }, (_, i) => {
           const day = i + 1;
           const value = byDay.get(day);
           const isToday = day === today;
           const isFuture = day > today;
-          const heightPct = value ? 20 + value * 16 : 14;
-          const bg = value ? BAR_COLORS[value - 1] : "var(--ink)";
+          const filled = !!value;
           return (
             <div
               key={day}
-              className="flex-1 flex flex-col items-center gap-0.5"
-              title={value ? `Dia ${day}: ${value}/5` : isFuture ? `Dia ${day}` : `Dia ${day}: sem check-in`}
-            >
-              <div
-                className={`w-full rounded-sm transition-all ${
-                  isToday ? "ring-1 ring-ink/40" : ""
-                }`}
-                style={{
-                  height: `${heightPct}px`,
-                  backgroundColor: bg,
-                  opacity: value ? 1 : isFuture ? 0.08 : 0.18,
-                }}
-              />
-            </div>
+              className={`size-4 rounded-full transition-all ${
+                isToday ? "ring-2 ring-ink/40 ring-offset-1 ring-offset-white" : ""
+              }`}
+              style={{
+                backgroundColor: filled ? BAR_COLORS[value! - 1] : "var(--ink)",
+                opacity: filled ? 1 : isFuture ? 0.1 : 0.2,
+              }}
+              title={
+                value
+                  ? `Dia ${day}: ${value}/5`
+                  : isFuture
+                    ? `Dia ${day}`
+                    : `Dia ${day}: sem check-in`
+              }
+            />
           );
         })}
-      </div>
-      <div className="flex justify-between text-[8px] text-ink/40 mt-1">
-        <span>1</span>
-        <span>7</span>
-        <span>14</span>
-        <span>21</span>
       </div>
     </div>
   );

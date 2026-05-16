@@ -89,43 +89,10 @@ function CeuHojePage() {
             <p className="text-[10px] uppercase tracking-[0.2em] text-ink/50 mb-1">
               {moon.fase.energia}
             </p>
-            <p className="text-sm text-ink/80 leading-relaxed mb-3">
+            <p className="text-sm text-ink/80 leading-relaxed">
               {moon.fase.significado}
             </p>
-            <div className="bg-white/60 rounded-2xl p-3 text-xs text-ink/70 leading-snug">
-              <strong className="font-display">prática de hoje:</strong> {moon.fase.pratica}
-            </div>
           </div>
-
-          {moon.proximas.length > 0 && (
-            <div className="mt-4 bg-white rounded-2xl ring-1 ring-black/5 p-4">
-              <p className="text-[10px] uppercase tracking-[0.25em] text-ink/50 mb-3">
-                próximas mudanças de lua
-              </p>
-              <ul className="space-y-2">
-                {moon.proximas.slice(0, 4).map((p) => (
-                  <li key={p.nome + p.dataISO} className="flex items-center gap-3 text-sm">
-                    <span className="text-xl">{p.glyph}</span>
-                    <span className="font-medium flex-1">{p.nome}</span>
-                    <span className="text-xs text-ink/60">
-                      {new Date(p.dataISO).toLocaleDateString("pt-BR", {
-                        day: "2-digit",
-                        month: "short",
-                      })}
-                      {" · "}
-                      {new Date(p.dataISO).toLocaleTimeString("pt-BR", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </span>
-                    <span className="text-[10px] text-ink/40 w-14 text-right">
-                      {p.diasRestantes === 0 ? "hoje" : `em ${p.diasRestantes}d`}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </section>
       )}
 
@@ -149,8 +116,8 @@ function CeuHojePage() {
             <div className="size-12 bg-lilac/40 rounded-2xl flex items-center justify-center font-display text-2xl shrink-0">
               {t.glyph}
             </div>
-            <div className="flex-1">
-              <div className="flex items-baseline gap-2">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-baseline gap-x-2 gap-y-1 flex-wrap">
                 <span className="font-display font-bold">{t.planeta}</span>
                 <span className="text-xs text-ink/50">em</span>
                 <span className="text-sm font-medium">{t.signo}</span>
@@ -159,12 +126,12 @@ function CeuHojePage() {
                 </span>
                 <span className="text-[10px] text-ink/40">{t.grau}°</span>
                 {t.retrograde && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-peach/60 text-ink/70 font-medium ml-auto">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-peach/60 text-ink/70 font-medium">
                     ℞ retrógrado
                   </span>
                 )}
               </div>
-              <p className="text-sm text-ink/70 mt-1 leading-snug">{t.texto}</p>
+              <p className="text-sm text-ink/70 mt-1 leading-snug break-words">{t.texto}</p>
             </div>
           </div>
         ))}

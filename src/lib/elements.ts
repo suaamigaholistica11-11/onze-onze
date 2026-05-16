@@ -43,13 +43,20 @@ export function signLongitude(sign: string, degree: number): number {
   return idx * 30 + degree;
 }
 
-export type AspectType = "Conjunção" | "Sextil" | "Quadratura" | "Trígono" | "Oposição";
+export type AspectType =
+  | "Conjunção"
+  | "Sextil"
+  | "Quadratura"
+  | "Trígono"
+  | "Oposição"
+  | "Quincúncio";
 
 const ASPECTS: Array<{ name: AspectType; angle: number; glyph: string; tone: "harm" | "tens" | "neut" }> = [
   { name: "Conjunção", angle: 0, glyph: "☌", tone: "neut" },
   { name: "Sextil", angle: 60, glyph: "⚹", tone: "harm" },
   { name: "Quadratura", angle: 90, glyph: "□", tone: "tens" },
   { name: "Trígono", angle: 120, glyph: "△", tone: "harm" },
+  { name: "Quincúncio", angle: 150, glyph: "⚻", tone: "neut" },
   { name: "Oposição", angle: 180, glyph: "☍", tone: "tens" },
 ];
 
