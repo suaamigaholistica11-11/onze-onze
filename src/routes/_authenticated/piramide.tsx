@@ -43,14 +43,14 @@ const TEMAS = [
 const COOLDOWN_DAYS = 21;
 
 const RECOMENDACOES: Record<string, string> = {
-  fisico: "fazer 20 minutos de movimento gostoso, uma caminhada, alongamento ou dancinha na sala?",
-  mental: "tirar pausas curtas de 5 minutos ao longo do dia pra desligar a tela e respirar?",
-  espiritual: "reservar 10 minutos pra meditar, respirar fundo ou só observar o silêncio?",
-  emocional: "escrever por 10 minutos sobre como você tá se sentindo hoje, sem filtro?",
-  social: "tirar 5 minutos pra mandar uma mensagem carinhosa pra alguém querido?",
-  criativo: "abrir 15 minutos no dia pra rabiscar, escrever ou criar algo só por prazer?",
-  carreira: "investir 25 minutos focada em estudar ou avançar num projeto da sua área?",
-  financas: "passar 10 minutos olhando seus gastos da semana e começando uma “reserva de paz”?",
+  fisico: "fazer 20 minutos de movimento gostoso, uma caminhada, alongamento ou dancinha na sala",
+  mental: "tirar pausas curtas de 5 minutos ao longo do dia pra desligar a tela e respirar",
+  espiritual: "reservar 10 minutos pra meditar, respirar fundo ou só observar o silêncio",
+  emocional: "escrever por 10 minutos sobre como você tá se sentindo hoje, sem filtro",
+  social: "tirar 5 minutos pra mandar uma mensagem carinhosa pra alguém querido",
+  criativo: "abrir 15 minutos no dia pra rabiscar, escrever ou criar algo só por prazer",
+  carreira: "investir 25 minutos focada em estudar ou avançar num projeto da sua área",
+  financas: "passar 10 minutos olhando seus gastos da semana e começando uma “reserva de paz”",
 };
 
 interface ChoiceRow {
@@ -98,9 +98,9 @@ const BAR_COLORS = [
 const BAR_LABELS = ["Ruim", "Pouco", "Ok", "Bom", "Ótimo"] as const;
 
 const DICA_INTROS = [
-  "Que tal",
-  "A dica de amiga que eu posso te dar é",
-  "Pensei aqui e acho que pra você seria interessante",
+  { texto: "Que tal", final: "?" },
+  { texto: "A dica de amiga que eu posso te dar é", final: "." },
+  { texto: "Pensei aqui e acho que pra você seria interessante", final: "." },
 ] as const;
 function dicaIntroFor(themeId: string) {
   let h = 0;
