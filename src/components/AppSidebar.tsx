@@ -34,7 +34,7 @@ const ITEMS = [
   { to: "/ceu-hoje", label: "O Céu Hoje", icon: Sparkles, soon: false },
   { to: "/piramide", label: "Pirâmide Evolutiva", icon: Triangle, soon: false },
   { to: "/plano-de-fundo", label: "Plano de fundo", icon: ImageIcon, soon: false },
-  { to: "/ritualzinho", label: "Ritualzinho", icon: Moon, soon: true },
+  { to: "/ritualzinho", label: "Ritualzinho", icon: Moon, soon: false },
   { to: "/blog", label: "Blog", icon: BookOpen, soon: true },
   { to: "/lojinha", label: "Lojinha 11:11", icon: ShoppingBag, soon: true },
   { to: "/redes", label: "Nossas Redes", icon: Share2, soon: true },
