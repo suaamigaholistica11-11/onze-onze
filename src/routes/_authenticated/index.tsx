@@ -6,7 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { Countdown } from "@/components/Countdown";
 import { SIGNS } from "@/lib/onze-data";
-import { getDailyMessage } from "@/lib/daily-message";
+import { getCachedDailyMessage } from "@/lib/daily-message";
 import { getSaudacao } from "@/lib/greeting";
 import { useAuth } from "@/lib/auth";
 import { getTransitsForToday, getMoonForToday } from "@/lib/transits.functions";
@@ -48,7 +48,11 @@ function HomePage() {
 
   // Hydration safety: compute time-sensitive values only after mount.
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const [mensagem, setMensagem] = useState("");
+  useEffect(() => {
+    setMounted(true);
+    setMensagem(getCachedDailyMessage());
+  }, []);
 
   const [meuSigno, setMeuSigno] = useState<string | null>(null);
   useEffect(() => {
@@ -66,7 +70,6 @@ function HomePage() {
   const saudacao = mounted
     ? getSaudacao(nome)
     : { titulo: `Oi, ${nome}!`, subtitulo: "Lindo dia pra você!", periodo: "manhã" as const };
-  const mensagem = mounted ? getDailyMessage() : "";
   const signoUsuario = SIGNS.leao;
 
   const fetchTransits = useServerFn(getTransitsForToday);
