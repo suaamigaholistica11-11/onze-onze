@@ -13,6 +13,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedRitualzinhoRouteImport } from './routes/_authenticated/ritualzinho'
 import { Route as AuthenticatedPlanoDeFundoRouteImport } from './routes/_authenticated/plano-de-fundo'
 import { Route as AuthenticatedPiramideRouteImport } from './routes/_authenticated/piramide'
 import { Route as AuthenticatedMapaAstralRouteImport } from './routes/_authenticated/mapa-astral'
@@ -39,6 +40,12 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedRitualzinhoRoute =
+  AuthenticatedRitualzinhoRouteImport.update({
+    id: '/ritualzinho',
+    path: '/ritualzinho',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedPlanoDeFundoRoute =
   AuthenticatedPlanoDeFundoRouteImport.update({
     id: '/plano-de-fundo',
@@ -82,6 +89,7 @@ export interface FileRoutesByFullPath {
   '/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/piramide': typeof AuthenticatedPiramideRoute
   '/plano-de-fundo': typeof AuthenticatedPlanoDeFundoRoute
+  '/ritualzinho': typeof AuthenticatedRitualzinhoRoute
   '/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
 }
 export interface FileRoutesByTo {
@@ -92,6 +100,7 @@ export interface FileRoutesByTo {
   '/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/piramide': typeof AuthenticatedPiramideRoute
   '/plano-de-fundo': typeof AuthenticatedPlanoDeFundoRoute
+  '/ritualzinho': typeof AuthenticatedRitualzinhoRoute
   '/': typeof AuthenticatedIndexRoute
   '/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
 }
@@ -105,6 +114,7 @@ export interface FileRoutesById {
   '/_authenticated/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/_authenticated/piramide': typeof AuthenticatedPiramideRoute
   '/_authenticated/plano-de-fundo': typeof AuthenticatedPlanoDeFundoRoute
+  '/_authenticated/ritualzinho': typeof AuthenticatedRitualzinhoRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
 }
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/mapa-astral'
     | '/piramide'
     | '/plano-de-fundo'
+    | '/ritualzinho'
     | '/mapa-astral/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/mapa-astral'
     | '/piramide'
     | '/plano-de-fundo'
+    | '/ritualzinho'
     | '/'
     | '/mapa-astral/$id'
   id:
@@ -141,6 +153,7 @@ export interface FileRouteTypes {
     | '/_authenticated/mapa-astral'
     | '/_authenticated/piramide'
     | '/_authenticated/plano-de-fundo'
+    | '/_authenticated/ritualzinho'
     | '/_authenticated/'
     | '/_authenticated/mapa-astral/$id'
   fileRoutesById: FileRoutesById
@@ -179,6 +192,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/ritualzinho': {
+      id: '/_authenticated/ritualzinho'
+      path: '/ritualzinho'
+      fullPath: '/ritualzinho'
+      preLoaderRoute: typeof AuthenticatedRitualzinhoRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/plano-de-fundo': {
@@ -246,6 +266,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedMapaAstralRoute: typeof AuthenticatedMapaAstralRouteWithChildren
   AuthenticatedPiramideRoute: typeof AuthenticatedPiramideRoute
   AuthenticatedPlanoDeFundoRoute: typeof AuthenticatedPlanoDeFundoRoute
+  AuthenticatedRitualzinhoRoute: typeof AuthenticatedRitualzinhoRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
@@ -255,6 +276,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedMapaAstralRoute: AuthenticatedMapaAstralRouteWithChildren,
   AuthenticatedPiramideRoute: AuthenticatedPiramideRoute,
   AuthenticatedPlanoDeFundoRoute: AuthenticatedPlanoDeFundoRoute,
+  AuthenticatedRitualzinhoRoute: AuthenticatedRitualzinhoRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
@@ -270,3 +292,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
