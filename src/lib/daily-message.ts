@@ -38,3 +38,40 @@ export function getDailyMessage(date = new Date()) {
   const day = Math.floor(diff / 86400000);
   return MENSAGENS[day % MENSAGENS.length];
 }
+
+const CACHE_KEY = "oo:daily-message";
+
+function todayKey(date = new Date()) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+/**
+ * Retorna a mensagem do dia usando cache em localStorage.
+ * - Se já houver uma mensagem salva com a data de hoje, devolve direto.
+ * - Caso contrário, computa, salva no localStorage e devolve.
+ * O cache invalida automaticamente quando o dia muda.
+ */
+export function getCachedDailyMessage(): string {
+  if (typeof window === "undefined") return getDailyMessage();
+  const today = todayKey();
+  try {
+    const raw = window.localStorage.getItem(CACHE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw) as { date?: string; message?: string };
+      if (parsed?.date === today && typeof parsed.message === "string") {
+        return parsed.message;
+      }
+    }
+  } catch {}
+  const message = getDailyMessage();
+  try {
+    window.localStorage.setItem(
+      CACHE_KEY,
+      JSON.stringify({ date: today, message }),
+    );
+  } catch {}
+  return message;
+}

@@ -6,7 +6,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
 import { Countdown } from "@/components/Countdown";
 import { SIGNS } from "@/lib/onze-data";
-import { getDailyMessage } from "@/lib/daily-message";
+import { getCachedDailyMessage } from "@/lib/daily-message";
 import { getSaudacao } from "@/lib/greeting";
 import { useAuth } from "@/lib/auth";
 import { getTransitsForToday, getMoonForToday } from "@/lib/transits.functions";
@@ -48,7 +48,11 @@ function HomePage() {
 
   // Hydration safety: compute time-sensitive values only after mount.
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const [mensagem, setMensagem] = useState("");
+  useEffect(() => {
+    setMounted(true);
+    setMensagem(getCachedDailyMessage());
+  }, []);
 
   const [meuSigno, setMeuSigno] = useState<string | null>(null);
   useEffect(() => {
@@ -66,7 +70,6 @@ function HomePage() {
   const saudacao = mounted
     ? getSaudacao(nome)
     : { titulo: `Oi, ${nome}!`, subtitulo: "Lindo dia pra você!", periodo: "manhã" as const };
-  const mensagem = mounted ? getDailyMessage() : "";
   const signoUsuario = SIGNS.leao;
 
   const fetchTransits = useServerFn(getTransitsForToday);
@@ -187,46 +190,44 @@ function MoonPanel({
   const img = next ? MOON_IMAGES[next.nome as MoonPhaseKey] : null;
 
   return (
-    <div className="bg-gradient-to-br from-lilac/60 to-sky/40 p-6 rounded-[28px] relative overflow-hidden ring-1 ring-black/5">
+    <div className="bg-gradient-to-br from-lilac/60 to-sky/40 p-5 rounded-[28px] relative overflow-hidden ring-1 ring-black/5">
       <div className="absolute -right-6 -top-8 size-40 bg-white/40 blur-2xl rounded-full" />
-      <div className="relative z-10 flex flex-col items-center text-center">
-        <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50 mb-2">
-          Lua
-        </p>
-        <h3 className="font-display text-lg font-bold leading-tight">
-          {next ? `${next.nome} começa em...` : "Ciclo lunar"}
-        </h3>
-
+      <div className="relative z-10 flex items-center gap-4">
         {img && (
-          <div className="relative my-4">
-            <div className="absolute inset-0 -m-6 rounded-full bg-white/50 blur-2xl" aria-hidden />
+          <div className="relative shrink-0">
+            <div className="absolute inset-0 -m-4 rounded-full bg-white/50 blur-2xl" aria-hidden />
             <img
               src={img}
               alt={`Imagem realista de ${next!.nome.toLowerCase()}`}
               width={512}
               height={512}
-              className="relative size-32 object-contain drop-shadow-[0_4px_18px_rgba(0,0,0,0.3)]"
+              className="relative size-24 object-contain drop-shadow-[0_4px_18px_rgba(0,0,0,0.3)]"
             />
-            <span aria-hidden className="absolute top-3 left-5 size-1.5 rounded-full bg-white shadow-[0_0_6px_2px_rgba(255,255,255,0.85)] animate-oo-twinkle-a" />
-            <span aria-hidden className="absolute top-8 right-4 size-1 rounded-full bg-white shadow-[0_0_5px_2px_rgba(255,255,255,0.7)] animate-oo-twinkle-b" />
-            <span aria-hidden className="absolute bottom-6 left-7 size-1 rounded-full bg-white shadow-[0_0_5px_2px_rgba(255,255,255,0.7)] animate-oo-twinkle-c" />
-            <span aria-hidden className="absolute bottom-4 right-6 size-1.5 rounded-full bg-white shadow-[0_0_6px_2px_rgba(255,255,255,0.85)] animate-oo-twinkle-d" />
+            <span aria-hidden className="absolute top-2 left-3 size-1.5 rounded-full bg-white shadow-[0_0_6px_2px_rgba(255,255,255,0.85)] animate-oo-twinkle-a" />
+            <span aria-hidden className="absolute bottom-3 right-3 size-1 rounded-full bg-white shadow-[0_0_5px_2px_rgba(255,255,255,0.7)] animate-oo-twinkle-c" />
           </div>
         )}
-
-        {next && (
-          <>
-            <Countdown target={new Date(next.dataISO)} />
-            <p className="text-[11px] text-ink/60 mt-2">
-              {new Date(next.dataISO).toLocaleString("pt-BR", {
-                day: "2-digit",
-                month: "2-digit",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </p>
-          </>
-        )}
+        <div className="flex-1 min-w-0">
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50 mb-1">
+            Próxima lunação
+          </p>
+          <h3 className="font-display text-base font-bold leading-tight mb-2">
+            {next ? next.nome : "Ciclo lunar"}
+          </h3>
+          {next && (
+            <>
+              <Countdown target={new Date(next.dataISO)} />
+              <p className="text-[11px] text-ink/60 mt-2">
+                {new Date(next.dataISO).toLocaleString("pt-BR", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
