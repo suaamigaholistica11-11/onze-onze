@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { ChevronDown, ChevronUp, ShoppingBag, ArrowLeft } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { getMoonForToday } from "@/lib/transits.functions";
+import type { MoonPhaseKey } from "@/lib/moon-phases";
 import {
   BANHOS,
   PHASE_GROUP_LABEL,
@@ -61,7 +62,7 @@ function RitualzinhoPage() {
   );
 }
 
-function Content({ phaseKey, signo }: { phaseKey: ReturnType<typeof groupFromPhase> extends infer _ ? Parameters<typeof groupFromPhase>[0] : never; signo: string }) {
+function Content({ phaseKey, signo }: { phaseKey: MoonPhaseKey; signo: string }) {
   const group = groupFromPhase(phaseKey);
   const fase = PHASE_GROUP_LABEL[group];
   const banhos = BANHOS[group];
