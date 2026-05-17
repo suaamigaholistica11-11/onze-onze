@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Sparkles, Triangle, Star } from "lucide-react";
+import { Sparkles, Triangle, Star, Moon, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -11,6 +11,7 @@ import { getSaudacao } from "@/lib/greeting";
 import { useAuth } from "@/lib/auth";
 import { getTransitsForToday, getMoonForToday } from "@/lib/transits.functions";
 import { buildDailyEnergy } from "@/lib/daily-energy";
+import { groupFromPhase, PHASE_GROUP_LABEL } from "@/lib/rituals";
 import moonNewImg from "@/assets/moon-new.png";
 import moonCrescentImg from "@/assets/moon-crescent.png";
 import moonFullImg from "@/assets/moon-full.png";
@@ -89,6 +90,32 @@ function HomePage() {
     staleTime: 1000 * 60 * 60,
   });
 
+  // Banner de notificação quando entramos em Lua Nova ou Lua Cheia.
+  const [showRitualBanner, setShowRitualBanner] = useState(false);
+  const [ritualBannerText, setRitualBannerText] = useState("");
+  useEffect(() => {
+    if (!moonData) return;
+    const group = groupFromPhase(moonData.fase.key);
+    if (group !== "nova" && group !== "cheia") return;
+    const sig = `${group}:${moonData.signo}`;
+    try {
+      const seen = localStorage.getItem("oo:ritual-phase-notif");
+      if (seen === sig) return;
+      setRitualBannerText(
+        `${PHASE_GROUP_LABEL[group]} em ${moonData.signo} chegou! Tem ritualzinho novo esperando por você 🌙`,
+      );
+      setShowRitualBanner(true);
+    } catch {}
+  }, [moonData]);
+  const dismissRitualBanner = () => {
+    if (!moonData) return;
+    const group = groupFromPhase(moonData.fase.key);
+    try {
+      localStorage.setItem("oo:ritual-phase-notif", `${group}:${moonData.signo}`);
+    } catch {}
+    setShowRitualBanner(false);
+  };
+
   return (
     <AppShell glyph={signoUsuario.glyph}>
       {signoBg && (
@@ -109,6 +136,34 @@ function HomePage() {
           {saudacao.subtitulo}
         </p>
       </header>
+
+      {showRitualBanner && (
+        <section className="px-6 mb-4 animate-oo-enter">
+          <div className="bg-gradient-to-br from-lilac/70 to-peach/60 p-4 rounded-[24px] ring-1 ring-black/5 flex items-start gap-3">
+            <div className="size-9 rounded-full bg-white/70 flex items-center justify-center shrink-0">
+              <Moon className="size-4 text-ink" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm leading-relaxed text-ink/90 mb-2">{ritualBannerText}</p>
+              <Link
+                to="/ritualzinho"
+                onClick={dismissRitualBanner}
+                className="inline-flex items-center gap-1.5 bg-ink text-white px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-[0.15em] hover:bg-ink/90 transition-colors"
+              >
+                Ver ritual
+              </Link>
+            </div>
+            <button
+              type="button"
+              onClick={dismissRitualBanner}
+              className="p-1 rounded-full hover:bg-white/40 transition-colors shrink-0"
+              aria-label="Dispensar"
+            >
+              <X className="size-4 text-ink/60" />
+            </button>
+          </div>
+        </section>
+      )}
 
       {/* Mensagem do dia */}
       <section className="px-6 mb-6 animate-oo-enter [animation-delay:80ms]">
@@ -160,6 +215,7 @@ function HomePage() {
         <Shortcut to="/mapa-astral" bg="sky" label="Mapa Astral" Icon={Star} />
         <Shortcut to="/ceu-hoje" bg="peach" label="O Céu Hoje" Icon={Sparkles} />
         <Shortcut to="/piramide" bg="mint" label="Pirâmide" Icon={Triangle} />
+        <Shortcut to="/ritualzinho" bg="yellow-candy" label="Bora de ritualzinho?" Icon={Moon} />
       </section>
     </AppShell>
   );
