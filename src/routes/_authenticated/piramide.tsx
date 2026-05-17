@@ -557,10 +557,16 @@ function PiramideEvolutivaIntro({
                 <p className="font-bold uppercase tracking-[0.15em] text-[10px] text-ink/50 mb-1">
                   Pega essa dica
                 </p>
-                <p>
-                  {dicaIntroFor(tid)}{" "}
-                  {RECOMENDACOES[tid] ?? "dar um passinho pequeno hoje?"}
-                </p>
+                {(() => {
+                  const intro = dicaIntroFor(tid);
+                  const rec = RECOMENDACOES[tid] ?? "dar um passinho pequeno hoje";
+                  return (
+                    <p>
+                      {intro.texto} {rec}
+                      {intro.final}
+                    </p>
+                  );
+                })()}
               </div>
             </div>
           );
