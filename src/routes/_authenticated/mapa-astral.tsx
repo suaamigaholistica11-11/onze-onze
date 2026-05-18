@@ -443,6 +443,12 @@ function InlineMapaRender({ id, name, data }: { id: string; name: string; data: 
       >
         Me conta mais sobre mim →
       </Link>
+      <Link
+        to="/meu-trio"
+        className="mt-2 block text-center text-xs font-bold uppercase tracking-[0.2em] text-ink/70"
+      >
+        Ver meu trio (Sol · Lua · Ascendente) →
+      </Link>
     </section>
   );
 }
