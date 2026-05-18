@@ -11,6 +11,7 @@ import {
   Share2,
   Settings,
   Image as ImageIcon,
+  Heart,
 } from "lucide-react";
 import {
   Sidebar,
@@ -31,6 +32,7 @@ import { supabase } from "@/integrations/supabase/client";
 const ITEMS = [
   { to: "/", label: "Home", icon: Home, soon: false },
   { to: "/mapa-astral", label: "Mapa Astral", icon: Star, soon: false },
+  { to: "/meu-trio", label: "Meu trio", icon: Heart, soon: false },
   { to: "/ceu-hoje", label: "O Céu Hoje", icon: Sparkles, soon: false },
   { to: "/piramide", label: "Pirâmide Evolutiva", icon: Triangle, soon: false },
   { to: "/plano-de-fundo", label: "Plano de fundo", icon: ImageIcon, soon: false },
