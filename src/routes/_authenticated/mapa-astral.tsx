@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { Lock, Sparkles, Trash2, MapPin, Loader2, Heart } from "lucide-react";
+import { Lock, Sparkles, Trash2, MapPin, Loader2, Heart, Sun, Moon, ArrowUpRight } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -10,6 +10,8 @@ import { calcAspects, signLongitude } from "@/lib/elements";
 import { toast } from "sonner";
 import zodiacWheel from "@/assets/zodiac-wheel.png";
 import { useBgDisabled } from "@/lib/bg-preference";
+import { SUN_TEXTS, MOON_TEXTS, ASC_TEXTS } from "@/lib/big-three-texts";
+import { SIGN_GLYPHS } from "@/lib/transit-copy";
 
 export const Route = createFileRoute("/_authenticated/mapa-astral")({
   head: () => ({
@@ -411,6 +413,7 @@ function InlineMapaRender({ id, name, data }: { id: string; name: string; data: 
   const aspects = calcAspects(
     bodies.map((b) => ({ name: b.name, longitude: signLongitude(b.sign, b.degree) })),
   );
+  const [trioOpen, setTrioOpen] = useState(false);
   return (
     <section
       id="mapa-render"
@@ -439,16 +442,90 @@ function InlineMapaRender({ id, name, data }: { id: string; name: string; data: 
       <Link
         to="/mapa-astral/$id"
         params={{ id }}
-        className="mt-3 block text-center text-xs font-bold uppercase tracking-[0.2em] text-lilac"
+        className="mt-3 hidden text-center text-xs font-bold uppercase tracking-[0.2em] text-lilac"
       >
-        Me conta mais sobre mim →
+        (link antigo)
       </Link>
-      <Link
-        to="/meu-trio"
-        className="mt-2 block text-center text-xs font-bold uppercase tracking-[0.2em] text-ink/70"
+      <button
+        type="button"
+        onClick={() => setTrioOpen((v) => !v)}
+        className="mt-3 w-full bg-white ring-1 ring-black/5 text-ink py-3 rounded-full text-[11px] font-bold uppercase tracking-[0.2em] hover:bg-cream transition-colors"
       >
-        Ver meu trio (Sol · Lua · Ascendente) →
-      </Link>
+        {trioOpen ? "Fechar" : "Me conta mais sobre mim →"}
+      </button>
+      {trioOpen && (
+        <div className="mt-4 grid gap-3 animate-oo-enter">
+          <TrioBlock
+            label="Sol"
+            sublabel="quem você está aprendendo a ser"
+            sign={data.sun.sign}
+            text={SUN_TEXTS[data.sun.sign] ?? data.sun.description}
+            icon={<Sun className="size-5" />}
+            bg="bg-yellow-candy"
+          />
+          <TrioBlock
+            label="Lua"
+            sublabel="como você sente o mundo"
+            sign={data.moon.sign}
+            text={MOON_TEXTS[data.moon.sign] ?? data.moon.description}
+            icon={<Moon className="size-5" />}
+            bg="bg-sky"
+          />
+          <TrioBlock
+            label="Ascendente"
+            sublabel="como o mundo te percebe"
+            sign={data.ascendant.sign}
+            text={ASC_TEXTS[data.ascendant.sign] ?? data.ascendant.description}
+            icon={<ArrowUpRight className="size-5" />}
+            bg="bg-peach"
+          />
+          <Link
+            to="/mapa-astral/$id"
+            params={{ id }}
+            className="mt-1 block text-center text-xs font-bold uppercase tracking-[0.2em] text-lilac"
+          >
+            Ver leitura completa →
+          </Link>
+        </div>
+      )}
     </section>
+  );
+}
+
+function TrioBlock({
+  label,
+  sublabel,
+  sign,
+  text,
+  icon,
+  bg,
+}: {
+  label: string;
+  sublabel: string;
+  sign: string;
+  text: string;
+  icon: React.ReactNode;
+  bg: string;
+}) {
+  return (
+    <div className={`${bg} p-5 rounded-[24px] ring-1 ring-black/5`}>
+      <div className="flex items-center gap-3 mb-2">
+        <div className="size-9 rounded-full bg-white/70 flex items-center justify-center">
+          {icon}
+        </div>
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/60">
+            {label}
+          </p>
+          <p className="font-display text-xl font-bold leading-none mt-0.5">
+            {SIGN_GLYPHS[sign] ?? "✦"} {sign}
+          </p>
+        </div>
+      </div>
+      <p className="text-[10px] uppercase tracking-[0.2em] text-ink/50 mb-1.5">
+        {sublabel}
+      </p>
+      <p className="font-display text-sm leading-relaxed text-pretty">{text}</p>
+    </div>
   );
 }

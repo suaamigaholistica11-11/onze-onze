@@ -16,10 +16,10 @@ import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedRitualzinhoRouteImport } from './routes/_authenticated/ritualzinho'
 import { Route as AuthenticatedPlanoDeFundoRouteImport } from './routes/_authenticated/plano-de-fundo'
 import { Route as AuthenticatedPiramideRouteImport } from './routes/_authenticated/piramide'
-import { Route as AuthenticatedMeuTrioRouteImport } from './routes/_authenticated/meu-trio'
 import { Route as AuthenticatedMapaAstralRouteImport } from './routes/_authenticated/mapa-astral'
 import { Route as AuthenticatedCompletarPerfilRouteImport } from './routes/_authenticated/completar-perfil'
 import { Route as AuthenticatedCeuHojeRouteImport } from './routes/_authenticated/ceu-hoje'
+import { Route as AuthenticatedBaralhoCiganoRouteImport } from './routes/_authenticated/baralho-cigano'
 import { Route as AuthenticatedMapaAstralIdRouteImport } from './routes/_authenticated/mapa-astral.$id'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -58,11 +58,6 @@ const AuthenticatedPiramideRoute = AuthenticatedPiramideRouteImport.update({
   path: '/piramide',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
-const AuthenticatedMeuTrioRoute = AuthenticatedMeuTrioRouteImport.update({
-  id: '/meu-trio',
-  path: '/meu-trio',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
 const AuthenticatedMapaAstralRoute = AuthenticatedMapaAstralRouteImport.update({
   id: '/mapa-astral',
   path: '/mapa-astral',
@@ -79,6 +74,12 @@ const AuthenticatedCeuHojeRoute = AuthenticatedCeuHojeRouteImport.update({
   path: '/ceu-hoje',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedBaralhoCiganoRoute =
+  AuthenticatedBaralhoCiganoRouteImport.update({
+    id: '/baralho-cigano',
+    path: '/baralho-cigano',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedMapaAstralIdRoute =
   AuthenticatedMapaAstralIdRouteImport.update({
     id: '/$id',
@@ -90,10 +91,10 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/baralho-cigano': typeof AuthenticatedBaralhoCiganoRoute
   '/ceu-hoje': typeof AuthenticatedCeuHojeRoute
   '/completar-perfil': typeof AuthenticatedCompletarPerfilRoute
   '/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
-  '/meu-trio': typeof AuthenticatedMeuTrioRoute
   '/piramide': typeof AuthenticatedPiramideRoute
   '/plano-de-fundo': typeof AuthenticatedPlanoDeFundoRoute
   '/ritualzinho': typeof AuthenticatedRitualzinhoRoute
@@ -102,10 +103,10 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/baralho-cigano': typeof AuthenticatedBaralhoCiganoRoute
   '/ceu-hoje': typeof AuthenticatedCeuHojeRoute
   '/completar-perfil': typeof AuthenticatedCompletarPerfilRoute
   '/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
-  '/meu-trio': typeof AuthenticatedMeuTrioRoute
   '/piramide': typeof AuthenticatedPiramideRoute
   '/plano-de-fundo': typeof AuthenticatedPlanoDeFundoRoute
   '/ritualzinho': typeof AuthenticatedRitualzinhoRoute
@@ -117,10 +118,10 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/baralho-cigano': typeof AuthenticatedBaralhoCiganoRoute
   '/_authenticated/ceu-hoje': typeof AuthenticatedCeuHojeRoute
   '/_authenticated/completar-perfil': typeof AuthenticatedCompletarPerfilRoute
   '/_authenticated/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
-  '/_authenticated/meu-trio': typeof AuthenticatedMeuTrioRoute
   '/_authenticated/piramide': typeof AuthenticatedPiramideRoute
   '/_authenticated/plano-de-fundo': typeof AuthenticatedPlanoDeFundoRoute
   '/_authenticated/ritualzinho': typeof AuthenticatedRitualzinhoRoute
@@ -133,10 +134,10 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/reset-password'
+    | '/baralho-cigano'
     | '/ceu-hoje'
     | '/completar-perfil'
     | '/mapa-astral'
-    | '/meu-trio'
     | '/piramide'
     | '/plano-de-fundo'
     | '/ritualzinho'
@@ -145,10 +146,10 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/reset-password'
+    | '/baralho-cigano'
     | '/ceu-hoje'
     | '/completar-perfil'
     | '/mapa-astral'
-    | '/meu-trio'
     | '/piramide'
     | '/plano-de-fundo'
     | '/ritualzinho'
@@ -159,10 +160,10 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/login'
     | '/reset-password'
+    | '/_authenticated/baralho-cigano'
     | '/_authenticated/ceu-hoje'
     | '/_authenticated/completar-perfil'
     | '/_authenticated/mapa-astral'
-    | '/_authenticated/meu-trio'
     | '/_authenticated/piramide'
     | '/_authenticated/plano-de-fundo'
     | '/_authenticated/ritualzinho'
@@ -227,13 +228,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPiramideRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
-    '/_authenticated/meu-trio': {
-      id: '/_authenticated/meu-trio'
-      path: '/meu-trio'
-      fullPath: '/meu-trio'
-      preLoaderRoute: typeof AuthenticatedMeuTrioRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
     '/_authenticated/mapa-astral': {
       id: '/_authenticated/mapa-astral'
       path: '/mapa-astral'
@@ -253,6 +247,13 @@ declare module '@tanstack/react-router' {
       path: '/ceu-hoje'
       fullPath: '/ceu-hoje'
       preLoaderRoute: typeof AuthenticatedCeuHojeRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/baralho-cigano': {
+      id: '/_authenticated/baralho-cigano'
+      path: '/baralho-cigano'
+      fullPath: '/baralho-cigano'
+      preLoaderRoute: typeof AuthenticatedBaralhoCiganoRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/mapa-astral/$id': {
@@ -280,10 +281,10 @@ const AuthenticatedMapaAstralRouteWithChildren =
   )
 
 interface AuthenticatedRouteChildren {
+  AuthenticatedBaralhoCiganoRoute: typeof AuthenticatedBaralhoCiganoRoute
   AuthenticatedCeuHojeRoute: typeof AuthenticatedCeuHojeRoute
   AuthenticatedCompletarPerfilRoute: typeof AuthenticatedCompletarPerfilRoute
   AuthenticatedMapaAstralRoute: typeof AuthenticatedMapaAstralRouteWithChildren
-  AuthenticatedMeuTrioRoute: typeof AuthenticatedMeuTrioRoute
   AuthenticatedPiramideRoute: typeof AuthenticatedPiramideRoute
   AuthenticatedPlanoDeFundoRoute: typeof AuthenticatedPlanoDeFundoRoute
   AuthenticatedRitualzinhoRoute: typeof AuthenticatedRitualzinhoRoute
@@ -291,10 +292,10 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedBaralhoCiganoRoute: AuthenticatedBaralhoCiganoRoute,
   AuthenticatedCeuHojeRoute: AuthenticatedCeuHojeRoute,
   AuthenticatedCompletarPerfilRoute: AuthenticatedCompletarPerfilRoute,
   AuthenticatedMapaAstralRoute: AuthenticatedMapaAstralRouteWithChildren,
-  AuthenticatedMeuTrioRoute: AuthenticatedMeuTrioRoute,
   AuthenticatedPiramideRoute: AuthenticatedPiramideRoute,
   AuthenticatedPlanoDeFundoRoute: AuthenticatedPlanoDeFundoRoute,
   AuthenticatedRitualzinhoRoute: AuthenticatedRitualzinhoRoute,

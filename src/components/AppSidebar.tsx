@@ -11,7 +11,7 @@ import {
   Share2,
   Settings,
   Image as ImageIcon,
-  Heart,
+  Layers,
 } from "lucide-react";
 import {
   Sidebar,
@@ -29,16 +29,29 @@ import { useAuth } from "@/lib/auth";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-const ITEMS = [
-  { to: "/", label: "Home", icon: Home, soon: false },
-  { to: "/mapa-astral", label: "Mapa Astral", icon: Star, soon: false },
-  { to: "/meu-trio", label: "Meu trio", icon: Heart, soon: false },
-  { to: "/ceu-hoje", label: "O Céu Hoje", icon: Sparkles, soon: false },
-  { to: "/piramide", label: "Pirâmide Evolutiva", icon: Triangle, soon: false },
-  { to: "/plano-de-fundo", label: "Plano de fundo", icon: ImageIcon, soon: false },
-  { to: "/ritualzinho", label: "Ritualzinho", icon: Moon, soon: false },
+type MenuItem = {
+  to: string;
+  label: string;
+  icon: typeof Home;
+  soon?: boolean;
+  external?: boolean;
+};
+
+const ITEMS: readonly MenuItem[] = [
+  { to: "/", label: "Home", icon: Home },
+  { to: "/mapa-astral", label: "Mapa Astral", icon: Star },
+  { to: "/ceu-hoje", label: "O Céu Hoje", icon: Sparkles },
+  { to: "/piramide", label: "Pirâmide Evolutiva", icon: Triangle },
+  { to: "/plano-de-fundo", label: "Plano de fundo", icon: ImageIcon },
+  { to: "/ritualzinho", label: "Ritualzinho", icon: Moon },
+  { to: "/baralho-cigano", label: "Baralho Cigano", icon: Layers },
+  {
+    to: "https://collshp.com/lojinjaonzeonze?view=storefront",
+    label: "Lojinha 11:11",
+    icon: ShoppingBag,
+    external: true,
+  },
   { to: "/blog", label: "Blog", icon: BookOpen, soon: true },
-  { to: "/lojinha", label: "Lojinha 11:11", icon: ShoppingBag, soon: true },
   { to: "/redes", label: "Nossas Redes", icon: Share2, soon: true },
   { to: "/configuracoes", label: "Configurações", icon: Settings, soon: true },
 ] as const;
@@ -112,6 +125,18 @@ export function AppSidebar() {
                         <span className="text-[9px] uppercase tracking-wider bg-lilac/30 px-1.5 py-0.5 rounded-full">
                           em breve
                         </span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                }
+                if (item.external) {
+                  return (
+                    <SidebarMenuItem key={item.to}>
+                      <SidebarMenuButton asChild>
+                        <a href={item.to} target="_blank" rel="noreferrer">
+                          <Icon className="size-4" />
+                          <span>{item.label}</span>
+                        </a>
                       </SidebarMenuButton>
                     </SidebarMenuItem>
                   );
