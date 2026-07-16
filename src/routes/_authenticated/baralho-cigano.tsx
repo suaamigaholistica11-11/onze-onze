@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { ChevronDown, ChevronUp, Layers } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { ChevronDown, ChevronUp, Layers, Shuffle, RotateCcw, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
+import { CIGANO_CARDS, shuffle, type CiganoCard } from "@/lib/cigano-cards";
+import { startShuffleSound, stopShuffleSound } from "@/lib/shuffle-sound";
 
 export const Route = createFileRoute("/_authenticated/baralho-cigano")({
   head: () => ({
@@ -9,85 +11,119 @@ export const Route = createFileRoute("/_authenticated/baralho-cigano")({
       { title: "Baralho Cigano · onze-onze" },
       {
         name: "description",
-        content:
-          "Métodos de leitura do baralho cigano: 3 cartas, 7 cartas, Cruz e Mesa Real.",
+        content: "Escolha suas cartas e leia com os métodos clássicos do baralho cigano.",
       },
     ],
   }),
   component: BaralhoCiganoPage,
 });
 
-type Metodo = {
-  id: string;
+type SpreadId = "3" | "7" | "cruz" | "mesa";
+
+type Spread = {
+  id: SpreadId;
   titulo: string;
+  qtd: number;
   resumo: string;
-  posicoes: { n: string; texto: string }[];
-  extras?: { titulo: string; itens: string[] };
+  posicoes: string[];
 };
 
-const METODOS: Metodo[] = [
+const SPREADS: Spread[] = [
   {
-    id: "3-cartas",
+    id: "3",
     titulo: "3 Cartas",
-    resumo:
-      "A leitura mais simples e direta. Ótima pra bater o olho num tema e entender o fio do que está acontecendo.",
-    posicoes: [
-      { n: "1", texto: "Passado. O que gerou a situação." },
-      { n: "2", texto: "Presente. O que está acontecendo agora." },
-      { n: "3", texto: "Futuro. O que tende a se desenrolar." },
-    ],
+    qtd: 3,
+    resumo: "Leitura direta pra ver o fio da situação.",
+    posicoes: ["Passado", "Presente", "Futuro"],
   },
   {
-    id: "7-cartas",
+    id: "7",
     titulo: "7 Cartas",
-    resumo:
-      "Um panorama mais completo, com espaço pra olhar o entorno, os desejos e o conselho final.",
+    qtd: 7,
+    resumo: "Um panorama com entorno, desejos e conselho.",
     posicoes: [
-      { n: "1", texto: "O consulente e a situação atual." },
-      { n: "2", texto: "O que o cerca, influências externas." },
-      { n: "3", texto: "O que deseja e aspira." },
-      { n: "4", texto: "O que não espera, a surpresa." },
-      { n: "5", texto: "Amor e relacionamentos." },
-      { n: "6", texto: "Trabalho e finanças." },
-      { n: "7", texto: "O conselho, a mensagem final." },
+      "Você agora",
+      "Ao seu redor",
+      "O que deseja",
+      "O que não espera",
+      "Amor",
+      "Trabalho",
+      "Conselho",
     ],
   },
   {
     id: "cruz",
-    titulo: "Método da Cruz (10 Cartas)",
-    resumo:
-      "Uma leitura mais profunda, boa quando o tema pede clareza sobre postura, desejo e desdobramento.",
+    titulo: "Cruz (10 Cartas)",
+    qtd: 10,
+    resumo: "Postura, desejo e desdobramento.",
     posicoes: [
-      { n: "1+2", texto: "O passado, o que gerou a situação." },
-      { n: "3", texto: "O presente." },
-      { n: "4", texto: "O que o consulente ainda não está percebendo." },
-      { n: "5", texto: "A melhor postura a tomar." },
-      { n: "6+7", texto: "Aspirações e desejos." },
-      { n: "8", texto: "Se o desejo se realiza." },
-      { n: "9", texto: "Se será bom pro consulente." },
-      { n: "10", texto: "O conselho final." },
+      "Passado 1",
+      "Passado 2",
+      "Presente",
+      "O que ainda não percebe",
+      "Melhor postura",
+      "Aspiração 1",
+      "Aspiração 2",
+      "O desejo se realiza?",
+      "Será bom pra você?",
+      "Conselho final",
     ],
   },
   {
-    id: "mesa-real",
-    titulo: "Mesa Real (36 Cartas)",
-    resumo:
-      "A leitura mais completa. Grade de 9 colunas por 4 linhas, casas de 1 a 36. Cada carta tem sua própria casa correspondente e, quando cai nela, amplifica o significado. Cartas à esquerda contam passado e causa, à direita futuro e resultado.",
-    posicoes: [],
-    extras: {
-      titulo: "Técnicas de leitura",
-      itens: [
-        "T1 Somas. A carta oculta é o número da carta somado ao da casa onde caiu. Se passar de 36, some os dígitos.",
-        "T2 Laterais. Leia as posições 1 e 36 juntas, 9 e 28 juntas, e cruze as casas 12 e 21 e 13 e 20 pra ler as preocupações centrais.",
-        "T3 Primeira mensagem. As cartas nas casas 1, 2 e 3 formam a primeira mensagem do jogo.",
-        "T4 Posição do consulente. Divida a mesa em colunas: esquerda é passado, centro é presente, direita é futuro.",
-        "T8 Espelhamentos. Cruze cartas em posições simétricas pra confirmar tendências.",
-      ],
-    },
+    id: "mesa",
+    titulo: "Mesa Real (36)",
+    qtd: 36,
+    resumo: "A leitura mais completa, todas as cartas em jogo.",
+    posicoes: Array.from({ length: 36 }, (_, i) => `Casa ${i + 1}`),
   },
 ];
 
 function BaralhoCiganoPage() {
+  const [spread, setSpread] = useState<Spread | null>(null);
+  const [deck, setDeck] = useState<CiganoCard[]>(() => shuffle(CIGANO_CARDS));
+  const [picked, setPicked] = useState<number[]>([]); // índices no deck
+  const [shuffling, setShuffling] = useState(false);
+  const shuffleTimer = useRef<number | null>(null);
+
+  useEffect(() => () => stopShuffleSound(), []);
+
+  const startShuffle = () => {
+    setPicked([]);
+    setShuffling(true);
+    startShuffleSound();
+    // embaralha várias vezes com sons
+    const rounds = 6;
+    let i = 0;
+    const step = () => {
+      setDeck((d) => shuffle(d));
+      i++;
+      if (i < rounds) {
+        shuffleTimer.current = window.setTimeout(step, 220);
+      } else {
+        stopShuffleSound();
+        setShuffling(false);
+      }
+    };
+    shuffleTimer.current = window.setTimeout(step, 220);
+  };
+
+  const pickCard = (idx: number) => {
+    if (!spread || shuffling) return;
+    if (picked.includes(idx)) return;
+    if (picked.length >= spread.qtd) return;
+    setPicked((p) => [...p, idx]);
+  };
+
+  const reset = () => {
+    if (shuffleTimer.current) window.clearTimeout(shuffleTimer.current);
+    stopShuffleSound();
+    setShuffling(false);
+    setPicked([]);
+    setDeck(shuffle(CIGANO_CARDS));
+  };
+
+  const completo = spread ? picked.length === spread.qtd : false;
+
   return (
     <AppShell glyph="✧">
       <header className="px-6 pt-10 pb-4 animate-oo-enter">
@@ -98,106 +134,236 @@ function BaralhoCiganoPage() {
           Baralho Cigano
         </h1>
         <p className="text-sm text-ink/60 mt-3 leading-relaxed">
-          O baralho cigano é um oráculo cheio de imagens vivas. Cada carta tem
-          uma lâmina e um arquétipo, e a leitura acontece na conversa entre elas.
-          Aqui embaixo estão os quatro métodos clássicos, escolhe o que mais
-          combina com a pergunta do momento.
+          Escolha o método, embaralha respirando fundo com a sua pergunta em mente
+          e toca nas cartas que te chamarem.
         </p>
       </header>
 
-      <section className="px-6 pb-10 space-y-3 animate-oo-enter [animation-delay:80ms]">
-        {METODOS.map((m) => (
-          <MetodoCard key={m.id} metodo={m} />
-        ))}
+      {!spread && (
+        <section className="px-6 pb-4 space-y-3 animate-oo-enter">
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50">
+            escolhe seu método
+          </p>
+          {SPREADS.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              onClick={() => {
+                setSpread(s);
+                setDeck(shuffle(CIGANO_CARDS));
+                setPicked([]);
+              }}
+              className="w-full text-left bg-white rounded-[24px] ring-1 ring-black/5 p-5 hover:bg-cream transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="size-10 rounded-2xl bg-lilac/40 flex items-center justify-center">
+                  <Layers className="size-4" />
+                </div>
+                <div className="flex-1">
+                  <p className="font-display font-bold text-base leading-tight">
+                    {s.titulo}
+                  </p>
+                  <p className="text-[11px] text-ink/50 mt-0.5">{s.resumo}</p>
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-ink/40">
+                  {s.qtd} cartas
+                </span>
+              </div>
+            </button>
+          ))}
+        </section>
+      )}
 
-        <div className="bg-yellow-candy/60 rounded-[24px] p-5 ring-1 ring-black/5 mt-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/60 mb-2">
-            dica de amiga
-          </p>
-          <p className="font-display text-base leading-relaxed">
-            Antes de embaralhar, respira fundo e formula a pergunta com calma.
-            O oráculo responde melhor pra quem chega inteira. E lembra: carta
-            nenhuma decide por você, ela só ilumina o caminho pra sua escolha
-            ficar mais consciente.
-          </p>
-        </div>
-      </section>
+      {spread && (
+        <section className="px-6 pb-10 animate-oo-enter">
+          <div className="flex items-center justify-between gap-3 mb-4">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50">
+                método
+              </p>
+              <p className="font-display font-bold text-lg leading-tight">
+                {spread.titulo}
+              </p>
+              <p className="text-[11px] text-ink/50 mt-0.5">
+                {picked.length}/{spread.qtd} escolhidas
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={startShuffle}
+                disabled={shuffling}
+                className="inline-flex items-center gap-1.5 bg-ink text-white px-3 py-2 rounded-full text-[10px] font-bold uppercase tracking-[0.18em] disabled:opacity-50"
+              >
+                <Shuffle className="size-3.5" />
+                {shuffling ? "embaralhando…" : "embaralhar"}
+              </button>
+              <button
+                type="button"
+                onClick={reset}
+                className="inline-flex items-center gap-1.5 bg-white ring-1 ring-black/10 text-ink px-3 py-2 rounded-full text-[10px] font-bold uppercase tracking-[0.18em]"
+              >
+                <RotateCcw className="size-3.5" />
+                trocar
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSpread(null);
+                  setPicked([]);
+                }}
+                className="text-[10px] font-bold uppercase tracking-[0.18em] text-ink/50 px-2"
+              >
+                método
+              </button>
+            </div>
+          </div>
+
+          {!completo && (
+            <>
+              <p className="text-sm text-ink/70 leading-relaxed mb-3">
+                {picked.length === 0
+                  ? "Antes de tirar, respira. Formula a pergunta com calma e toca nas cartas que te chamarem."
+                  : `Escolhe mais ${spread.qtd - picked.length} carta${
+                      spread.qtd - picked.length > 1 ? "s" : ""
+                    }.`}
+              </p>
+              <div
+                className={`grid gap-2 ${
+                  shuffling ? "animate-pulse" : ""
+                } grid-cols-6 sm:grid-cols-8`}
+              >
+                {deck.map((card, idx) => {
+                  const chosen = picked.includes(idx);
+                  const disabled = shuffling || chosen;
+                  return (
+                    <button
+                      key={`${card.n}-${idx}`}
+                      type="button"
+                      onClick={() => pickCard(idx)}
+                      disabled={disabled}
+                      aria-label={chosen ? `Carta escolhida` : "Carta virada"}
+                      className={`aspect-[2/3] rounded-lg ring-1 ring-black/10 transition-all ${
+                        chosen
+                          ? "opacity-30 scale-95"
+                          : "hover:-translate-y-1 hover:ring-lilac"
+                      } ${shuffling ? "animate-oo-shuffle" : ""}`}
+                      style={{
+                        background:
+                          "repeating-linear-gradient(45deg, #6b4a8b 0 6px, #8863a8 6px 12px), radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15), transparent 60%)",
+                        backgroundBlendMode: "overlay",
+                        animationDelay: `${(idx % 8) * 30}ms`,
+                      }}
+                    >
+                      <span className="block w-full h-full rounded-lg border border-white/25 flex items-center justify-center text-white/70 text-[10px] font-display">
+                        ✦
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {completo && (
+            <div className="animate-oo-enter">
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles className="size-4 text-lilac" />
+                <p className="font-display font-bold text-lg">
+                  Sua leitura
+                </p>
+              </div>
+              <ul className="space-y-3">
+                {picked.map((deckIdx, i) => {
+                  const c = deck[deckIdx];
+                  return (
+                    <li
+                      key={i}
+                      className="bg-white rounded-[20px] ring-1 ring-black/5 p-4"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="size-14 shrink-0 rounded-lg flex items-center justify-center text-white font-display font-bold text-lg"
+                          style={{
+                            background:
+                              "linear-gradient(135deg, #b48ad4, #7a4fa0)",
+                          }}
+                        >
+                          {c.n}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-ink/50">
+                            {spread.posicoes[i] ?? `Posição ${i + 1}`}
+                          </p>
+                          <p className="font-display font-bold text-base leading-tight mt-0.5">
+                            {c.nome}
+                          </p>
+                          <p className="text-sm text-ink/70 leading-relaxed mt-1">
+                            {c.sig}
+                          </p>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+              <button
+                type="button"
+                onClick={reset}
+                className="mt-4 w-full bg-ink text-white py-3 rounded-full text-[11px] font-bold uppercase tracking-[0.2em]"
+              >
+                Nova leitura
+              </button>
+            </div>
+          )}
+        </section>
+      )}
+
+      <MetodosDetalhados />
     </AppShell>
   );
 }
 
-function MetodoCard({ metodo }: { metodo: Metodo }) {
+function MetodosDetalhados() {
   const [open, setOpen] = useState(false);
   return (
-    <div className="bg-white rounded-[24px] ring-1 ring-black/5 overflow-hidden">
+    <section className="px-6 pb-16 animate-oo-enter">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between gap-3 p-5 text-left hover:bg-ink/5 transition-colors"
+        className="w-full flex items-center justify-between bg-cream/60 rounded-2xl px-4 py-3"
       >
-        <div className="flex items-center gap-3">
-          <div className="size-10 rounded-2xl bg-lilac/40 flex items-center justify-center">
-            <Layers className="size-4" />
-          </div>
-          <div>
-            <p className="font-display font-bold text-base leading-tight">
-              {metodo.titulo}
-            </p>
-            <p className="text-[11px] text-ink/50 mt-0.5">
-              {open ? "toque pra fechar" : "toque pra abrir"}
-            </p>
-          </div>
-        </div>
+        <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-ink/70">
+          como ler cada método
+        </span>
         {open ? (
-          <ChevronUp className="size-4 text-ink/60 shrink-0" />
+          <ChevronUp className="size-4 text-ink/60" />
         ) : (
-          <ChevronDown className="size-4 text-ink/60 shrink-0" />
+          <ChevronDown className="size-4 text-ink/60" />
         )}
       </button>
       {open && (
-        <div className="px-5 pb-5 space-y-4">
-          <p className="text-sm text-ink/70 leading-relaxed">{metodo.resumo}</p>
-          {metodo.posicoes.length > 0 && (
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-ink/50 mb-2">
-                posições
-              </p>
-              <ul className="space-y-2">
-                {metodo.posicoes.map((p) => (
-                  <li
-                    key={p.n}
-                    className="flex gap-3 bg-cream/60 rounded-2xl p-3"
-                  >
-                    <span className="font-display font-bold text-sm shrink-0 min-w-8">
-                      {p.n}.
-                    </span>
-                    <span className="text-sm text-ink/80 leading-relaxed">
-                      {p.texto}
-                    </span>
-                  </li>
+        <div className="mt-3 space-y-3">
+          {SPREADS.map((s) => (
+            <div
+              key={s.id}
+              className="bg-white rounded-2xl ring-1 ring-black/5 p-4"
+            >
+              <p className="font-display font-bold text-base mb-1">{s.titulo}</p>
+              <p className="text-sm text-ink/60 mb-2">{s.resumo}</p>
+              <ol className="text-sm text-ink/80 space-y-1 list-decimal list-inside">
+                {s.posicoes.slice(0, 10).map((p, i) => (
+                  <li key={i}>{p}</li>
                 ))}
-              </ul>
-            </div>
-          )}
-          {metodo.extras && (
-            <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-ink/50 mb-2">
-                {metodo.extras.titulo}
-              </p>
-              <ul className="space-y-2">
-                {metodo.extras.itens.map((t, i) => (
-                  <li
-                    key={i}
-                    className="bg-lilac/20 rounded-2xl p-3 text-sm text-ink/80 leading-relaxed"
-                  >
-                    {t}
+                {s.posicoes.length > 10 && (
+                  <li className="list-none text-ink/50 italic">
+                    … e mais {s.posicoes.length - 10} casas.
                   </li>
-                ))}
-              </ul>
+                )}
+              </ol>
             </div>
-          )}
+          ))}
         </div>
       )}
-    </div>
+    </section>
   );
 }
