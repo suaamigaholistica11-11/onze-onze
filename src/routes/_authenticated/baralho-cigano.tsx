@@ -221,7 +221,7 @@ function BaralhoCiganoPage() {
 
           {!completo && (
             <>
-              <p className="text-sm text-ink/70 leading-relaxed mb-3">
+              <p className="text-sm text-oo-offwhite/80 leading-relaxed mb-3">
                 {picked.length === 0
                   ? "Antes de tirar, respira. Formula a pergunta com calma e toca nas cartas que te chamarem."
                   : `Escolhe mais ${spread.qtd - picked.length} carta${
