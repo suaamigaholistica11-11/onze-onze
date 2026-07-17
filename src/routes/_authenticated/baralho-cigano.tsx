@@ -127,13 +127,13 @@ function BaralhoCiganoPage() {
   return (
     <AppShell glyph="✧" className="dark bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-900">
       <header className="px-6 pt-10 pb-4 animate-oo-enter">
-        <p className="text-xs font-medium uppercase tracking-[0.25em] text-ink/40 mb-2">
+        <p className="text-xs font-medium uppercase tracking-[0.25em] text-oo-offwhite/50 mb-2">
           leitura oracular
         </p>
-        <h1 className="font-display text-4xl font-bold tracking-tight">
+        <h1 className="font-display text-4xl font-bold tracking-tight text-oo-gold">
           Baralho Cigano
         </h1>
-        <p className="text-sm text-ink/60 mt-3 leading-relaxed">
+        <p className="text-sm text-oo-offwhite mt-3 leading-relaxed">
           Escolha o método, embaralha respirando fundo com a sua pergunta em mente
           e toca nas cartas que te chamarem.
         </p>
