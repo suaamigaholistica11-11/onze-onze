@@ -193,7 +193,7 @@ function BaralhoCiganoPage() {
                 type="button"
                 onClick={startShuffle}
                 disabled={shuffling}
-                className="inline-flex items-center gap-1.5 bg-ink text-white px-3 py-2 rounded-full text-[10px] font-bold uppercase tracking-[0.18em] disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 bg-oo-gold text-oo-burgundy px-3 py-2 rounded-full text-[10px] font-bold uppercase tracking-[0.18em] disabled:opacity-50"
               >
                 <Shuffle className="size-3.5" />
                 {shuffling ? "embaralhando…" : "embaralhar"}
@@ -201,7 +201,7 @@ function BaralhoCiganoPage() {
               <button
                 type="button"
                 onClick={reset}
-                className="inline-flex items-center gap-1.5 bg-white ring-1 ring-black/10 text-ink px-3 py-2 rounded-full text-[10px] font-bold uppercase tracking-[0.18em]"
+                className="inline-flex items-center gap-1.5 bg-oo-burgundy ring-1 ring-white/10 text-oo-offwhite px-3 py-2 rounded-full text-[10px] font-bold uppercase tracking-[0.18em]"
               >
                 <RotateCcw className="size-3.5" />
                 trocar
@@ -212,7 +212,7 @@ function BaralhoCiganoPage() {
                   setSpread(null);
                   setPicked([]);
                 }}
-                className="text-[10px] font-bold uppercase tracking-[0.18em] text-ink/50 px-2"
+                className="text-[10px] font-bold uppercase tracking-[0.18em] text-oo-offwhite/50 px-2"
               >
                 método
               </button>
