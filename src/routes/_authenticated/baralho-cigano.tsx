@@ -4,6 +4,7 @@ import { ChevronDown, ChevronUp, Layers, Shuffle, RotateCcw, Sparkles } from "lu
 import { AppShell } from "@/components/AppShell";
 import { CIGANO_CARDS, shuffle, type CiganoCard } from "@/lib/cigano-cards";
 import { startShuffleSound, stopShuffleSound } from "@/lib/shuffle-sound";
+import ciganaImg from "@/assets/cigana.png";
 
 export const Route = createFileRoute("/_authenticated/baralho-cigano")({
   head: () => ({
