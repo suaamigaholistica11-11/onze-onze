@@ -140,6 +140,21 @@ function BaralhoCiganoPage() {
         </p>
       </header>
 
+      <section className="px-6 pb-6 animate-oo-enter">
+        <div className="mx-auto w-40 h-40 rounded-full overflow-hidden ring-2 ring-oo-gold/40 shadow-[0_0_40px_-8px_rgba(234,179,8,0.35)] bg-slate-900/50">
+          <img
+            src={ciganaImg}
+            alt="A Cigana"
+            width={160}
+            height={160}
+            className="w-full h-full object-cover"
+          />
+        </div>
+        <p className="text-center text-[10px] font-bold uppercase tracking-[0.25em] text-oo-gold/70 mt-3">
+          a cigana te convida
+        </p>
+      </section>
+
       {!spread && (
         <section className="px-6 pb-4 space-y-3 animate-oo-enter">
           <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-oo-offwhite/60">
