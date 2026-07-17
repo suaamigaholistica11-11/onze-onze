@@ -84,6 +84,9 @@
   --bar-5: var(--mint);
   --yellow-candy: oklch(0.95 0.07 95);
   --ink: oklch(0.24 0.03 305);
+  --oo-gold: oklch(0.72 0.13 85);
+  --oo-offwhite: oklch(0.94 0.01 85);
+  --oo-burgundy: oklch(0.38 0.1 340);
 
   --background: oklch(0.96 0.025 35); /* peach/30 base */
   --foreground: var(--ink);
