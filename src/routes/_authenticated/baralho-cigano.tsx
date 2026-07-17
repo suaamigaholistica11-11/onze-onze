@@ -279,9 +279,10 @@ function BaralhoCiganoPage() {
                         <span className="block w-full h-full rounded-lg border border-white/25 flex items-center justify-center text-white/70 text-[10px] font-display">
                           ✦
                         </span>
-                      </button>
-                    );
-                  })}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </>
