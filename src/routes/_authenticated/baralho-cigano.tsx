@@ -178,13 +178,13 @@ function BaralhoCiganoPage() {
         <section className="px-6 pb-10 animate-oo-enter">
           <div className="flex items-center justify-between gap-3 mb-4">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50">
+              <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-oo-offwhite/60">
                 método
               </p>
-              <p className="font-display font-bold text-lg leading-tight">
+              <p className="font-display font-bold text-lg leading-tight text-oo-gold">
                 {spread.titulo}
               </p>
-              <p className="text-[11px] text-ink/50 mt-0.5">
+              <p className="text-[11px] text-oo-offwhite/70 mt-0.5">
                 {picked.length}/{spread.qtd} escolhidas
               </p>
             </div>
