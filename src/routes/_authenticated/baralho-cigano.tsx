@@ -141,7 +141,7 @@ function BaralhoCiganoPage() {
 
       {!spread && (
         <section className="px-6 pb-4 space-y-3 animate-oo-enter">
-          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50">
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-oo-offwhite/60">
             escolhe seu método
           </p>
           {SPREADS.map((s) => (
@@ -153,19 +153,19 @@ function BaralhoCiganoPage() {
                 setDeck(shuffle(CIGANO_CARDS));
                 setPicked([]);
               }}
-              className="w-full text-left bg-white rounded-[24px] ring-1 ring-black/5 p-5 hover:bg-cream transition-colors"
+              className="w-full text-left bg-oo-burgundy rounded-[24px] ring-1 ring-white/10 p-5 hover:brightness-110 transition-all"
             >
               <div className="flex items-center gap-3">
-                <div className="size-10 rounded-2xl bg-lilac/40 flex items-center justify-center">
+                <div className="size-10 rounded-2xl bg-white/10 flex items-center justify-center text-oo-gold">
                   <Layers className="size-4" />
                 </div>
                 <div className="flex-1">
-                  <p className="font-display font-bold text-base leading-tight">
+                  <p className="font-display font-bold text-base leading-tight text-oo-gold">
                     {s.titulo}
                   </p>
-                  <p className="text-[11px] text-ink/50 mt-0.5">{s.resumo}</p>
+                  <p className="text-[11px] text-oo-offwhite/70 mt-0.5">{s.resumo}</p>
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-ink/40">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-oo-gold/70">
                   {s.qtd} cartas
                 </span>
               </div>
