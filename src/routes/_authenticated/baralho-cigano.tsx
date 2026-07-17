@@ -125,7 +125,7 @@ function BaralhoCiganoPage() {
   const completo = spread ? picked.length === spread.qtd : false;
 
   return (
-    <AppShell glyph="✧">
+    <AppShell glyph="✧" className="dark bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-900">
       <header className="px-6 pt-10 pb-4 animate-oo-enter">
         <p className="text-xs font-medium uppercase tracking-[0.25em] text-ink/40 mb-2">
           leitura oracular
@@ -228,39 +228,41 @@ function BaralhoCiganoPage() {
                       spread.qtd - picked.length > 1 ? "s" : ""
                     }.`}
               </p>
-              <div
-                className={`grid gap-2 ${
-                  shuffling ? "animate-pulse" : ""
-                } grid-cols-6 sm:grid-cols-8`}
-              >
-                {deck.map((card, idx) => {
-                  const chosen = picked.includes(idx);
-                  const disabled = shuffling || chosen;
-                  return (
-                    <button
-                      key={`${card.n}-${idx}`}
-                      type="button"
-                      onClick={() => pickCard(idx)}
-                      disabled={disabled}
-                      aria-label={chosen ? `Carta escolhida` : "Carta virada"}
-                      className={`aspect-[2/3] rounded-lg ring-1 ring-black/10 transition-all ${
-                        chosen
-                          ? "opacity-30 scale-95"
-                          : "hover:-translate-y-1 hover:ring-lilac"
-                      } ${shuffling ? "animate-oo-shuffle" : ""}`}
-                      style={{
-                        background:
-                          "repeating-linear-gradient(45deg, #6b4a8b 0 6px, #8863a8 6px 12px), radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15), transparent 60%)",
-                        backgroundBlendMode: "overlay",
-                        animationDelay: `${(idx % 8) * 30}ms`,
-                      }}
-                    >
-                      <span className="block w-full h-full rounded-lg border border-white/25 flex items-center justify-center text-white/70 text-[10px] font-display">
-                        ✦
-                      </span>
-                    </button>
-                  );
-                })}
+              <div className="relative rounded-[32px] bg-gradient-to-br from-purple-950/90 via-indigo-950/90 to-slate-950/90 p-5 border border-purple-300/20 shadow-[0_0_60px_-12px_rgba(139,92,246,0.25)] backdrop-blur-sm">
+                <div
+                  className={`grid gap-2 ${
+                    shuffling ? "animate-pulse" : ""
+                  } grid-cols-6 sm:grid-cols-8`}
+                >
+                  {deck.map((card, idx) => {
+                    const chosen = picked.includes(idx);
+                    const disabled = shuffling || chosen;
+                    return (
+                      <button
+                        key={`${card.n}-${idx}`}
+                        type="button"
+                        onClick={() => pickCard(idx)}
+                        disabled={disabled}
+                        aria-label={chosen ? `Carta escolhida` : "Carta virada"}
+                        className={`aspect-[2/3] rounded-lg ring-1 ring-black/10 transition-all ${
+                          chosen
+                            ? "opacity-30 scale-95"
+                            : "hover:-translate-y-1 hover:ring-lilac"
+                        } ${shuffling ? "animate-oo-shuffle" : ""}`}
+                        style={{
+                          background:
+                            "repeating-linear-gradient(45deg, #6b4a8b 0 6px, #8863a8 6px 12px), radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15), transparent 60%)",
+                          backgroundBlendMode: "overlay",
+                          animationDelay: `${(idx % 8) * 30}ms`,
+                        }}
+                      >
+                        <span className="block w-full h-full rounded-lg border border-white/25 flex items-center justify-center text-white/70 text-[10px] font-display">
+                          ✦
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </>
           )}
