@@ -57,6 +57,9 @@
   --color-sky: var(--sky);
   --color-yellow-candy: var(--yellow-candy);
   --color-ink: var(--ink);
+  --color-oo-gold: var(--oo-gold);
+  --color-oo-offwhite: var(--oo-offwhite);
+  --color-oo-burgundy: var(--oo-burgundy);
 
   --font-display: "Fraunces", serif;
   --font-sans: "Inter", system-ui, sans-serif;
@@ -81,6 +84,9 @@
   --bar-5: var(--mint);
   --yellow-candy: oklch(0.95 0.07 95);
   --ink: oklch(0.24 0.03 305);
+  --oo-gold: oklch(0.72 0.13 85);
+  --oo-offwhite: oklch(0.94 0.01 85);
+  --oo-burgundy: oklch(0.38 0.1 340);
 
   --background: oklch(0.96 0.025 35); /* peach/30 base */
   --foreground: var(--ink);
@@ -117,6 +123,10 @@
 }
 
 .dark {
+  --oo-gold: oklch(0.78 0.14 85);
+  --oo-offwhite: oklch(0.93 0.015 85);
+  --oo-burgundy: oklch(0.32 0.12 340);
+
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
   --card: oklch(0.208 0.042 265.755);
