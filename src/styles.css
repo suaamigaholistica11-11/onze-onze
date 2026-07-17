@@ -57,6 +57,9 @@
   --color-sky: var(--sky);
   --color-yellow-candy: var(--yellow-candy);
   --color-ink: var(--ink);
+  --color-oo-gold: var(--oo-gold);
+  --color-oo-offwhite: var(--oo-offwhite);
+  --color-oo-burgundy: var(--oo-burgundy);
 
   --font-display: "Fraunces", serif;
   --font-sans: "Inter", system-ui, sans-serif;
