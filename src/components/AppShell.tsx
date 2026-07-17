@@ -1,16 +1,21 @@
 import type { ReactNode } from "react";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { cn } from "@/lib/utils";
 
 interface Props {
   children: ReactNode;
   glyph?: string;
+  className?: string;
 }
 
-export function AppShell({ children }: Props) {
+export function AppShell({ children, className }: Props) {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen w-full bg-[color-mix(in_oklab,var(--peach)_30%,white)] text-ink">
+      <div className={cn(
+        "flex min-h-screen w-full bg-[color-mix(in_oklab,var(--peach)_30%,white)] text-ink",
+        className
+      )}>
         <AppSidebar />
         <div className="flex-1 relative overflow-x-hidden">
           <header className="sticky top-0 z-30 h-12 flex items-center px-3 bg-white/40 backdrop-blur-md border-b border-black/5">

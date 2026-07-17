@@ -125,7 +125,7 @@ function BaralhoCiganoPage() {
   const completo = spread ? picked.length === spread.qtd : false;
 
   return (
-    <AppShell glyph="✧">
+    <AppShell glyph="✧" className="dark bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-900">
       <header className="px-6 pt-10 pb-4 animate-oo-enter">
         <p className="text-xs font-medium uppercase tracking-[0.25em] text-ink/40 mb-2">
           leitura oracular
