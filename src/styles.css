@@ -123,6 +123,10 @@
 }
 
 .dark {
+  --oo-gold: oklch(0.78 0.14 85);
+  --oo-offwhite: oklch(0.93 0.015 85);
+  --oo-burgundy: oklch(0.32 0.12 340);
+
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
   --card: oklch(0.208 0.042 265.755);
