@@ -270,8 +270,8 @@ function BaralhoCiganoPage() {
           {completo && (
             <div className="animate-oo-enter">
               <div className="flex items-center gap-2 mb-3">
-                <Sparkles className="size-4 text-lilac" />
-                <p className="font-display font-bold text-lg">
+                <Sparkles className="size-4 text-oo-gold" />
+                <p className="font-display font-bold text-lg text-oo-gold">
                   Sua leitura
                 </p>
               </div>
@@ -281,7 +281,7 @@ function BaralhoCiganoPage() {
                   return (
                     <li
                       key={i}
-                      className="bg-white rounded-[20px] ring-1 ring-black/5 p-4"
+                      className="bg-oo-burgundy rounded-[20px] ring-1 ring-white/10 p-4"
                     >
                       <div className="flex items-start gap-3">
                         <div className="size-14 shrink-0 rounded-lg flex items-center justify-center text-white font-display font-bold text-lg"
@@ -293,13 +293,13 @@ function BaralhoCiganoPage() {
                           {c.n}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-ink/50">
+                          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-oo-offwhite/60">
                             {spread.posicoes[i] ?? `Posição ${i + 1}`}
                           </p>
-                          <p className="font-display font-bold text-base leading-tight mt-0.5">
+                          <p className="font-display font-bold text-base leading-tight mt-0.5 text-oo-gold">
                             {c.nome}
                           </p>
-                          <p className="text-sm text-ink/70 leading-relaxed mt-1">
+                          <p className="text-sm text-oo-offwhite/80 leading-relaxed mt-1">
                             {c.sig}
                           </p>
                         </div>
@@ -311,7 +311,7 @@ function BaralhoCiganoPage() {
               <button
                 type="button"
                 onClick={reset}
-                className="mt-4 w-full bg-ink text-white py-3 rounded-full text-[11px] font-bold uppercase tracking-[0.2em]"
+                className="mt-4 w-full bg-oo-gold text-oo-burgundy py-3 rounded-full text-[11px] font-bold uppercase tracking-[0.2em]"
               >
                 Nova leitura
               </button>
