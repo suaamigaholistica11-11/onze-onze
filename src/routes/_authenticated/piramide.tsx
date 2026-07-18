@@ -535,7 +535,7 @@ function PiramideEvolutivaIntro({
   return (
     <>
       <h2 className="font-display text-xl font-bold italic">
-        Pirâmide Evolutiva — <span className="capitalize">{mesAno}</span>
+        Pirâmide Evolutiva · <span className="capitalize">{mesAno}</span>
       </h2>
       <p className="text-sm text-ink/70 mt-1 mb-1">Veja como você evoluiu nas 3 áreas do ciclo.</p>
       <p className="text-xs text-ink/50 leading-relaxed mb-4">
@@ -716,7 +716,7 @@ function CheckinDialog({
       <DialogContent className="rounded-[28px]">
         <DialogHeader>
           <DialogTitle className="font-display text-2xl">
-            Check-in {tema ? `— ${tema.emoji} ${tema.nome}` : ""}
+            Check-in {tema ? `· ${tema.emoji} ${tema.nome}` : ""}
           </DialogTitle>
         </DialogHeader>
         <div className="space-y-5 pt-2">
@@ -806,7 +806,7 @@ function HistoryDialog({
       <DialogContent className="rounded-[28px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-display text-2xl">
-            Histórico {tema ? `— ${tema.emoji} ${tema.nome}` : ""}
+            Histórico {tema ? `· ${tema.emoji} ${tema.nome}` : ""}
           </DialogTitle>
           <DialogDescription className="text-sm text-ink/70">
             Toque num dia para ver o check-in e a nota "um passo" que você deixou.
@@ -827,7 +827,7 @@ function HistoryDialog({
               <div key={it.entry_date} className="bg-cream/60 rounded-2xl p-3 text-sm">
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-bold">{d}</span>
-                  <span className="text-ink/60">— Nota: {it.value}/5</span>
+                  <span className="text-ink/60">· Nota: {it.value}/5</span>
                 </div>
                 {it.next_step && (
                   <p className="text-ink/70 mt-1">
