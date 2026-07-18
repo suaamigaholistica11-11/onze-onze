@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Lock, History as HistoryIcon, ChevronDown, ChevronUp } from "lucide-react";
+import { Lock, History as HistoryIcon, ChevronDown, ChevronUp, CalendarDays } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -13,8 +13,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { VoiceInput } from "@/components/VoiceInput";
 
 export const Route = createFileRoute("/_authenticated/piramide")({
   head: () => ({
@@ -175,6 +174,7 @@ function PiramidePage() {
   const [howItWorksOpen, setHowItWorksOpen] = useState(false);
   const [checkinTheme, setCheckinTheme] = useState<string | null>(null);
   const [historyTheme, setHistoryTheme] = useState<string | null>(null);
+  const [evolutionOpen, setEvolutionOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -491,6 +491,12 @@ function PiramidePage() {
         themeId={historyTheme}
         progress={progress}
         onClose={() => setHistoryTheme(null)}
+      />
+      <EvolutionHistoryDialog
+        open={evolutionOpen}
+        onClose={() => setEvolutionOpen(false)}
+        progress={progress}
+        themes={choice?.themes ?? []}
       />
     </AppShell>
   );
