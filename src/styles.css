@@ -73,7 +73,7 @@
 
   /* candy palette */
   --peach: oklch(0.89 0.06 35);
-  --lilac: oklch(0.88 0.07 305);
+  --lilac: #74836A;
   --mint: oklch(0.93 0.06 155);
   --sky: oklch(0.92 0.045 235);
   /* Pirâmide bar chart (1 a 5) */
@@ -82,44 +82,44 @@
   --bar-3: var(--lilac);
   --bar-4: var(--sky);
   --bar-5: var(--mint);
-  --yellow-candy: oklch(0.95 0.07 95);
-  --ink: oklch(0.24 0.03 305);
+  --yellow-candy: #A8623C;
+  --ink: #3A2E26;
   --oo-gold: oklch(0.72 0.13 85);
-  --oo-offwhite: oklch(0.94 0.01 85);
+  --oo-offwhite: #FAF5EC;
   --oo-burgundy: oklch(0.38 0.1 340);
 
-  --background: oklch(0.96 0.025 35); /* peach/30 base */
+  --background: #F0E4D4;
   --foreground: var(--ink);
-  --card: oklch(1 0 0);
+  --card: #FAF5EC;
   --card-foreground: var(--ink);
-  --popover: oklch(1 0 0);
+  --popover: #FAF5EC;
   --popover-foreground: var(--ink);
-  --primary: var(--ink);
-  --primary-foreground: oklch(0.99 0.005 95);
+  --primary: #B5652E;
+  --primary-foreground: #FAF5EC;
   --secondary: var(--lilac);
-  --secondary-foreground: var(--ink);
-  --muted: oklch(0.95 0.015 35);
-  --muted-foreground: oklch(0.45 0.03 305);
-  --accent: var(--peach);
+  --secondary-foreground: #FAF5EC;
+  --muted: #FAF5EC;
+  --muted-foreground: #8C7A6B;
+  --accent: #D9A94A;
   --accent-foreground: var(--ink);
   --destructive: oklch(0.62 0.2 25);
   --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.92 0.02 305);
-  --input: oklch(0.92 0.02 305);
-  --ring: var(--lilac);
+  --border: color-mix(in oklab, #3A2E26 12%, transparent);
+  --input: color-mix(in oklab, #3A2E26 10%, transparent);
+  --ring: #D9A94A;
   --chart-1: var(--peach);
   --chart-2: var(--lilac);
   --chart-3: var(--mint);
   --chart-4: var(--sky);
   --chart-5: var(--yellow-candy);
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
+  --sidebar: #FAF5EC;
+  --sidebar-foreground: var(--ink);
+  --sidebar-primary: #B5652E;
+  --sidebar-primary-foreground: #FAF5EC;
+  --sidebar-accent: #D9A94A;
+  --sidebar-accent-foreground: var(--ink);
+  --sidebar-border: color-mix(in oklab, #3A2E26 12%, transparent);
+  --sidebar-ring: #D9A94A;
 }
 
 .dark {
@@ -167,7 +167,7 @@
   }
 
   body {
-    background-color: color-mix(in oklab, var(--peach) 30%, white);
+    background-color: var(--background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
