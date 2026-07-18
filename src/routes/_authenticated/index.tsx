@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Moon, Image as ImageIcon, ImageOff, Sun, MoonStar } from "lucide-react";
+import { Moon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -23,12 +23,7 @@ import moonFullImg from "@/assets/moon-full.png";
 import moonWaningImg from "@/assets/moon-waning.png";
 import peixesBg from "@/assets/signs/peixes.png";
 import zodiacWheel from "@/assets/zodiac-wheel.png";
-import {
-  useBgDisabled,
-  setBgDisabled,
-  useTheme,
-  setTheme,
-} from "@/lib/bg-preference";
+import { useBgDisabled } from "@/lib/bg-preference";
 
 const SIGN_BACKGROUNDS: Record<string, string> = {
   Peixes: peixesBg,
@@ -72,7 +67,6 @@ function HomePage() {
     } catch {}
   }, []);
   const bgDisabled = useBgDisabled();
-  const theme = useTheme();
   const signoBg = bgDisabled
     ? undefined
     : meuSigno
@@ -145,41 +139,6 @@ function HomePage() {
           {saudacao.titulo}
         </h1>
       </header>
-
-      {/* Aparência: imagens de fundo + tema */}
-      <section className="px-6 mb-6 animate-oo-enter [animation-delay:40ms]">
-        <div className="bg-card rounded-[24px] ring-1 ring-border p-4 flex items-center gap-2 flex-wrap">
-          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-muted-foreground w-full mb-1">
-            Aparência
-          </p>
-          <button
-            type="button"
-            onClick={() => setBgDisabled(!bgDisabled)}
-            aria-pressed={!bgDisabled}
-            className="flex items-center gap-2 px-3 py-2 rounded-full text-xs font-medium ring-1 ring-border bg-background hover:bg-accent/10 transition-colors"
-          >
-            {bgDisabled ? (
-              <ImageOff className="size-3.5" />
-            ) : (
-              <ImageIcon className="size-3.5" />
-            )}
-            {bgDisabled ? "Sem imagens" : "Com imagens"}
-          </button>
-          <button
-            type="button"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            aria-pressed={theme === "dark"}
-            className="flex items-center gap-2 px-3 py-2 rounded-full text-xs font-medium ring-1 ring-border bg-background hover:bg-accent/10 transition-colors"
-          >
-            {theme === "dark" ? (
-              <MoonStar className="size-3.5" />
-            ) : (
-              <Sun className="size-3.5" />
-            )}
-            {theme === "dark" ? "Voltar ao tema claro" : "Ativar tema escuro"}
-          </button>
-        </div>
-      </section>
 
       {/* Mensagem do dia */}
       <section className="px-6 mb-6 animate-oo-enter [animation-delay:80ms]">
