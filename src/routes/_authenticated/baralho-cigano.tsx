@@ -18,6 +18,7 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { CIGANO_CARDS, shuffle, type CiganoCard } from "@/lib/cigano-cards";
 import { startShuffleSound, stopShuffleSound } from "@/lib/shuffle-sound";
+import ciganaShufflingImg from "@/assets/cigana-shuffling.png";
 import {
   gerarLeituraNadja,
   listNadjaReadings,
