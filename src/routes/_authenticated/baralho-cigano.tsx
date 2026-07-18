@@ -127,8 +127,8 @@ function BaralhoCiganoPage() {
     setPicked([]);
     setShuffling(true);
     startShuffleSound();
-    // embaralha várias vezes com sons
-    const rounds = 6;
+    // embaralha várias vezes com som e animação (~2.6s)
+    const rounds = 12;
     let i = 0;
     const step = () => {
       setDeck((d) => shuffle(d));
