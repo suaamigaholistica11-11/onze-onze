@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      nadja_readings: {
+        Row: {
+          cartas: Json
+          created_at: string
+          id: string
+          pergunta: string | null
+          spread_id: string
+          spread_title: string
+          texto: string
+          user_id: string
+        }
+        Insert: {
+          cartas: Json
+          created_at?: string
+          id?: string
+          pergunta?: string | null
+          spread_id: string
+          spread_title: string
+          texto: string
+          user_id: string
+        }
+        Update: {
+          cartas?: Json
+          created_at?: string
+          id?: string
+          pergunta?: string | null
+          spread_id?: string
+          spread_title?: string
+          texto?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       natal_chart_deletions: {
         Row: {
           deleted_at: string

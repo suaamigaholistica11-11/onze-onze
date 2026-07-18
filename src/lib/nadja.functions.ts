@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const cardSchema = z.object({
   n: z.number(),
@@ -9,6 +10,7 @@ const cardSchema = z.object({
 });
 
 const inputSchema = z.object({
+  spreadId: z.string().min(1).max(20),
   spreadTitle: z.string().min(1).max(80),
   pergunta: z.string().trim().max(2000).optional().default(""),
   cartas: z.array(cardSchema).min(1).max(36),
@@ -51,8 +53,9 @@ REGRAS INEGOCIÁVEIS:
 10. Devolva SOMENTE o texto da leitura, sem preâmbulo tipo "Aqui está sua leitura:". Sem markdown, sem asteriscos, sem títulos.`;
 
 export const gerarLeituraNadja = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => inputSchema.parse(data))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
 
@@ -102,5 +105,50 @@ Agora escreva a leitura da Nadja seguindo TODAS as regras do sistema.`;
     const texto: string = json.choices?.[0]?.message?.content ?? "";
     // Remove any stray em/en dashes just in case.
     const limpo = texto.replace(/[—–]/g, ",").trim();
-    return { texto: limpo };
+
+    let id: string | null = null;
+    try {
+      const { data: inserted, error } = await context.supabase
+        .from("nadja_readings")
+        .insert({
+          user_id: context.userId,
+          spread_id: data.spreadId,
+          spread_title: data.spreadTitle,
+          pergunta: data.pergunta || null,
+          cartas: data.cartas,
+          texto: limpo,
+        })
+        .select("id")
+        .single();
+      if (error) console.error("save nadja reading", error);
+      id = inserted?.id ?? null;
+    } catch (e) {
+      console.error("save nadja reading exception", e);
+    }
+
+    return { texto: limpo, id };
+  });
+
+export const listNadjaReadings = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase
+      .from("nadja_readings")
+      .select("id, spread_id, spread_title, pergunta, cartas, texto, created_at")
+      .order("created_at", { ascending: false })
+      .limit(30);
+    if (error) throw new Error(error.message);
+    return { readings: data ?? [] };
+  });
+
+export const deleteNadjaReading = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("nadja_readings")
+      .delete()
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
   });
