@@ -470,6 +470,14 @@ function PiramidePage() {
             progress={progress}
             chosenAt={choice.chosen_at}
           />
+          <button
+            type="button"
+            onClick={() => setEvolutionOpen(true)}
+            className="mt-5 w-full flex items-center justify-center gap-2 bg-white ring-1 ring-black/5 rounded-full py-3 text-xs font-bold uppercase tracking-[0.2em] text-ink/80 hover:bg-ink/5 transition-colors"
+          >
+            <CalendarDays className="size-4" />
+            Histórico da Evolução
+          </button>
         </section>
       )}
 
