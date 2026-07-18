@@ -1,100 +1,140 @@
-// Calendário oficial de fases da lua até dez/2027.
-// Fonte: material enviado pela usuária. Datas em horário de Brasília (BRT, UTC-3).
+// Calendário oficial das Luas de 2026 (Brasília, UTC-3).
+// Fonte: material enviado pela usuária (Luas_2026.md).
 
 export type MoonPhaseGroup = "nova" | "crescente" | "cheia" | "minguante";
 
-export interface MoonCalendarEntry {
-  /** ISO date, horário local BRT (UTC-3), sem hora exata (usamos 12:00). */
+export interface MoonPhaseEvent {
+  /** ISO em UTC (convertido de BRT/UTC-3). */
   date: string;
   fase: MoonPhaseGroup;
   signo: string;
-  observacao: string;
+  observacao?: string;
 }
 
-// Helper pra escrever entradas de forma compacta. Mês/dia em BRT, hora 12:00.
-function e(y: number, m: number, d: number, fase: MoonPhaseGroup, signo: string, observacao: string): MoonCalendarEntry {
-  const iso = new Date(Date.UTC(y, m - 1, d, 15, 0, 0)).toISOString(); // 12:00 BRT = 15:00 UTC
-  return { date: iso, fase, signo, observacao };
+export interface MoonSignIngress {
+  date: string;
+  signo: string;
 }
 
-export const MOON_CALENDAR: MoonCalendarEntry[] = [
-  // 2026
-  e(2026, 7, 14, "nova", "Câncer", "Superlua em Câncer. Momento fértil pra plantar intenções ligadas ao lar, família e cuidado emocional."),
-  e(2026, 7, 18, "crescente", "Virgem", "A energia começa a crescer. Organize a rotina e dê os primeiros passos práticos no que você plantou."),
-  e(2026, 7, 21, "crescente", "Libra", "Foque em parcerias e diplomacia nos projetos."),
-  e(2026, 7, 29, "cheia", "Aquário", "Clímax em projetos coletivos e ideias inovadoras."),
-  e(2026, 8, 5, "minguante", "Touro", "Silencie e desapegue de teimosias ou gastos desnecessários."),
-  e(2026, 8, 12, "nova", "Leão", "Eclipse Solar Total. Não inicie coisas importantes hoje. O dia pede introspecção para recalibrar seu brilho pessoal e propósitos."),
-  e(2026, 8, 19, "crescente", "Escorpião", "Agir com estratégia, profundidade e foco total."),
-  e(2026, 8, 28, "cheia", "Peixes", "Eclipse Lunar Parcial (visível no BR). Emoções intensas e transbordantes. Evite discussões e busque atividades terapêuticas."),
-  e(2026, 9, 4, "minguante", "Gêmeos", "Desacelere a mente. Evite fofocas e excesso de telas."),
-  e(2026, 9, 11, "nova", "Virgem", "Excelente para organizar a rotina, agenda e começar dietas."),
-  e(2026, 9, 18, "crescente", "Sagitário", "Expanda horizontes, estude e planeje viagens com otimismo."),
-  e(2026, 9, 26, "cheia", "Áries", "Cuidado com a impulsividade. Canalize a energia em exercícios físicos."),
-  e(2026, 10, 3, "minguante", "Câncer", "Recolha-se no ambiente familiar. Período de autocuidado emocional."),
-  e(2026, 10, 10, "nova", "Libra", "Ótimo para plantar intenções de harmonia nos relacionamentos."),
-  e(2026, 10, 18, "crescente", "Capricórnio", "Estruture suas metas profissionais com seriedade."),
-  e(2026, 10, 26, "cheia", "Touro", "Desfrute do conforto, mas cuidado com a possessividade."),
-  e(2026, 11, 1, "minguante", "Leão", "Hora de diminuir o ego e dar espaço para os outros brilharem."),
-  e(2026, 11, 9, "nova", "Escorpião", "Momento de transformação interna e investigação emocional."),
-  e(2026, 11, 17, "crescente", "Aquário", "Invista em networking e em tecnologia para seus planos."),
-  e(2026, 11, 24, "cheia", "Gêmeos", "Diálogos importantes vêm à tona. Cuidado com mal-entendidos."),
-  e(2026, 12, 1, "minguante", "Virgem", "Faça aquela faxina de fim de ano (física e mental)."),
-  e(2026, 12, 8, "nova", "Sagitário", "Renove a fé para o próximo ano. Trace grandes metas."),
-  e(2026, 12, 17, "crescente", "Peixes", "Siga a intuição e dê asas à criatividade."),
-  e(2026, 12, 23, "cheia", "Câncer", "Natal de emoções à flor da pele. Foco no acolhimento familiar."),
-  e(2026, 12, 30, "minguante", "Libra", "Reveja suas relações e encerre o ano em paz com as pessoas."),
-  // 2027
-  e(2027, 1, 7, "nova", "Capricórnio", "Excelente para traçar as metas profissionais de longo prazo do ano."),
-  e(2027, 1, 15, "crescente", "Áries", "Período de muita atitude e iniciativa individual."),
-  e(2027, 1, 22, "cheia", "Câncer", "Culminância de assuntos familiares e íntimos."),
-  e(2027, 1, 29, "minguante", "Escorpião", "Fase de profunda eliminação de mágoas e desapego."),
-  e(2027, 2, 6, "cheia", "Leão", "Período de alta visibilidade e orgulho."),
-  e(2027, 2, 13, "minguante", "Sagitário", "Momento de filtrar excessos de otimismo e focar na realidade."),
-  e(2027, 2, 20, "nova", "Aquário", "Eclipse Solar Anular. Cuidado com radicalismos. O momento pede silêncio sobre planos futuros e desapego de rebeldias."),
-  e(2027, 3, 4, "cheia", "Virgem", "Eclipse Lunar Total (Lua de Sangue). Muita atenção à saúde física e esgotamento mental. Evite o perfeccionismo excessivo."),
-  e(2027, 3, 12, "minguante", "Touro", "Desacelere o ritmo material e financeiro."),
-  e(2027, 3, 18, "nova", "Peixes", "Intuição altíssima. Excelente para meditação e rituais internos."),
-  e(2027, 3, 26, "crescente", "Gêmeos", "Período movimentado para vendas, comércio e estudos."),
-  e(2027, 4, 2, "cheia", "Libra", "Relacionamentos em pauta. Equilíbrio entre o eu e o outro."),
-  e(2027, 4, 10, "minguante", "Gêmeos", "Limpeza mental. Evite o excesso de informações."),
-  e(2027, 4, 16, "nova", "Áries", "O verdadeiro Ano Novo astrológico. Hora de dar o primeiro passo em projetos ousados."),
-  e(2027, 4, 24, "crescente", "Sagitário", "Expansão de projetos acadêmicos e metas ousadas."),
-  e(2027, 5, 1, "cheia", "Escorpião", "Crises e revelações profundas podem surgir. Mantenha a calma."),
-  e(2027, 5, 10, "minguante", "Câncer", "Proteja sua energia em casa. Minimize o contato social exaustivo."),
-  e(2027, 5, 16, "nova", "Touro", "Plantar estabilidade financeira e buscar conforto prático."),
-  e(2027, 5, 24, "crescente", "Aquário", "Teste novas ideias e colabore em equipe."),
-  e(2027, 5, 31, "cheia", "Sagitário", "Desejo de liberdade em alta. Cuidado com o dogmatismo."),
-  e(2027, 6, 8, "minguante", "Peixes", "Excelente para o descanso da mente e sono reparador."),
-  e(2027, 6, 14, "nova", "Gêmeos", "Escreva, estude e planeje novas formas de se comunicar."),
-  e(2027, 6, 22, "crescente", "Peixes", "Use a imaginação para resolver problemas práticos."),
-  e(2027, 6, 29, "cheia", "Capricórnio", "Culminância de esforços profissionais. Colheita de trabalho duro."),
-  e(2027, 7, 7, "minguante", "Áries", "Hora de recuar e controlar a agressividade gerada pelo cansaço."),
-  e(2027, 7, 14, "nova", "Câncer", "Superlua. Intuição e sensibilidade aguçadas. Excelente para cuidar do lar."),
-  e(2027, 7, 21, "crescente", "Escorpião", "Força total para mudar estratégias que não estavam funcionando."),
-  e(2027, 7, 28, "cheia", "Aquário", "Clímax em causas sociais ou projetos com tecnologia."),
-  e(2027, 8, 5, "minguante", "Touro", "Fase excelente para organizar o orçamento doméstico."),
-  e(2027, 8, 12, "nova", "Leão", "Eclipse Solar Total + Superlua. Um dos momentos astrológicos mais dramáticos do século. Forte impacto na autoexpressão e liderança. Fique recolhida e evite grandes decisões."),
-  e(2027, 8, 19, "crescente", "Sagitário", "Impulso de crescimento após o período tenso do eclipse."),
-  e(2027, 8, 26, "cheia", "Peixes", "Grande sensibilidade. Excelente para as artes e espiritualidade."),
-  e(2027, 8, 31, "nova", "Virgem", "Superlua em Virgem. Momento poderoso para reorganizar rotina e saúde."),
-  e(2027, 9, 4, "minguante", "Libra", "Momento de avaliar e reajustar contratos ou concessões excessivas."),
-  e(2027, 9, 11, "nova", "Virgem", "Foque no minimalismo, na limpeza prática e na rotina de exercícios."),
-  e(2027, 9, 18, "crescente", "Sagitário", "Busque mentores ou cursos para alavancar sua carreira."),
-  e(2027, 9, 25, "cheia", "Áries", "Energia combativa. Direcione para a liderança construtiva."),
-  e(2027, 10, 3, "minguante", "Escorpião", "Descarte mágoas acumuladas e objetos antigos sem uso."),
-  e(2027, 10, 10, "nova", "Libra", "Plantar intenções de novos contratos e associações justas."),
-  e(2027, 10, 17, "crescente", "Capricórnio", "Execução implacável de metas profissionais."),
-  e(2027, 10, 24, "cheia", "Touro", "Excelente para colher frutos de investimentos financeiros."),
-  e(2027, 10, 31, "minguante", "Leão", "Desapegue da necessidade neurótica de aprovação e aplausos."),
-  e(2027, 11, 8, "nova", "Escorpião", "Fase de regeneração e mergulho no autoconhecimento profundo."),
-  e(2027, 11, 15, "crescente", "Aquário", "Momento de diversificar suas frentes de atuação e inovação."),
-  e(2027, 11, 22, "cheia", "Gêmeos", "Grande volume de informações e notícias vindo a público."),
-  e(2027, 11, 29, "minguante", "Virgem", "Triagem e organização antes da correria do fim do ano."),
-  e(2027, 12, 8, "nova", "Sagitário", "Expansão mental, renovação do otimismo."),
-  e(2027, 12, 15, "crescente", "Peixes", "Conecte-se com causas humanitárias ou projetos artísticos."),
-  e(2027, 12, 22, "cheia", "Câncer", "Emoções fortes ligadas às tradições e memórias do passado."),
-  e(2027, 12, 29, "minguante", "Libra", "Fechamento do ano buscando equilíbrio e harmonia nas relações."),
+// BRT (UTC-3) -> ISO UTC.
+function brt(y: number, m: number, d: number, hh: number, mm: number): string {
+  return new Date(Date.UTC(y, m - 1, d, hh + 3, mm, 0)).toISOString();
+}
+
+function p(y: number, m: number, d: number, hh: number, mm: number, fase: MoonPhaseGroup, signo: string, observacao?: string): MoonPhaseEvent {
+  return { date: brt(y, m, d, hh, mm), fase, signo, observacao };
+}
+
+function s(y: number, m: number, d: number, hh: number, mm: number, signo: string): MoonSignIngress {
+  return { date: brt(y, m, d, hh, mm), signo };
+}
+
+/** Eventos de fase da Lua em 2026. */
+export const MOON_PHASE_EVENTS: MoonPhaseEvent[] = [
+  p(2026, 7, 7, 16, 29, "minguante", "Áries"),
+  p(2026, 7, 14, 6, 43, "nova", "Câncer", "Superlua de Lua Nova em Câncer. Emoções amplificadas e intuição em alta, o signo que mais sente as fases lunares. Momento fértil pra plantar intenções ligadas ao lar, cuidado e afeto."),
+  p(2026, 7, 21, 8, 5, "crescente", "Libra"),
+  p(2026, 7, 29, 11, 35, "cheia", "Aquário"),
+  p(2026, 8, 5, 23, 21, "minguante", "Touro"),
+  p(2026, 8, 12, 14, 36, "nova", "Leão", "Eclipse Solar Total em Leão. Não inicie nada importante hoje. Dia pra recolher, respirar e recalibrar seu brilho e propósitos."),
+  p(2026, 8, 19, 23, 46, "crescente", "Escorpião"),
+  p(2026, 8, 28, 1, 18, "cheia", "Peixes", "Eclipse Lunar Parcial em Peixes. Emoções transbordantes. Evite discussões e busque atividades terapêuticas."),
+  p(2026, 9, 4, 4, 51, "minguante", "Gêmeos"),
+  p(2026, 9, 11, 0, 26, "nova", "Virgem"),
+  p(2026, 9, 18, 17, 43, "crescente", "Sagitário"),
+  p(2026, 9, 26, 13, 48, "cheia", "Áries"),
+  p(2026, 10, 3, 10, 25, "minguante", "Câncer"),
+  p(2026, 10, 10, 12, 50, "nova", "Libra"),
+  p(2026, 10, 18, 13, 12, "crescente", "Capricórnio"),
+  p(2026, 10, 26, 1, 11, "cheia", "Touro"),
+  p(2026, 11, 1, 17, 28, "minguante", "Leão"),
+  p(2026, 11, 9, 4, 2, "nova", "Escorpião"),
+  p(2026, 11, 17, 8, 47, "crescente", "Aquário"),
+  p(2026, 11, 24, 11, 53, "cheia", "Gêmeos", "Superlua Cheia em Gêmeos, a maior e mais brilhante Superlua de 2026. Emoções e revelações em alta."),
+  p(2026, 12, 1, 3, 8, "minguante", "Virgem"),
+  p(2026, 12, 8, 21, 51, "nova", "Sagitário"),
+  p(2026, 12, 17, 2, 42, "crescente", "Peixes"),
+  p(2026, 12, 23, 22, 28, "cheia", "Câncer"),
+  p(2026, 12, 30, 15, 59, "minguante", "Libra"),
+];
+
+/** Ingressos: quando a Lua entra em cada signo (2026). */
+export const MOON_SIGN_INGRESSES: MoonSignIngress[] = [
+  s(2026, 7, 8, 17, 31, "Touro"),
+  s(2026, 7, 10, 19, 42, "Gêmeos"),
+  s(2026, 7, 12, 19, 47, "Câncer"),
+  s(2026, 7, 14, 19, 35, "Leão"),
+  s(2026, 7, 16, 21, 7, "Virgem"),
+  s(2026, 7, 19, 1, 57, "Libra"),
+  s(2026, 7, 23, 22, 7, "Sagitário"),
+  s(2026, 7, 26, 10, 44, "Capricórnio"),
+  s(2026, 7, 28, 22, 46, "Aquário"),
+  s(2026, 7, 31, 9, 14, "Peixes"),
+  s(2026, 8, 2, 17, 37, "Áries"),
+  s(2026, 8, 4, 23, 36, "Touro"),
+  s(2026, 8, 7, 3, 8, "Gêmeos"),
+  s(2026, 8, 9, 4, 46, "Câncer"),
+  s(2026, 8, 11, 5, 38, "Leão"),
+  s(2026, 8, 13, 7, 18, "Virgem"),
+  s(2026, 8, 15, 11, 20, "Libra"),
+  s(2026, 8, 17, 18, 46, "Escorpião"),
+  s(2026, 8, 20, 5, 30, "Sagitário"),
+  s(2026, 8, 22, 17, 59, "Capricórnio"),
+  s(2026, 8, 25, 6, 2, "Aquário"),
+  s(2026, 8, 27, 16, 4, "Peixes"),
+  s(2026, 8, 29, 23, 38, "Áries"),
+  s(2026, 9, 1, 5, 1, "Touro"),
+  s(2026, 9, 3, 8, 47, "Gêmeos"),
+  s(2026, 9, 5, 11, 31, "Câncer"),
+  s(2026, 9, 7, 13, 50, "Leão"),
+  s(2026, 9, 9, 16, 35, "Virgem"),
+  s(2026, 9, 11, 20, 52, "Libra"),
+  s(2026, 9, 14, 3, 44, "Escorpião"),
+  s(2026, 9, 16, 13, 42, "Sagitário"),
+  s(2026, 9, 19, 1, 55, "Capricórnio"),
+  s(2026, 9, 21, 14, 15, "Aquário"),
+  s(2026, 9, 24, 0, 24, "Peixes"),
+  s(2026, 9, 26, 7, 23, "Áries"),
+  s(2026, 9, 28, 11, 40, "Touro"),
+  s(2026, 9, 30, 14, 26, "Gêmeos"),
+  s(2026, 10, 2, 16, 54, "Câncer"),
+  s(2026, 10, 4, 19, 54, "Leão"),
+  s(2026, 10, 6, 23, 53, "Virgem"),
+  s(2026, 10, 9, 5, 11, "Libra"),
+  s(2026, 10, 11, 12, 21, "Escorpião"),
+  s(2026, 10, 13, 22, 0, "Sagitário"),
+  s(2026, 10, 16, 9, 57, "Capricórnio"),
+  s(2026, 10, 18, 22, 40, "Aquário"),
+  s(2026, 10, 21, 9, 35, "Peixes"),
+  s(2026, 10, 23, 16, 54, "Áries"),
+  s(2026, 10, 25, 20, 35, "Touro"),
+  s(2026, 10, 27, 22, 2, "Gêmeos"),
+  s(2026, 10, 29, 23, 6, "Câncer"),
+  s(2026, 11, 3, 5, 28, "Virgem"),
+  s(2026, 11, 5, 11, 38, "Libra"),
+  s(2026, 11, 7, 19, 40, "Escorpião"),
+  s(2026, 11, 10, 5, 36, "Sagitário"),
+  s(2026, 11, 12, 17, 27, "Capricórnio"),
+  s(2026, 11, 15, 6, 25, "Aquário"),
+  s(2026, 11, 17, 18, 20, "Peixes"),
+  s(2026, 11, 20, 2, 52, "Áries"),
+  s(2026, 11, 22, 7, 10, "Touro"),
+  s(2026, 11, 26, 7, 51, "Câncer"),
+  s(2026, 11, 28, 8, 21, "Leão"),
+  s(2026, 11, 30, 11, 13, "Virgem"),
+  s(2026, 12, 2, 17, 4, "Libra"),
+  s(2026, 12, 5, 1, 35, "Escorpião"),
+  s(2026, 12, 7, 12, 7, "Sagitário"),
+  s(2026, 12, 10, 0, 9, "Capricórnio"),
+  s(2026, 12, 12, 13, 6, "Aquário"),
+  s(2026, 12, 15, 1, 36, "Peixes"),
+  s(2026, 12, 17, 11, 35, "Áries"),
+  s(2026, 12, 19, 17, 30, "Touro"),
+  s(2026, 12, 21, 19, 27, "Gêmeos"),
+  s(2026, 12, 23, 18, 58, "Câncer"),
+  s(2026, 12, 25, 18, 12, "Leão"),
+  s(2026, 12, 27, 19, 13, "Virgem"),
+  s(2026, 12, 29, 23, 27, "Libra"),
 ];
 
 export const PHASE_LABEL: Record<MoonPhaseGroup, string> = {
@@ -111,22 +151,29 @@ export const PHASE_MEANING: Record<MoonPhaseGroup, string> = {
   minguante: "A energia recolhe. Momento fértil pra desapegar, perdoar e abrir espaço pro que vem a seguir.",
 };
 
-/** Retorna a entrada de fase vigente (a mais recente já iniciada) e a próxima. */
-export function getCurrentMoonPhase(now: Date = new Date()): {
-  current: MoonCalendarEntry;
-  next: MoonCalendarEntry | null;
+/** Retorna a fase e o signo vigentes da Lua. */
+export function getCurrentMoon(now: Date = new Date()): {
+  fase: MoonPhaseGroup;
+  signo: string;
+  observacao?: string;
 } {
   const t = now.getTime();
-  let idx = -1;
-  for (let i = 0; i < MOON_CALENDAR.length; i++) {
-    if (new Date(MOON_CALENDAR[i].date).getTime() <= t) idx = i;
+
+  let phase: MoonPhaseEvent = MOON_PHASE_EVENTS[0];
+  for (const ev of MOON_PHASE_EVENTS) {
+    if (new Date(ev.date).getTime() <= t) phase = ev;
     else break;
   }
-  if (idx === -1) {
-    return { current: MOON_CALENDAR[0], next: MOON_CALENDAR[1] ?? null };
+
+  let signo = phase.signo;
+  let lastAnchor = new Date(phase.date).getTime();
+  for (const ing of MOON_SIGN_INGRESSES) {
+    const it = new Date(ing.date).getTime();
+    if (it <= t && it >= lastAnchor) {
+      signo = ing.signo;
+      lastAnchor = it;
+    }
   }
-  return {
-    current: MOON_CALENDAR[idx],
-    next: MOON_CALENDAR[idx + 1] ?? null,
-  };
+
+  return { fase: phase.fase, signo, observacao: phase.observacao };
 }
