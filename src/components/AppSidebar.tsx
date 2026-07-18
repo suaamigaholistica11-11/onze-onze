@@ -10,7 +10,6 @@ import {
   ShoppingBag,
   Share2,
   Settings,
-  Layers,
 } from "lucide-react";
 import {
   Sidebar,
@@ -36,13 +35,25 @@ type MenuItem = {
   external?: boolean;
 };
 
+function CrystalBallIcon(props: { className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={props.className}
+      style={{ fontSize: "1rem", lineHeight: 1 }}
+    >
+      🔮
+    </span>
+  );
+}
+
 const ITEMS: readonly MenuItem[] = [
   { to: "/", label: "Home", icon: Home },
   { to: "/mapa-astral", label: "Mapa Astral", icon: Star },
   { to: "/ceu-hoje", label: "O Céu Hoje", icon: Sparkles },
   { to: "/piramide", label: "Pirâmide Evolutiva", icon: Triangle },
   { to: "/ritualzinho", label: "Ritualzinho", icon: Moon },
-  { to: "/baralho-cigano", label: "Baralho Cigano", icon: Layers },
+  { to: "/baralho-cigano", label: "Cigana Nadja", icon: CrystalBallIcon as unknown as typeof Home },
   {
     to: "https://collshp.com/lojinjaonzeonze?view=storefront",
     label: "Lojinha 11:11",
