@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Mic, Square, Loader2 } from "lucide-react";
+import { Mic, Square, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -71,6 +71,17 @@ export function VoiceInput({ value, onChange, placeholder, multiline, className 
   function discardPreview() {
     setPreview(null);
   }
+
+  function clearAll() {
+    recRef.current?.cancel();
+    recRef.current = null;
+    setRecording(false);
+    setTranscribing(false);
+    setPreview(null);
+    onChange("");
+  }
+
+  const hasContent = value.trim().length > 0 || preview !== null || recording || transcribing;
 
   const Field: typeof Input = (multiline ? Textarea : Input) as typeof Input;
 
@@ -146,6 +157,17 @@ export function VoiceInput({ value, onChange, placeholder, multiline, className 
             </button>
           </div>
         </div>
+      )}
+
+      {hasContent && (
+        <button
+          type="button"
+          onClick={clearAll}
+          className="mt-2 inline-flex items-center gap-1.5 text-[11px] font-medium text-ink/50 hover:text-red-500 transition-colors"
+        >
+          <X className="size-3.5" />
+          limpar áudio e texto
+        </button>
       )}
     </div>
   );
