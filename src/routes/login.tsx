@@ -186,6 +186,21 @@ function LoginPage() {
               className="w-full bg-white border border-black/10 rounded-2xl px-4 py-3 text-sm outline-none focus:border-lilac"
             />
           )}
+          {mode === "signup" && (
+            <label className="block">
+              <span className="block text-[11px] font-medium text-ink/60 mb-1 px-1">
+                Data de nascimento
+              </span>
+              <input
+                type="date"
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+                required
+                max={new Date().toISOString().slice(0, 10)}
+                className="w-full bg-white border border-black/10 rounded-2xl px-4 py-3 text-sm outline-none focus:border-lilac"
+              />
+            </label>
+          )}
           <input
             type="email"
             placeholder="E-mail"
