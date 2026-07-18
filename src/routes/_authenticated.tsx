@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 import { PlanetsLoader } from "@/components/PlanetsLoader";
+import { useTheme } from "@/lib/bg-preference";
 
 export const Route = createFileRoute("/_authenticated")({
   component: AuthGuard,
@@ -10,6 +11,7 @@ export const Route = createFileRoute("/_authenticated")({
 function AuthGuard() {
   const { session, loading } = useAuth();
   const navigate = useNavigate();
+  useTheme();
 
   useEffect(() => {
     if (!loading && !session) {
