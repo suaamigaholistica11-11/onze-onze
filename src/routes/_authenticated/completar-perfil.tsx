@@ -197,16 +197,26 @@ function CompletarPerfilPage() {
                 "✨"
               )}
             </div>
-            <label className="flex items-center gap-2 text-sm font-medium text-ink/70 cursor-pointer">
-              <Upload className="size-4" />
-              Escolher foto
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleAvatarChange}
-                className="hidden"
-              />
-            </label>
+            <div className="flex-1 min-w-0">
+              <label className="inline-flex items-center gap-2 text-sm font-medium text-ink/70 cursor-pointer">
+                <Upload className="size-4" />
+                {avatarPreview ? "Trocar foto" : "Escolher foto"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                />
+              </label>
+              {signo && (
+                <p className="text-xs text-ink/60 mt-2">
+                  Seu signo:{" "}
+                  <span className="font-display text-base text-ink">
+                    {glifoDoSigno(signo)} {signo}
+                  </span>
+                </p>
+              )}
+            </div>
           </div>
 
           <Field label="Como você quer ser chamada">
