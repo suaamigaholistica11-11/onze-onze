@@ -4,6 +4,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { useAuth } from "@/lib/auth";
+import { calcularSignoSolar } from "@/lib/signo";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/login")({
@@ -24,6 +25,10 @@ const schema = z.object({
   email: z.string().email("E-mail inválido").max(255),
   password: z.string().min(6, "Mínimo 6 caracteres").max(72),
   name: z.string().trim().min(1, "Diz teu nome").max(60).optional(),
+  birthDate: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Data de nascimento inválida")
+    .optional(),
 });
 
 function LoginPage() {
@@ -33,6 +38,7 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [birthDate, setBirthDate] = useState("");
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -47,13 +53,19 @@ function LoginPage() {
         email,
         password,
         name: mode === "signup" ? name : undefined,
+        birthDate: mode === "signup" ? birthDate : undefined,
       });
       if (!parsed.success) {
         toast.error(parsed.error.issues[0]?.message ?? "Dados inválidos");
         return;
       }
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        if (!parsed.data.birthDate) {
+          toast.error("Preencha sua data de nascimento");
+          return;
+        }
+        const signo = calcularSignoSolar(parsed.data.birthDate);
+        const { data: signUpData, error } = await supabase.auth.signUp({
           email: parsed.data.email,
           password: parsed.data.password,
           options: {
@@ -64,6 +76,16 @@ function LoginPage() {
         if (error) {
           toast.error(error.message);
         } else {
+          const userId = signUpData.user?.id;
+          if (userId) {
+            await supabase
+              .from("profiles")
+              .update({
+                birth_date: parsed.data.birthDate,
+                signo_solar: signo,
+              })
+              .eq("user_id", userId);
+          }
           toast.success("Conta criada! ✨");
           navigate({ to: "/completar-perfil" });
         }
@@ -163,6 +185,21 @@ function LoginPage() {
               required
               className="w-full bg-white border border-black/10 rounded-2xl px-4 py-3 text-sm outline-none focus:border-lilac"
             />
+          )}
+          {mode === "signup" && (
+            <label className="block">
+              <span className="block text-[11px] font-medium text-ink/60 mb-1 px-1">
+                Data de nascimento
+              </span>
+              <input
+                type="date"
+                value={birthDate}
+                onChange={(e) => setBirthDate(e.target.value)}
+                required
+                max={new Date().toISOString().slice(0, 10)}
+                className="w-full bg-white border border-black/10 rounded-2xl px-4 py-3 text-sm outline-none focus:border-lilac"
+              />
+            </label>
           )}
           <input
             type="email"
