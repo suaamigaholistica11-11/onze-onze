@@ -1,16 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
+import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, ShoppingBag, ArrowLeft } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
-import { getMoonForToday } from "@/lib/transits.functions";
-import type { MoonPhaseKey } from "@/lib/moon-phases";
+import { getCurrentMoon, type MoonPhaseGroup } from "@/lib/moon-calendar";
 import {
   BANHOS,
   PHASE_GROUP_LABEL,
   buildContextMessage,
-  groupFromPhase,
   type Banho,
 } from "@/lib/rituals";
 
@@ -28,12 +24,10 @@ export const Route = createFileRoute("/_authenticated/ritualzinho")({
 });
 
 function RitualzinhoPage() {
-  const fetchMoon = useServerFn(getMoonForToday);
-  const { data, isLoading } = useQuery({
-    queryKey: ["moon-today"],
-    queryFn: () => fetchMoon(),
-    staleTime: 1000 * 60 * 60,
-  });
+  const [data, setData] = useState<ReturnType<typeof getCurrentMoon> | null>(null);
+  useEffect(() => {
+    setData(getCurrentMoon());
+  }, []);
 
   return (
     <AppShell glyph="🌙">
@@ -47,23 +41,19 @@ function RitualzinhoPage() {
         <p className="text-xs font-medium uppercase tracking-[0.25em] text-ink/40 mb-2">
           ritualzinho
         </p>
-        {isLoading || !data ? (
+        {!data ? (
           <h1 className="font-display text-3xl font-bold tracking-tight text-ink/40 italic">
             lendo o céu…
           </h1>
         ) : (
-          <Content
-            phaseKey={data.fase.key}
-            signo={data.signo}
-          />
+          <Content group={data.fase} signo={data.signo} />
         )}
       </header>
     </AppShell>
   );
 }
 
-function Content({ phaseKey, signo }: { phaseKey: MoonPhaseKey; signo: string }) {
-  const group = groupFromPhase(phaseKey);
+function Content({ group, signo }: { group: MoonPhaseGroup; signo: string }) {
   const fase = PHASE_GROUP_LABEL[group];
   const banhos = BANHOS[group];
   const mensagem = buildContextMessage(group, signo);
