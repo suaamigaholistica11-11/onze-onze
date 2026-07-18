@@ -24,6 +24,7 @@ import {
   deleteNadjaReading,
 } from "@/lib/nadja.functions";
 import ciganaImg from "@/assets/cigana.png";
+import { VoiceInput } from "@/components/VoiceInput";
 
 export const Route = createFileRoute("/_authenticated/baralho-cigano")({
   head: () => ({
