@@ -220,33 +220,3 @@ function CurrentMoonCard({
     </div>
   );
 }
-
-function Shortcut({
-  to,
-  bg,
-  label,
-  Icon,
-}: {
-  to: string;
-  bg: ShortcutBg;
-  label: string;
-  Icon: typeof Sparkles;
-}) {
-  const bgClass: Record<ShortcutBg, string> = {
-    sky: "bg-sky",
-    mint: "bg-mint",
-    "yellow-candy": "bg-yellow-candy",
-    peach: "bg-peach",
-  };
-  return (
-    <Link
-      to={to}
-      className={`${bgClass[bg]} p-4 rounded-3xl aspect-square flex flex-col justify-between ring-1 ring-black/5 hover:scale-[1.02] transition-transform`}
-    >
-      <div className="size-9 bg-white/70 rounded-xl flex items-center justify-center">
-        <Icon className="size-4 text-ink" />
-      </div>
-      <span className="font-display font-bold text-base">{label}</span>
-    </Link>
-  );
-}
