@@ -624,8 +624,9 @@ function PiramideEvolutivaIntro({
                   Pega essa dica
                 </p>
                 {(() => {
-                  const intro = dicaIntroFor(tid);
-                  const rec = RECOMENDACOES[tid] ?? "dar um passinho pequeno hoje";
+                  const intro = pickForTheme(DICA_INTROS, tid);
+                  const recs = RECOMENDACOES[tid] ?? ["dar um passinho pequeno hoje"];
+                  const rec = pickForTheme(recs, tid, 1);
                   return (
                     <p>
                       {intro.texto} {rec}
