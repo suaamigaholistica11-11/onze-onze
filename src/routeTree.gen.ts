@@ -17,6 +17,7 @@ import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
 import { Route as AuthenticatedRitualzinhoRouteImport } from './routes/_authenticated/ritualzinho'
 import { Route as AuthenticatedPiramideRouteImport } from './routes/_authenticated/piramide'
 import { Route as AuthenticatedMapaAstralRouteImport } from './routes/_authenticated/mapa-astral'
+import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
 import { Route as AuthenticatedCompletarPerfilRouteImport } from './routes/_authenticated/completar-perfil'
 import { Route as AuthenticatedCeuHojeRouteImport } from './routes/_authenticated/ceu-hoje'
 import { Route as AuthenticatedBaralhoCiganoRouteImport } from './routes/_authenticated/baralho-cigano'
@@ -62,6 +63,12 @@ const AuthenticatedMapaAstralRoute = AuthenticatedMapaAstralRouteImport.update({
   path: '/mapa-astral',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedConfiguracoesRoute =
+  AuthenticatedConfiguracoesRouteImport.update({
+    id: '/configuracoes',
+    path: '/configuracoes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedCompletarPerfilRoute =
   AuthenticatedCompletarPerfilRouteImport.update({
     id: '/completar-perfil',
@@ -93,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/baralho-cigano': typeof AuthenticatedBaralhoCiganoRoute
   '/ceu-hoje': typeof AuthenticatedCeuHojeRoute
   '/completar-perfil': typeof AuthenticatedCompletarPerfilRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/piramide': typeof AuthenticatedPiramideRoute
   '/ritualzinho': typeof AuthenticatedRitualzinhoRoute
@@ -105,6 +113,7 @@ export interface FileRoutesByTo {
   '/baralho-cigano': typeof AuthenticatedBaralhoCiganoRoute
   '/ceu-hoje': typeof AuthenticatedCeuHojeRoute
   '/completar-perfil': typeof AuthenticatedCompletarPerfilRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/piramide': typeof AuthenticatedPiramideRoute
   '/ritualzinho': typeof AuthenticatedRitualzinhoRoute
@@ -120,6 +129,7 @@ export interface FileRoutesById {
   '/_authenticated/baralho-cigano': typeof AuthenticatedBaralhoCiganoRoute
   '/_authenticated/ceu-hoje': typeof AuthenticatedCeuHojeRoute
   '/_authenticated/completar-perfil': typeof AuthenticatedCompletarPerfilRoute
+  '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/_authenticated/piramide': typeof AuthenticatedPiramideRoute
   '/_authenticated/ritualzinho': typeof AuthenticatedRitualzinhoRoute
@@ -136,6 +146,7 @@ export interface FileRouteTypes {
     | '/baralho-cigano'
     | '/ceu-hoje'
     | '/completar-perfil'
+    | '/configuracoes'
     | '/mapa-astral'
     | '/piramide'
     | '/ritualzinho'
@@ -148,6 +159,7 @@ export interface FileRouteTypes {
     | '/baralho-cigano'
     | '/ceu-hoje'
     | '/completar-perfil'
+    | '/configuracoes'
     | '/mapa-astral'
     | '/piramide'
     | '/ritualzinho'
@@ -162,6 +174,7 @@ export interface FileRouteTypes {
     | '/_authenticated/baralho-cigano'
     | '/_authenticated/ceu-hoje'
     | '/_authenticated/completar-perfil'
+    | '/_authenticated/configuracoes'
     | '/_authenticated/mapa-astral'
     | '/_authenticated/piramide'
     | '/_authenticated/ritualzinho'
@@ -235,6 +248,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMapaAstralRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/configuracoes': {
+      id: '/_authenticated/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/completar-perfil': {
       id: '/_authenticated/completar-perfil'
       path: '/completar-perfil'
@@ -284,6 +304,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedBaralhoCiganoRoute: typeof AuthenticatedBaralhoCiganoRoute
   AuthenticatedCeuHojeRoute: typeof AuthenticatedCeuHojeRoute
   AuthenticatedCompletarPerfilRoute: typeof AuthenticatedCompletarPerfilRoute
+  AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedMapaAstralRoute: typeof AuthenticatedMapaAstralRouteWithChildren
   AuthenticatedPiramideRoute: typeof AuthenticatedPiramideRoute
   AuthenticatedRitualzinhoRoute: typeof AuthenticatedRitualzinhoRoute
@@ -294,6 +315,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedBaralhoCiganoRoute: AuthenticatedBaralhoCiganoRoute,
   AuthenticatedCeuHojeRoute: AuthenticatedCeuHojeRoute,
   AuthenticatedCompletarPerfilRoute: AuthenticatedCompletarPerfilRoute,
+  AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedMapaAstralRoute: AuthenticatedMapaAstralRouteWithChildren,
   AuthenticatedPiramideRoute: AuthenticatedPiramideRoute,
   AuthenticatedRitualzinhoRoute: AuthenticatedRitualzinhoRoute,
@@ -313,3 +335,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
