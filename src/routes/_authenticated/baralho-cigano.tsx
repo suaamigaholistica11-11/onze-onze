@@ -29,7 +29,7 @@ import ciganaImg from "@/assets/cigana.png";
 export const Route = createFileRoute("/_authenticated/baralho-cigano")({
   head: () => ({
     meta: [
-      { title: "Baralho Cigano · onze-onze" },
+      { title: "Cigana Nadja · onze-onze" },
       {
         name: "description",
         content: "Escolha suas cartas e leia com os métodos clássicos do baralho cigano.",
@@ -191,11 +191,8 @@ function BaralhoCiganoPage() {
   return (
     <AppShell glyph="✧" className="dark bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-900">
       <header className="px-6 pt-10 pb-4 animate-oo-enter">
-        <p className="text-xs font-medium uppercase tracking-[0.25em] text-oo-offwhite/50 mb-2">
-          leitura oracular
-        </p>
         <h1 className="font-display text-4xl font-bold tracking-tight text-oo-gold">
-          Baralho Cigano
+          Cigana Nadja
         </h1>
         <p className="text-sm text-oo-offwhite mt-3 leading-relaxed">
           Escolha o método, embaralha respirando fundo com a sua pergunta em mente
@@ -257,8 +254,8 @@ function BaralhoCiganoPage() {
             className="w-full h-full object-cover"
           />
         </div>
-        <p className="text-center text-[10px] font-bold uppercase tracking-[0.25em] text-oo-gold/70 mt-3">
-          a cigana te convida
+        <p className="text-center text-sm font-display text-oo-gold/90 mt-3">
+          Receba a leitura da Cigana Nadja
         </p>
       </section>
 
@@ -323,11 +320,13 @@ function BaralhoCiganoPage() {
               </button>
               <button
                 type="button"
-                onClick={reset}
+                onClick={() => {
+                  if (typeof window !== "undefined") window.history.back();
+                }}
                 className="inline-flex items-center gap-1.5 bg-oo-burgundy ring-1 ring-white/10 text-oo-offwhite px-3 py-2 rounded-full text-[10px] font-bold uppercase tracking-[0.18em]"
               >
-                <RotateCcw className="size-3.5" />
-                trocar
+                <ArrowLeft className="size-3.5" />
+                voltar
               </button>
               <button
                 type="button"
@@ -344,6 +343,19 @@ function BaralhoCiganoPage() {
 
           {!completo && (
             <>
+              <div className="bg-oo-burgundy rounded-[20px] ring-1 ring-white/10 p-4 mb-4">
+                <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-oo-gold/80 block mb-2">
+                  conta pra Nadja o que te trouxe aqui (opcional)
+                </label>
+                <textarea
+                  value={pergunta}
+                  onChange={(e) => setPergunta(e.target.value)}
+                  maxLength={1000}
+                  rows={3}
+                  placeholder="Ex: estou naquela situação indefinida com alguém e não sei se espero mais ou sigo…"
+                  className="w-full bg-slate-950/60 text-oo-offwhite placeholder:text-oo-offwhite/40 text-sm rounded-xl p-3 ring-1 ring-white/10 focus:ring-oo-gold/50 outline-none resize-none"
+                />
+              </div>
               <p className="text-sm text-oo-offwhite/80 leading-relaxed mb-3">
                 {picked.length === 0
                   ? "Antes de tirar, respira. Formula a pergunta com calma e toca nas cartas que te chamarem."
@@ -436,22 +448,11 @@ function BaralhoCiganoPage() {
 
               {!leitura && (
                 <div className="bg-oo-burgundy rounded-[20px] ring-1 ring-white/10 p-4 mb-3">
-                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-oo-gold/80 block mb-2">
-                    conta pra Nadja o que te trouxe aqui (opcional)
-                  </label>
-                  <textarea
-                    value={pergunta}
-                    onChange={(e) => setPergunta(e.target.value)}
-                    maxLength={1000}
-                    rows={3}
-                    placeholder="Ex: estou naquela situação indefinida com alguém e não sei se espero mais ou sigo…"
-                    className="w-full bg-slate-950/60 text-oo-offwhite placeholder:text-oo-offwhite/40 text-sm rounded-xl p-3 ring-1 ring-white/10 focus:ring-oo-gold/50 outline-none resize-none"
-                  />
                   <button
                     type="button"
                     onClick={pedirLeitura}
                     disabled={gerando}
-                    className="mt-3 w-full inline-flex items-center justify-center gap-2 bg-oo-gold text-oo-burgundy py-3 rounded-full text-[11px] font-bold uppercase tracking-[0.2em] disabled:opacity-60"
+                    className="w-full inline-flex items-center justify-center gap-2 bg-oo-gold text-oo-burgundy py-3 rounded-full text-[11px] font-bold uppercase tracking-[0.2em] disabled:opacity-60"
                   >
                     {gerando ? (
                       <>
@@ -494,7 +495,6 @@ function BaralhoCiganoPage() {
         </section>
       )}
 
-      <MetodosDetalhados />
         </>
       )}
     </AppShell>
