@@ -1,170 +1,55 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSoundEnabled } from "@/lib/bg-preference";
 
-const PLAYLIST_URI = "spotify:playlist:4RIra0o3FVZgbXktW2yNHR";
-const SCRIPT_SRC = "https://open.spotify.com/embed/iframe-api/v3";
-
-declare global {
-  interface Window {
-    onSpotifyIframeApiReady?: (api: SpotifyIframeApi) => void;
-    SpotifyIframeApi?: SpotifyIframeApi;
-  }
-}
-
-interface SpotifyController {
-  play: () => void;
-  pause: () => void;
-  resume: () => void;
-  destroy: () => void;
-  addListener: (event: string, cb: (e: unknown) => void) => void;
-}
-
-interface SpotifyIframeApi {
-  createController: (
-    element: HTMLElement,
-    options: { uri: string; height?: number; width?: number },
-    cb: (controller: SpotifyController) => void,
-  ) => void;
-}
+const PLAYLIST_ID = "4RIra0o3FVZgbXktW2yNHR";
+const EMBED_SRC = `https://open.spotify.com/embed/playlist/${PLAYLIST_ID}?utm_source=generator&autoplay=1`;
 
 /**
- * Hidden Spotify player. Loads a curated playlist and plays a random-ish
- * track from it as soon as the user interacts with the app. The iframe is
- * visually hidden so the user never knows which track is playing. Toggle
- * via Configurações > Som.
+ * Player oculto do Spotify. Carrega uma playlist curada e toca em segundo
+ * plano assim que o usuário interage com o app (política de autoplay dos
+ * navegadores). O iframe é invisível, então o usuário não vê qual música
+ * está tocando. Liga/desliga em Configurações > Som.
  */
 export function HiddenPlayer() {
   const soundOn = useSoundEnabled();
-  const containerRef = useRef<HTMLDivElement>(null);
-  const controllerRef = useRef<SpotifyController | null>(null);
-  const startedRef = useRef(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [armed, setArmed] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-
-    let cancelled = false;
-
-    const ensureScript = () =>
-      new Promise<void>((resolve) => {
-        if (window.SpotifyIframeApi) {
-          resolve();
-          return;
-        }
-        const existing = document.querySelector<HTMLScriptElement>(
-          `script[src="${SCRIPT_SRC}"]`,
-        );
-        const prev = window.onSpotifyIframeApiReady;
-        window.onSpotifyIframeApiReady = (api) => {
-          window.SpotifyIframeApi = api;
-          if (prev) prev(api);
-          resolve();
-        };
-        if (!existing) {
-          const s = document.createElement("script");
-          s.src = SCRIPT_SRC;
-          s.async = true;
-          document.body.appendChild(s);
-        }
-      });
-
-    const boot = async () => {
-      await ensureScript();
-      if (cancelled || !containerRef.current || controllerRef.current) return;
-      const api = window.SpotifyIframeApi;
-      if (!api) return;
-      api.createController(
-        containerRef.current,
-        { uri: PLAYLIST_URI, height: 80, width: 300 },
-        (controller) => {
-          if (cancelled) {
-            controller.destroy();
-            return;
-          }
-          controllerRef.current = controller;
-          tryStart();
-        },
-      );
-    };
-
-    const tryStart = () => {
-      const c = controllerRef.current;
-      if (!c || startedRef.current) return;
-      try {
-        c.play();
-        startedRef.current = true;
-      } catch {
-        /* autoplay blocked, waits for interaction */
-      }
-    };
-
-    const onInteract = () => {
-      if (startedRef.current || !getSoundPref()) return;
-      tryStart();
-    };
-
-    const getSoundPref = () => {
-      try {
-        const v = window.localStorage.getItem("oo:sound-enabled");
-        return v === null ? true : v === "1";
-      } catch {
-        return true;
-      }
-    };
-
-    if (getSoundPref()) {
-      boot();
-    }
-
-    window.addEventListener("pointerdown", onInteract, { once: false });
-    window.addEventListener("keydown", onInteract, { once: false });
-
+    // O autoplay do navegador exige um gesto do usuário. Só montamos o
+    // iframe depois da primeira interação para maximizar a chance de tocar.
+    const arm = () => setArmed(true);
+    window.addEventListener("pointerdown", arm, { once: true });
+    window.addEventListener("keydown", arm, { once: true });
+    window.addEventListener("touchstart", arm, { once: true });
     return () => {
-      cancelled = true;
-      window.removeEventListener("pointerdown", onInteract);
-      window.removeEventListener("keydown", onInteract);
-      const c = controllerRef.current;
-      if (c) {
-        try {
-          c.destroy();
-        } catch {}
-      }
-      controllerRef.current = null;
-      startedRef.current = false;
+      window.removeEventListener("pointerdown", arm);
+      window.removeEventListener("keydown", arm);
+      window.removeEventListener("touchstart", arm);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // React to preference toggle
-  useEffect(() => {
-    const c = controllerRef.current;
-    if (!c) {
-      if (soundOn && !controllerRef.current) {
-        // trigger boot by re-running init effect via a re-render is unnecessary;
-        // instead attempt to start on next interaction
-      }
-      return;
-    }
-    try {
-      if (soundOn) {
-        c.resume();
-        startedRef.current = true;
-      } else {
-        c.pause();
-      }
-    } catch {}
-  }, [soundOn]);
+  // Ao desligar o som, remove o iframe (pausa o áudio). Ao ligar de novo,
+  // remonta e toca a próxima música da playlist.
+  const shouldMount = armed && soundOn;
+
+  if (!shouldMount) return null;
 
   return (
-    <div
+    <iframe
+      ref={iframeRef}
+      title="onze-onze background music"
       aria-hidden
-      ref={containerRef}
+      src={EMBED_SRC}
+      allow="autoplay; encrypted-media; clipboard-write"
       style={{
         position: "fixed",
         left: "-9999px",
         top: "-9999px",
         width: 1,
         height: 1,
-        overflow: "hidden",
+        border: 0,
         opacity: 0,
         pointerEvents: "none",
       }}
