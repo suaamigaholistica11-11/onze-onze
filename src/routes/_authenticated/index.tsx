@@ -8,6 +8,7 @@ import { SIGNS } from "@/lib/onze-data";
 import { getCachedDailyMessage } from "@/lib/daily-message";
 import { getSaudacao } from "@/lib/greeting";
 import { useAuth } from "@/lib/auth";
+import { glifoDoSigno } from "@/lib/signo";
 import { getTransitsForToday } from "@/lib/transits.functions";
 import { buildDailyEnergy } from "@/lib/daily-energy";
 import {
@@ -78,6 +79,8 @@ function HomePage() {
       ? SIGN_BACKGROUNDS[meuSigno]
       : zodiacWheel;
 
+  const signoGlifo = glifoDoSigno(profile?.signo_solar);
+
   const saudacao = mounted
     ? getSaudacao(nome)
     : { titulo: `Oi, ${nome}!`, subtitulo: "Lindo dia pra você!", periodo: "manhã" as const };
@@ -106,6 +109,36 @@ function HomePage() {
           className="pointer-events-none fixed inset-0 z-0 bg-no-repeat bg-center bg-cover opacity-15"
           style={{ backgroundImage: `url(${signoBg})` }}
         />
+      )}
+      {signoGlifo && (
+        <svg
+          aria-hidden
+          viewBox="0 0 400 400"
+          preserveAspectRatio="xMidYMid slice"
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            zIndex: 0,
+            pointerEvents: "none",
+          }}
+          opacity="0.55"
+        >
+          <text
+            x="200"
+            y="260"
+            textAnchor="middle"
+            fontSize="340"
+            fontFamily="Georgia, serif"
+            fill="none"
+            stroke="#B5652E"
+            strokeWidth="1.1"
+          >
+            {signoGlifo}
+          </text>
+        </svg>
       )}
       <header className="px-6 pt-10 pb-6 animate-oo-enter">
         <h1 className="font-display text-3xl font-bold tracking-tight">
