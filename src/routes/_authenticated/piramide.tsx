@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Lock, Info, History as HistoryIcon } from "lucide-react";
+import { Lock, History as HistoryIcon, ChevronDown, ChevronUp } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -42,15 +42,64 @@ const TEMAS = [
 
 const COOLDOWN_DAYS = 21;
 
-const RECOMENDACOES: Record<string, string> = {
-  fisico: "fazer 20 minutos de movimento gostoso, uma caminhada, alongamento ou dancinha na sala",
-  mental: "tirar pausas curtas de 5 minutos ao longo do dia pra desligar a tela e respirar",
-  espiritual: "reservar 10 minutos pra meditar, respirar fundo ou só observar o silêncio",
-  emocional: "escrever por 10 minutos sobre como você tá se sentindo hoje, sem filtro",
-  social: "tirar 5 minutos pra mandar uma mensagem carinhosa pra alguém querido",
-  criativo: "abrir 15 minutos no dia pra rabiscar, escrever ou criar algo só por prazer",
-  carreira: "investir 25 minutos focada em estudar ou avançar num projeto da sua área",
-  financas: "passar 10 minutos olhando seus gastos da semana e começando uma “reserva de paz”",
+// Vários "passinhos" por tema pra sortear e manter a leveza.
+const RECOMENDACOES: Record<string, string[]> = {
+  fisico: [
+    "fazer 20 minutinhos de movimento gostoso, uma caminhada, alongamento ou dancinha na sala",
+    "beber aquele copão de água logo cedo, antes até de olhar o celular",
+    "subir de escada em vez do elevador uma vez hoje, o corpo agradece",
+    "reservar 10 minutinhos pra alongar ombros, pescoço e coluna sem pressa",
+    "dormir 30 minutos mais cedo hoje, seu corpo tá pedindo colinho",
+  ],
+  mental: [
+    "tirar pausas curtas de 5 minutinhos ao longo do dia pra desligar a tela e respirar",
+    "colocar o celular no silencioso por 1 hora e ver como sua cabeça reage",
+    "anotar num papel os 3 assuntos que mais tão pesando, só pra tirar da cabeça",
+    "escolher 1 tarefa da lista e fazer só ela, sem multitarefa hoje",
+    "assistir a nada por 10 minutinhos, olhar pela janela conta muito",
+  ],
+  espiritual: [
+    "reservar 10 minutinhos pra meditar, respirar fundo ou só observar o silêncio",
+    "acender uma velinha e agradecer 3 coisas boas do seu dia",
+    "fazer uma caminhada em silêncio, sentindo o vento e os sons ao redor",
+    "escrever uma carta pro seu eu de daqui a 1 ano, contando dos seus sonhos",
+    "escolher um banho de ervas hoje, mesmo que só de alecrim com hortelã",
+  ],
+  emocional: [
+    "escrever por 10 minutinhos sobre como você tá se sentindo hoje, sem filtro",
+    "abraçar alguém (ou você mesma) por 20 segundos, ativa hormônio bom",
+    "chorar se precisar, colocar aquela playlist e deixar rolar",
+    "dizer não pra 1 coisa que hoje te pesa, sem culpa",
+    "olhar no espelho e falar 3 elogios pra você, mesmo que soe estranho",
+  ],
+  social: [
+    "tirar 5 minutinhos pra mandar uma mensagem carinhosa pra alguém querido",
+    "marcar aquele café que você vem adiando faz tempo",
+    "ligar (sim, ligar mesmo) pra alguém que você ama e não fala há um tempo",
+    "elogiar de verdade uma pessoa hoje, olho no olho ou por mensagem",
+    "aceitar 1 convite social que normalmente você recusaria, só pra experimentar",
+  ],
+  criativo: [
+    "abrir 15 minutinhos no dia pra rabiscar, escrever ou criar algo só por prazer",
+    "tirar uma foto boba do seu dia e olhar depois com carinho",
+    "cozinhar algo diferente hoje, mesmo que seja só temperar de outro jeito",
+    "escutar uma playlist de um estilo que você nunca escuta, deixa surpreender",
+    "escrever 3 ideias malucas pra um projeto seu, sem julgar nenhuma",
+  ],
+  carreira: [
+    "investir 25 minutinhos focada em estudar ou avançar num projeto da sua área",
+    "atualizar 1 linha do seu currículo ou LinkedIn, começa por aí",
+    "listar 3 conquistas suas do último mês, autoestima profissional agradece",
+    "mandar mensagem pra alguém que admira, uma pergunta ou um oi conta",
+    "reservar 15 minutos pra planejar sua semana com calma, antes da correria",
+  ],
+  financas: [
+    "passar 10 minutinhos olhando seus gastos da semana e começando uma reserva de paz",
+    "cancelar 1 assinatura que você nem usa mais, quantia pequena vira grande",
+    "separar 5 reais hoje pro seu cofrinho, comece pequenininho",
+    "anotar tudo que gastar hoje, só pra ver o retrato real",
+    "pesquisar preço antes de comprar aquela coisinha que tá no carrinho",
+  ],
 };
 
 interface ChoiceRow {
@@ -101,11 +150,20 @@ const DICA_INTROS = [
   { texto: "Que tal", final: "?" },
   { texto: "A dica de amiga que eu posso te dar é", final: "." },
   { texto: "Pensei aqui e acho que pra você seria interessante", final: "." },
+  { texto: "Bora tentar", final: "?" },
+  { texto: "Fica a sugestão", final: "." },
+  { texto: "Uma ideia pra hoje", final: "." },
+  { texto: "Se pintar vontade, você pode", final: ".",  },
+  { texto: "Vou te dar um empurrãozinho", final: ":" },
 ] as const;
-function dicaIntroFor(themeId: string) {
+
+// Sorteia intro + dica de forma estável no dia (muda a cada dia, muda por tema).
+function pickForTheme<T>(arr: readonly T[], themeId: string, salt = 0): T {
+  const today = new Date();
+  const seed = `${themeId}-${today.getFullYear()}-${today.getMonth()}-${today.getDate()}-${salt}`;
   let h = 0;
-  for (let i = 0; i < themeId.length; i++) h = (h * 31 + themeId.charCodeAt(i)) >>> 0;
-  return DICA_INTROS[h % DICA_INTROS.length];
+  for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) >>> 0;
+  return arr[h % arr.length];
 }
 
 function PiramidePage() {
@@ -230,21 +288,31 @@ function PiramidePage() {
   return (
     <AppShell glyph="△">
       <header className="px-6 pt-10 pb-4 animate-oo-enter">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <p className="text-xs font-medium uppercase tracking-[0.25em] text-ink/40 mb-2">
-              tríade evolutiva
-            </p>
-            <h1 className="font-display text-4xl font-bold tracking-tight">Pirâmide</h1>
-          </div>
+        <h1 className="font-display text-4xl font-bold tracking-tight">
+          Pirâmide Evolutiva
+        </h1>
+        <div className="mt-3">
           <button
             type="button"
-            onClick={() => setHowItWorksOpen(true)}
-            className="flex items-center gap-1.5 bg-white ring-1 ring-black/5 rounded-full px-3 py-1.5 text-xs font-medium text-ink/70 hover:bg-ink/5 transition-colors"
+            onClick={() => setHowItWorksOpen((v) => !v)}
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-ink/70 hover:text-ink transition-colors"
+            aria-expanded={howItWorksOpen}
           >
-            <Info className="size-3.5" />
             Como funciona
+            {howItWorksOpen ? (
+              <ChevronUp className="size-3.5" />
+            ) : (
+              <ChevronDown className="size-3.5" />
+            )}
           </button>
+          {howItWorksOpen && (
+            <p className="text-sm text-ink/70 leading-relaxed mt-2 bg-white/60 rounded-2xl ring-1 ring-black/5 p-4 animate-oo-enter">
+              Escolha 3 áreas da sua vida pra focar por 21 dias. Todo dia você faz um
+              check-in rapidinho contando como cada uma tá indo. No fim do ciclo, sua
+              Pirâmide Evolutiva mostra a média de cada área e traz insights e dicas pra
+              você seguir crescendo, no seu tempo e do seu jeito.
+            </p>
+          )}
         </div>
       </header>
 
@@ -405,8 +473,6 @@ function PiramidePage() {
         </section>
       )}
 
-      {/* Modais */}
-      <HowItWorksDialog open={howItWorksOpen} onOpenChange={setHowItWorksOpen} />
       <CheckinDialog
         themeId={checkinTheme}
         existing={
