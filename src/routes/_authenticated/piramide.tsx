@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Lock, History as HistoryIcon, ChevronDown, ChevronUp } from "lucide-react";
+import { Lock, History as HistoryIcon, ChevronDown, ChevronUp, CalendarDays } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -13,8 +13,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import { VoiceInput } from "@/components/VoiceInput";
 
 export const Route = createFileRoute("/_authenticated/piramide")({
   head: () => ({
@@ -175,6 +174,7 @@ function PiramidePage() {
   const [howItWorksOpen, setHowItWorksOpen] = useState(false);
   const [checkinTheme, setCheckinTheme] = useState<string | null>(null);
   const [historyTheme, setHistoryTheme] = useState<string | null>(null);
+  const [evolutionOpen, setEvolutionOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -470,6 +470,14 @@ function PiramidePage() {
             progress={progress}
             chosenAt={choice.chosen_at}
           />
+          <button
+            type="button"
+            onClick={() => setEvolutionOpen(true)}
+            className="mt-5 w-full flex items-center justify-center gap-2 bg-white ring-1 ring-black/5 rounded-full py-3 text-xs font-bold uppercase tracking-[0.2em] text-ink/80 hover:bg-ink/5 transition-colors"
+          >
+            <CalendarDays className="size-4" />
+            Histórico da Evolução
+          </button>
         </section>
       )}
 
@@ -491,6 +499,12 @@ function PiramidePage() {
         themeId={historyTheme}
         progress={progress}
         onClose={() => setHistoryTheme(null)}
+      />
+      <EvolutionHistoryDialog
+        open={evolutionOpen}
+        onClose={() => setEvolutionOpen(false)}
+        progress={progress}
+        themes={choice?.themes ?? []}
       />
     </AppShell>
   );
@@ -732,21 +746,20 @@ function CheckinDialog({
             <label className="text-sm text-ink/80 block mb-2">
               Um passo que posso dar amanhã
             </label>
-            <Input
+            <VoiceInput
               value={nextStep}
-              onChange={(e) => setNextStep(e.target.value)}
-              placeholder='ex.: "Ligar pra pessoa X", "Andar 15 min", "Estudar 30 min"'
-              className="rounded-xl"
+              onChange={setNextStep}
+              placeholder='digite ou grave um áudio: "Ligar pra pessoa X", "Andar 15 min"...'
             />
           </div>
 
           <div>
             <label className="text-sm text-ink/80 block mb-2">Observações rápidas (opcional)</label>
-            <Textarea
+            <VoiceInput
+              multiline
               value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Como você se sentiu hoje?"
-              className="rounded-xl min-h-[80px]"
+              onChange={setComment}
+              placeholder="Como você se sentiu hoje? Escreve ou manda um áudio..."
             />
           </div>
 
@@ -969,5 +982,143 @@ function TriadeRadarImpl({ themes, progress }: { themes: string[]; progress: Pro
         );
       })}
     </svg>
+  );
+}
+
+const MESES_ABREV = [
+  "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+  "Jul", "Ago", "Set", "Out", "Nov", "Dez",
+] as const;
+
+function EvolutionHistoryDialog({
+  open,
+  onClose,
+  progress,
+  themes,
+}: {
+  open: boolean;
+  onClose: () => void;
+  progress: ProgressRow[];
+  themes: string[];
+}) {
+  // Agrupa entradas por ano-mês.
+  const byMonth = new Map<string, ProgressRow[]>();
+  for (const p of progress) {
+    const d = new Date(p.entry_date + "T00:00:00");
+    const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
+    const arr = byMonth.get(key);
+    if (arr) arr.push(p);
+    else byMonth.set(key, [p]);
+  }
+
+  // Ordena por data crescente (Jan, Fev, Mar...).
+  const monthKeys = [...byMonth.keys()].sort();
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="rounded-[28px] max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="font-display text-2xl">Histórico da Evolução</DialogTitle>
+          <DialogDescription className="text-sm text-ink/70 leading-relaxed">
+            Seus check-ins organizados mês a mês. Cada bolinha é um dia.
+          </DialogDescription>
+        </DialogHeader>
+
+        {monthKeys.length === 0 ? (
+          <p className="text-sm text-ink/50 italic text-center py-6">
+            Ainda não tem check-in por aqui. Comece pelo primeiro passinho ✨
+          </p>
+        ) : (
+          <div className="space-y-5 pt-2">
+            {monthKeys.map((key) => {
+              const [yy, mm] = key.split("-").map(Number);
+              const label = `${MESES_ABREV[mm]} ${yy}`;
+              const rows = byMonth.get(key)!;
+              const daysInMonth = new Date(yy, mm + 1, 0).getDate();
+
+              // Descobre temas presentes nesse mês (prioriza os 3 atuais).
+              const monthThemes = Array.from(
+                new Set([
+                  ...themes.filter((t) => rows.some((r) => r.theme === t)),
+                  ...rows.map((r) => r.theme),
+                ]),
+              );
+
+              return (
+                <div key={key} className="bg-white rounded-[24px] ring-1 ring-black/5 p-4">
+                  <p className="font-display text-base font-bold mb-3">{label}</p>
+                  <div className="space-y-3">
+                    {monthThemes.map((tid) => {
+                      const t = TEMAS.find((x) => x.id === tid);
+                      const nome = t?.nome ?? tid;
+                      const emoji = t?.emoji ?? "•";
+                      const byDay = new Map<number, number>();
+                      rows
+                        .filter((r) => r.theme === tid)
+                        .forEach((r) => {
+                          const d = new Date(r.entry_date + "T00:00:00");
+                          byDay.set(d.getDate(), r.value);
+                        });
+                      return (
+                        <div key={tid}>
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="text-xs font-display font-bold">
+                              <span className="mr-1">{emoji}</span>
+                              {nome}
+                            </span>
+                            <span className="text-[10px] text-ink/50">
+                              {byDay.size} check-in{byDay.size === 1 ? "" : "s"}
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-1">
+                            {Array.from({ length: daysInMonth }, (_, i) => {
+                              const day = i + 1;
+                              const value = byDay.get(day);
+                              const filled = !!value;
+                              return (
+                                <div
+                                  key={day}
+                                  className="size-3.5 rounded-full transition-all"
+                                  style={{
+                                    backgroundColor: filled
+                                      ? BAR_COLORS[value! - 1]
+                                      : "var(--ink)",
+                                    opacity: filled ? 1 : 0.15,
+                                  }}
+                                  title={
+                                    value
+                                      ? `Dia ${day}: ${value}/5`
+                                      : `Dia ${day}: sem check-in`
+                                  }
+                                />
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+
+            <div className="flex flex-wrap gap-2 pt-2 border-t border-ink/5">
+              {BAR_COLORS.map((c, i) => (
+                <div key={i} className="flex items-center gap-1.5">
+                  <span
+                    className="size-3 rounded-sm"
+                    style={{ backgroundColor: c }}
+                    aria-hidden
+                  />
+                  <span className="text-[10px] text-ink/60">
+                    {i + 1} {BAR_LABELS[i]}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
