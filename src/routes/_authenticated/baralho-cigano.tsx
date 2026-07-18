@@ -18,6 +18,7 @@ import {
 import { AppShell } from "@/components/AppShell";
 import { CIGANO_CARDS, shuffle, type CiganoCard } from "@/lib/cigano-cards";
 import { startShuffleSound, stopShuffleSound } from "@/lib/shuffle-sound";
+import ciganaShufflingImg from "@/assets/cigana-shuffling.png";
 import {
   gerarLeituraNadja,
   listNadjaReadings,
@@ -367,6 +368,22 @@ function BaralhoCiganoPage() {
                   <p className="text-center text-[10px] font-bold uppercase tracking-[0.25em] text-oo-gold/60 mb-3">
                     área das cartas
                   </p>
+                  {shuffling && (
+                    <div className="absolute inset-0 z-20 flex items-center justify-center rounded-[32px] overflow-hidden pointer-events-none">
+                      <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" />
+                      <img
+                        src={ciganaShufflingImg}
+                        alt="Cigana Nadja embaralhando as cartas"
+                        width={1024}
+                        height={1024}
+                        loading="lazy"
+                        className="relative z-10 w-[85%] max-w-[380px] rounded-2xl ring-1 ring-oo-gold/40 shadow-[0_0_60px_-8px_rgba(201,154,68,0.55)] animate-oo-shuffle"
+                      />
+                      <p className="absolute bottom-6 z-10 text-[10px] font-bold uppercase tracking-[0.3em] text-oo-gold/90 animate-pulse">
+                        embaralhando…
+                      </p>
+                    </div>
+                  )}
                   <div
                     className={`grid gap-2 ${
                       shuffling ? "animate-pulse" : ""
