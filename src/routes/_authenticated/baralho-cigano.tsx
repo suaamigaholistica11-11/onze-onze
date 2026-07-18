@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown, ChevronUp, Layers, Shuffle, RotateCcw, Sparkles } from "lucide-react";
+import { ChevronDown, ChevronUp, Layers, Shuffle, RotateCcw, Sparkles, Loader2 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { CIGANO_CARDS, shuffle, type CiganoCard } from "@/lib/cigano-cards";
 import { startShuffleSound, stopShuffleSound } from "@/lib/shuffle-sound";
+import { gerarLeituraNadja } from "@/lib/nadja.functions";
 import ciganaImg from "@/assets/cigana.png";
 
 export const Route = createFileRoute("/_authenticated/baralho-cigano")({
@@ -85,6 +86,10 @@ function BaralhoCiganoPage() {
   const [picked, setPicked] = useState<number[]>([]); // índices no deck
   const [shuffling, setShuffling] = useState(false);
   const shuffleTimer = useRef<number | null>(null);
+  const [pergunta, setPergunta] = useState("");
+  const [leitura, setLeitura] = useState<string | null>(null);
+  const [gerando, setGerando] = useState(false);
+  const [erroLeitura, setErroLeitura] = useState<string | null>(null);
 
   useEffect(() => () => stopShuffleSound(), []);
 
@@ -121,9 +126,36 @@ function BaralhoCiganoPage() {
     setShuffling(false);
     setPicked([]);
     setDeck(shuffle(CIGANO_CARDS));
+    setLeitura(null);
+    setErroLeitura(null);
   };
 
   const completo = spread ? picked.length === spread.qtd : false;
+
+  const pedirLeitura = async () => {
+    if (!spread || !completo || gerando) return;
+    setGerando(true);
+    setErroLeitura(null);
+    try {
+      const cartas = picked.map((deckIdx, i) => {
+        const c = deck[deckIdx];
+        return {
+          n: c.n,
+          nome: c.nome,
+          sig: c.sig,
+          posicao: spread.posicoes[i] ?? `Posição ${i + 1}`,
+        };
+      });
+      const res = await gerarLeituraNadja({
+        data: { spreadTitle: spread.titulo, pergunta, cartas },
+      });
+      setLeitura(res.texto);
+    } catch (err: any) {
+      setErroLeitura(err?.message ?? "Algo travou. Tenta de novo em instantes.");
+    } finally {
+      setGerando(false);
+    }
+  };
 
   return (
     <AppShell glyph="✧" className="dark bg-gradient-to-b from-slate-950 via-indigo-950 to-slate-900">
@@ -296,16 +328,16 @@ function BaralhoCiganoPage() {
                   Sua leitura
                 </p>
               </div>
-              <ul className="space-y-3">
+              <ul className="space-y-2 mb-4">
                 {picked.map((deckIdx, i) => {
                   const c = deck[deckIdx];
                   return (
                     <li
                       key={i}
-                      className="bg-oo-burgundy rounded-[20px] ring-1 ring-white/10 p-4"
+                      className="bg-oo-burgundy/70 rounded-2xl ring-1 ring-white/10 p-3"
                     >
-                      <div className="flex items-start gap-3">
-                        <div className="size-14 shrink-0 rounded-lg flex items-center justify-center text-white font-display font-bold text-lg"
+                      <div className="flex items-center gap-3">
+                        <div className="size-10 shrink-0 rounded-lg flex items-center justify-center text-white font-display font-bold text-sm"
                           style={{
                             background:
                               "linear-gradient(135deg, #b48ad4, #7a4fa0)",
@@ -317,11 +349,8 @@ function BaralhoCiganoPage() {
                           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-oo-offwhite/60">
                             {spread.posicoes[i] ?? `Posição ${i + 1}`}
                           </p>
-                          <p className="font-display font-bold text-base leading-tight mt-0.5 text-oo-gold">
+                          <p className="font-display font-bold text-sm leading-tight mt-0.5 text-oo-gold">
                             {c.nome}
-                          </p>
-                          <p className="text-sm text-oo-offwhite/80 leading-relaxed mt-1">
-                            {c.sig}
                           </p>
                         </div>
                       </div>
@@ -329,6 +358,55 @@ function BaralhoCiganoPage() {
                   );
                 })}
               </ul>
+
+              {!leitura && (
+                <div className="bg-oo-burgundy rounded-[20px] ring-1 ring-white/10 p-4 mb-3">
+                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-oo-gold/80 block mb-2">
+                    conta pra Nadja o que te trouxe aqui (opcional)
+                  </label>
+                  <textarea
+                    value={pergunta}
+                    onChange={(e) => setPergunta(e.target.value)}
+                    maxLength={1000}
+                    rows={3}
+                    placeholder="Ex: estou naquela situação indefinida com alguém e não sei se espero mais ou sigo…"
+                    className="w-full bg-slate-950/60 text-oo-offwhite placeholder:text-oo-offwhite/40 text-sm rounded-xl p-3 ring-1 ring-white/10 focus:ring-oo-gold/50 outline-none resize-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={pedirLeitura}
+                    disabled={gerando}
+                    className="mt-3 w-full inline-flex items-center justify-center gap-2 bg-oo-gold text-oo-burgundy py-3 rounded-full text-[11px] font-bold uppercase tracking-[0.2em] disabled:opacity-60"
+                  >
+                    {gerando ? (
+                      <>
+                        <Loader2 className="size-4 animate-spin" />
+                        a Nadja está lendo…
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="size-4" />
+                        pedir leitura da Nadja
+                      </>
+                    )}
+                  </button>
+                  {erroLeitura && (
+                    <p className="text-xs text-red-300/90 mt-2 leading-relaxed">{erroLeitura}</p>
+                  )}
+                </div>
+              )}
+
+              {leitura && (
+                <div className="bg-oo-burgundy rounded-[24px] ring-1 ring-oo-gold/30 p-5 mb-3 shadow-[0_0_40px_-12px_rgba(234,179,8,0.35)]">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-oo-gold/80 mb-3">
+                    a Nadja diz
+                  </p>
+                  <div className="text-oo-offwhite text-[15px] leading-[1.75] font-display whitespace-pre-wrap">
+                    {leitura}
+                  </div>
+                </div>
+              )}
+
               <button
                 type="button"
                 onClick={reset}
