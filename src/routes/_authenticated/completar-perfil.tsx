@@ -6,6 +6,7 @@ import { AppShell } from "@/components/AppShell";
 import { PrivacyPolicyModal } from "@/components/PrivacyPolicyModal";
 import { toast } from "sonner";
 import { Upload, MapPin, Loader2 } from "lucide-react";
+import { calcularSignoSolar, glifoDoSigno } from "@/lib/signo";
 
 export const Route = createFileRoute("/_authenticated/completar-perfil")({
   component: CompletarPerfilPage,
@@ -33,6 +34,7 @@ function CompletarPerfilPage() {
   const [results, setResults] = useState<NominatimResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [signo, setSigno] = useState<string | null>(null);
   const cityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Carregar perfil existente
@@ -54,9 +56,19 @@ function CompletarPerfilPage() {
         setLng(data.birth_lng ?? null);
         setAvatarPreview(data.avatar_url ?? null);
         setConsent(!!data.lgpd_consent);
+        setSigno(
+          (data as { signo_solar?: string | null }).signo_solar ??
+            (data.birth_date ? calcularSignoSolar(data.birth_date) : null),
+        );
       }
     })();
   }, [user]);
+
+  // Recalcula o signo em tempo real ao mudar a data de nascimento.
+  useEffect(() => {
+    if (birthDate) setSigno(calcularSignoSolar(birthDate));
+    else setSigno(null);
+  }, [birthDate]);
 
   const handleCityChange = (v: string) => {
     setCity(v);
@@ -139,6 +151,7 @@ function CompletarPerfilPage() {
         birth_lat: lat,
         birth_lng: lng,
         avatar_url: avatarUrl,
+        signo_solar: birthDate ? calcularSignoSolar(birthDate) : null,
         lgpd_consent: true,
         lgpd_consent_at: new Date().toISOString(),
       };
@@ -184,16 +197,26 @@ function CompletarPerfilPage() {
                 "✨"
               )}
             </div>
-            <label className="flex items-center gap-2 text-sm font-medium text-ink/70 cursor-pointer">
-              <Upload className="size-4" />
-              Escolher foto
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleAvatarChange}
-                className="hidden"
-              />
-            </label>
+            <div className="flex-1 min-w-0">
+              <label className="inline-flex items-center gap-2 text-sm font-medium text-ink/70 cursor-pointer">
+                <Upload className="size-4" />
+                {avatarPreview ? "Trocar foto" : "Escolher foto"}
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  className="hidden"
+                />
+              </label>
+              {signo && (
+                <p className="text-xs text-ink/60 mt-2">
+                  Seu signo:{" "}
+                  <span className="font-display text-base text-ink">
+                    {glifoDoSigno(signo)} {signo}
+                  </span>
+                </p>
+              )}
+            </div>
           </div>
 
           <Field label="Como você quer ser chamada">

@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 interface Profile {
   display_name: string | null;
   signo_solar: string | null;
+  avatar_url: string | null;
 }
 
 interface AuthContextValue {
@@ -33,7 +34,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setTimeout(async () => {
           const { data } = await supabase
             .from("profiles")
-            .select("display_name, signo_solar")
+            .select("display_name, signo_solar, avatar_url")
             .eq("user_id", s.user.id)
             .maybeSingle();
           if (mounted) setProfile(data ?? null);
