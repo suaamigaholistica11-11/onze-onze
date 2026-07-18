@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useSoundEnabled } from "@/lib/bg-preference";
 
-const PLAYLIST_ID = "4RIra0o3FVZgbXktW2yNHR";
-const EMBED_SRC = `https://open.spotify.com/embed/playlist/${PLAYLIST_ID}?utm_source=generator&autoplay=1`;
+const TRACK_ID = "0DxnNG6GGQqzfFUV08OQLG";
+const EMBED_SRC = `https://open.spotify.com/embed/track/${TRACK_ID}?utm_source=generator&autoplay=1`;
 
 /**
  * Player oculto do Spotify. Carrega uma playlist curada e toca em segundo
