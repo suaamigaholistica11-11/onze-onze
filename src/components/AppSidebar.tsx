@@ -62,7 +62,7 @@ const ITEMS: readonly MenuItem[] = [
   },
   { to: "/blog", label: "Blog", icon: BookOpen, soon: true },
   { to: "/redes", label: "Nossas Redes", icon: Share2, soon: true },
-  { to: "/configuracoes", label: "Configurações", icon: Settings, soon: true },
+  { to: "/configuracoes", label: "Configurações", icon: Settings },
 ] as const;
 
 export function AppSidebar() {

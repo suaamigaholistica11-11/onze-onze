@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermosRouteImport } from './routes/termos'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
@@ -17,11 +18,17 @@ import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
 import { Route as AuthenticatedRitualzinhoRouteImport } from './routes/_authenticated/ritualzinho'
 import { Route as AuthenticatedPiramideRouteImport } from './routes/_authenticated/piramide'
 import { Route as AuthenticatedMapaAstralRouteImport } from './routes/_authenticated/mapa-astral'
+import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authenticated/configuracoes'
 import { Route as AuthenticatedCompletarPerfilRouteImport } from './routes/_authenticated/completar-perfil'
 import { Route as AuthenticatedCeuHojeRouteImport } from './routes/_authenticated/ceu-hoje'
 import { Route as AuthenticatedBaralhoCiganoRouteImport } from './routes/_authenticated/baralho-cigano'
 import { Route as AuthenticatedMapaAstralIdRouteImport } from './routes/_authenticated/mapa-astral.$id'
 
+const TermosRoute = TermosRouteImport.update({
+  id: '/termos',
+  path: '/termos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -62,6 +69,12 @@ const AuthenticatedMapaAstralRoute = AuthenticatedMapaAstralRouteImport.update({
   path: '/mapa-astral',
   getParentRoute: () => AuthenticatedRoute,
 } as any)
+const AuthenticatedConfiguracoesRoute =
+  AuthenticatedConfiguracoesRouteImport.update({
+    id: '/configuracoes',
+    path: '/configuracoes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 const AuthenticatedCompletarPerfilRoute =
   AuthenticatedCompletarPerfilRouteImport.update({
     id: '/completar-perfil',
@@ -90,9 +103,11 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/termos': typeof TermosRoute
   '/baralho-cigano': typeof AuthenticatedBaralhoCiganoRoute
   '/ceu-hoje': typeof AuthenticatedCeuHojeRoute
   '/completar-perfil': typeof AuthenticatedCompletarPerfilRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/piramide': typeof AuthenticatedPiramideRoute
   '/ritualzinho': typeof AuthenticatedRitualzinhoRoute
@@ -102,9 +117,11 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/termos': typeof TermosRoute
   '/baralho-cigano': typeof AuthenticatedBaralhoCiganoRoute
   '/ceu-hoje': typeof AuthenticatedCeuHojeRoute
   '/completar-perfil': typeof AuthenticatedCompletarPerfilRoute
+  '/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/piramide': typeof AuthenticatedPiramideRoute
   '/ritualzinho': typeof AuthenticatedRitualzinhoRoute
@@ -117,9 +134,11 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/termos': typeof TermosRoute
   '/_authenticated/baralho-cigano': typeof AuthenticatedBaralhoCiganoRoute
   '/_authenticated/ceu-hoje': typeof AuthenticatedCeuHojeRoute
   '/_authenticated/completar-perfil': typeof AuthenticatedCompletarPerfilRoute
+  '/_authenticated/configuracoes': typeof AuthenticatedConfiguracoesRoute
   '/_authenticated/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/_authenticated/piramide': typeof AuthenticatedPiramideRoute
   '/_authenticated/ritualzinho': typeof AuthenticatedRitualzinhoRoute
@@ -133,9 +152,11 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/reset-password'
+    | '/termos'
     | '/baralho-cigano'
     | '/ceu-hoje'
     | '/completar-perfil'
+    | '/configuracoes'
     | '/mapa-astral'
     | '/piramide'
     | '/ritualzinho'
@@ -145,9 +166,11 @@ export interface FileRouteTypes {
   to:
     | '/login'
     | '/reset-password'
+    | '/termos'
     | '/baralho-cigano'
     | '/ceu-hoje'
     | '/completar-perfil'
+    | '/configuracoes'
     | '/mapa-astral'
     | '/piramide'
     | '/ritualzinho'
@@ -159,9 +182,11 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/login'
     | '/reset-password'
+    | '/termos'
     | '/_authenticated/baralho-cigano'
     | '/_authenticated/ceu-hoje'
     | '/_authenticated/completar-perfil'
+    | '/_authenticated/configuracoes'
     | '/_authenticated/mapa-astral'
     | '/_authenticated/piramide'
     | '/_authenticated/ritualzinho'
@@ -174,11 +199,19 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  TermosRoute: typeof TermosRoute
   ApiTranscribeRoute: typeof ApiTranscribeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/termos': {
+      id: '/termos'
+      path: '/termos'
+      fullPath: '/termos'
+      preLoaderRoute: typeof TermosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -235,6 +268,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMapaAstralRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/configuracoes': {
+      id: '/_authenticated/configuracoes'
+      path: '/configuracoes'
+      fullPath: '/configuracoes'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/completar-perfil': {
       id: '/_authenticated/completar-perfil'
       path: '/completar-perfil'
@@ -284,6 +324,7 @@ interface AuthenticatedRouteChildren {
   AuthenticatedBaralhoCiganoRoute: typeof AuthenticatedBaralhoCiganoRoute
   AuthenticatedCeuHojeRoute: typeof AuthenticatedCeuHojeRoute
   AuthenticatedCompletarPerfilRoute: typeof AuthenticatedCompletarPerfilRoute
+  AuthenticatedConfiguracoesRoute: typeof AuthenticatedConfiguracoesRoute
   AuthenticatedMapaAstralRoute: typeof AuthenticatedMapaAstralRouteWithChildren
   AuthenticatedPiramideRoute: typeof AuthenticatedPiramideRoute
   AuthenticatedRitualzinhoRoute: typeof AuthenticatedRitualzinhoRoute
@@ -294,6 +335,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedBaralhoCiganoRoute: AuthenticatedBaralhoCiganoRoute,
   AuthenticatedCeuHojeRoute: AuthenticatedCeuHojeRoute,
   AuthenticatedCompletarPerfilRoute: AuthenticatedCompletarPerfilRoute,
+  AuthenticatedConfiguracoesRoute: AuthenticatedConfiguracoesRoute,
   AuthenticatedMapaAstralRoute: AuthenticatedMapaAstralRouteWithChildren,
   AuthenticatedPiramideRoute: AuthenticatedPiramideRoute,
   AuthenticatedRitualzinhoRoute: AuthenticatedRitualzinhoRoute,
@@ -308,6 +350,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  TermosRoute: TermosRoute,
   ApiTranscribeRoute: ApiTranscribeRoute,
 }
 export const routeTree = rootRouteImport
