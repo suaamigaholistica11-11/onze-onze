@@ -13,12 +13,12 @@ export function AppShell({ children, className }: Props) {
   return (
     <SidebarProvider>
       <div className={cn(
-        "flex min-h-screen w-full bg-[color-mix(in_oklab,var(--peach)_30%,white)] text-ink",
+        "flex min-h-screen w-full bg-background text-foreground",
         className
       )}>
         <AppSidebar />
         <div className="flex-1 relative overflow-x-hidden">
-          <header className="sticky top-0 z-30 h-12 flex items-center px-3 bg-white/40 backdrop-blur-md border-b border-black/5">
+          <header className="sticky top-0 z-30 h-12 flex items-center px-3 bg-card/40 backdrop-blur-md border-b border-border">
             <SidebarTrigger />
           </header>
 

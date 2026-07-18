@@ -15,7 +15,6 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
 import { Route as AuthenticatedRitualzinhoRouteImport } from './routes/_authenticated/ritualzinho'
-import { Route as AuthenticatedPlanoDeFundoRouteImport } from './routes/_authenticated/plano-de-fundo'
 import { Route as AuthenticatedPiramideRouteImport } from './routes/_authenticated/piramide'
 import { Route as AuthenticatedMapaAstralRouteImport } from './routes/_authenticated/mapa-astral'
 import { Route as AuthenticatedCompletarPerfilRouteImport } from './routes/_authenticated/completar-perfil'
@@ -51,12 +50,6 @@ const AuthenticatedRitualzinhoRoute =
   AuthenticatedRitualzinhoRouteImport.update({
     id: '/ritualzinho',
     path: '/ritualzinho',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
-const AuthenticatedPlanoDeFundoRoute =
-  AuthenticatedPlanoDeFundoRouteImport.update({
-    id: '/plano-de-fundo',
-    path: '/plano-de-fundo',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
 const AuthenticatedPiramideRoute = AuthenticatedPiramideRouteImport.update({
@@ -102,7 +95,6 @@ export interface FileRoutesByFullPath {
   '/completar-perfil': typeof AuthenticatedCompletarPerfilRoute
   '/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/piramide': typeof AuthenticatedPiramideRoute
-  '/plano-de-fundo': typeof AuthenticatedPlanoDeFundoRoute
   '/ritualzinho': typeof AuthenticatedRitualzinhoRoute
   '/api/transcribe': typeof ApiTranscribeRoute
   '/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
@@ -115,7 +107,6 @@ export interface FileRoutesByTo {
   '/completar-perfil': typeof AuthenticatedCompletarPerfilRoute
   '/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/piramide': typeof AuthenticatedPiramideRoute
-  '/plano-de-fundo': typeof AuthenticatedPlanoDeFundoRoute
   '/ritualzinho': typeof AuthenticatedRitualzinhoRoute
   '/api/transcribe': typeof ApiTranscribeRoute
   '/': typeof AuthenticatedIndexRoute
@@ -131,7 +122,6 @@ export interface FileRoutesById {
   '/_authenticated/completar-perfil': typeof AuthenticatedCompletarPerfilRoute
   '/_authenticated/mapa-astral': typeof AuthenticatedMapaAstralRouteWithChildren
   '/_authenticated/piramide': typeof AuthenticatedPiramideRoute
-  '/_authenticated/plano-de-fundo': typeof AuthenticatedPlanoDeFundoRoute
   '/_authenticated/ritualzinho': typeof AuthenticatedRitualzinhoRoute
   '/api/transcribe': typeof ApiTranscribeRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
@@ -148,7 +138,6 @@ export interface FileRouteTypes {
     | '/completar-perfil'
     | '/mapa-astral'
     | '/piramide'
-    | '/plano-de-fundo'
     | '/ritualzinho'
     | '/api/transcribe'
     | '/mapa-astral/$id'
@@ -161,7 +150,6 @@ export interface FileRouteTypes {
     | '/completar-perfil'
     | '/mapa-astral'
     | '/piramide'
-    | '/plano-de-fundo'
     | '/ritualzinho'
     | '/api/transcribe'
     | '/'
@@ -176,7 +164,6 @@ export interface FileRouteTypes {
     | '/_authenticated/completar-perfil'
     | '/_authenticated/mapa-astral'
     | '/_authenticated/piramide'
-    | '/_authenticated/plano-de-fundo'
     | '/_authenticated/ritualzinho'
     | '/api/transcribe'
     | '/_authenticated/'
@@ -232,13 +219,6 @@ declare module '@tanstack/react-router' {
       path: '/ritualzinho'
       fullPath: '/ritualzinho'
       preLoaderRoute: typeof AuthenticatedRitualzinhoRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/plano-de-fundo': {
-      id: '/_authenticated/plano-de-fundo'
-      path: '/plano-de-fundo'
-      fullPath: '/plano-de-fundo'
-      preLoaderRoute: typeof AuthenticatedPlanoDeFundoRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
     '/_authenticated/piramide': {
@@ -306,7 +286,6 @@ interface AuthenticatedRouteChildren {
   AuthenticatedCompletarPerfilRoute: typeof AuthenticatedCompletarPerfilRoute
   AuthenticatedMapaAstralRoute: typeof AuthenticatedMapaAstralRouteWithChildren
   AuthenticatedPiramideRoute: typeof AuthenticatedPiramideRoute
-  AuthenticatedPlanoDeFundoRoute: typeof AuthenticatedPlanoDeFundoRoute
   AuthenticatedRitualzinhoRoute: typeof AuthenticatedRitualzinhoRoute
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
@@ -317,7 +296,6 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedCompletarPerfilRoute: AuthenticatedCompletarPerfilRoute,
   AuthenticatedMapaAstralRoute: AuthenticatedMapaAstralRouteWithChildren,
   AuthenticatedPiramideRoute: AuthenticatedPiramideRoute,
-  AuthenticatedPlanoDeFundoRoute: AuthenticatedPlanoDeFundoRoute,
   AuthenticatedRitualzinhoRoute: AuthenticatedRitualzinhoRoute,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }

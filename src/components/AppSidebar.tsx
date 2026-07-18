@@ -10,7 +10,6 @@ import {
   ShoppingBag,
   Share2,
   Settings,
-  Image as ImageIcon,
   Layers,
 } from "lucide-react";
 import {
@@ -42,7 +41,6 @@ const ITEMS: readonly MenuItem[] = [
   { to: "/mapa-astral", label: "Mapa Astral", icon: Star },
   { to: "/ceu-hoje", label: "O Céu Hoje", icon: Sparkles },
   { to: "/piramide", label: "Pirâmide Evolutiva", icon: Triangle },
-  { to: "/plano-de-fundo", label: "Plano de fundo", icon: ImageIcon },
   { to: "/ritualzinho", label: "Ritualzinho", icon: Moon },
   { to: "/baralho-cigano", label: "Baralho Cigano", icon: Layers },
   {
