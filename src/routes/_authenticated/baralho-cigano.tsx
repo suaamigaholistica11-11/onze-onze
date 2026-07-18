@@ -376,7 +376,8 @@ function BaralhoCiganoPage() {
                         alt="Cigana Nadja embaralhando as cartas"
                         width={1024}
                         height={1024}
-                        loading="lazy"
+                        loading="eager"
+                        decoding="sync"
                         className="relative z-10 w-[85%] max-w-[380px] rounded-2xl ring-1 ring-oo-gold/40 shadow-[0_0_60px_-8px_rgba(201,154,68,0.55)] animate-oo-shuffle"
                       />
                       <p className="absolute bottom-6 z-10 text-[10px] font-bold uppercase tracking-[0.3em] text-oo-gold/90 animate-pulse">
