@@ -1,10 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { ChevronDown, ChevronUp, Layers, Shuffle, RotateCcw, Sparkles, Loader2 } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  ChevronDown,
+  ChevronUp,
+  Layers,
+  Shuffle,
+  RotateCcw,
+  Sparkles,
+  Loader2,
+  Copy,
+  Check,
+  Trash2,
+  BookOpen,
+  ArrowLeft,
+} from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { CIGANO_CARDS, shuffle, type CiganoCard } from "@/lib/cigano-cards";
 import { startShuffleSound, stopShuffleSound } from "@/lib/shuffle-sound";
-import { gerarLeituraNadja } from "@/lib/nadja.functions";
+import {
+  gerarLeituraNadja,
+  listNadjaReadings,
+  deleteNadjaReading,
+} from "@/lib/nadja.functions";
 import ciganaImg from "@/assets/cigana.png";
 
 export const Route = createFileRoute("/_authenticated/baralho-cigano")({
@@ -90,6 +109,17 @@ function BaralhoCiganoPage() {
   const [leitura, setLeitura] = useState<string | null>(null);
   const [gerando, setGerando] = useState(false);
   const [erroLeitura, setErroLeitura] = useState<string | null>(null);
+  const [view, setView] = useState<"jogar" | "historico">("jogar");
+  const [openReadingId, setOpenReadingId] = useState<string | null>(null);
+
+  const listFn = useServerFn(listNadjaReadings);
+  const deleteFn = useServerFn(deleteNadjaReading);
+  const qc = useQueryClient();
+  const historyQ = useQuery({
+    queryKey: ["nadja-readings"],
+    queryFn: () => listFn(),
+    staleTime: 30_000,
+  });
 
   useEffect(() => () => stopShuffleSound(), []);
 
@@ -147,9 +177,10 @@ function BaralhoCiganoPage() {
         };
       });
       const res = await gerarLeituraNadja({
-        data: { spreadTitle: spread.titulo, pergunta, cartas },
+        data: { spreadId: spread.id, spreadTitle: spread.titulo, pergunta, cartas },
       });
       setLeitura(res.texto);
+      qc.invalidateQueries({ queryKey: ["nadja-readings"] });
     } catch (err: any) {
       setErroLeitura(err?.message ?? "Algo travou. Tenta de novo em instantes.");
     } finally {
@@ -170,8 +201,52 @@ function BaralhoCiganoPage() {
           Escolha o método, embaralha respirando fundo com a sua pergunta em mente
           e toca nas cartas que te chamarem.
         </p>
+        <div className="mt-4 flex gap-2">
+          <button
+            type="button"
+            onClick={() => setView("jogar")}
+            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-[10px] font-bold uppercase tracking-[0.18em] ${
+              view === "jogar"
+                ? "bg-oo-gold text-oo-burgundy"
+                : "bg-oo-burgundy ring-1 ring-white/10 text-oo-offwhite"
+            }`}
+          >
+            <Sparkles className="size-3.5" />
+            nova leitura
+          </button>
+          <button
+            type="button"
+            onClick={() => setView("historico")}
+            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-[10px] font-bold uppercase tracking-[0.18em] ${
+              view === "historico"
+                ? "bg-oo-gold text-oo-burgundy"
+                : "bg-oo-burgundy ring-1 ring-white/10 text-oo-offwhite"
+            }`}
+          >
+            <BookOpen className="size-3.5" />
+            minhas leituras
+            {historyQ.data?.readings?.length ? (
+              <span className="ml-1 opacity-70">({historyQ.data.readings.length})</span>
+            ) : null}
+          </button>
+        </div>
       </header>
 
+      {view === "historico" ? (
+        <HistoricoLeituras
+          loading={historyQ.isLoading}
+          readings={historyQ.data?.readings ?? []}
+          openId={openReadingId}
+          setOpenId={setOpenReadingId}
+          onDelete={async (id) => {
+            await deleteFn({ data: { id } });
+            if (openReadingId === id) setOpenReadingId(null);
+            qc.invalidateQueries({ queryKey: ["nadja-readings"] });
+          }}
+          onNew={() => setView("jogar")}
+        />
+      ) : (
+        <>
       <section className="px-6 pb-6 animate-oo-enter">
         <div className="mx-auto w-40 h-40 rounded-full overflow-hidden ring-2 ring-oo-gold/40 shadow-[0_0_40px_-8px_rgba(234,179,8,0.35)] bg-slate-900/50">
           <img
@@ -420,7 +495,210 @@ function BaralhoCiganoPage() {
       )}
 
       <MetodosDetalhados />
+        </>
+      )}
     </AppShell>
+  );
+}
+
+function formatDate(iso: string) {
+  try {
+    return new Date(iso).toLocaleString("pt-BR", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  } catch {
+    return iso;
+  }
+}
+
+type ReadingRow = {
+  id: string;
+  spread_id: string;
+  spread_title: string;
+  pergunta: string | null;
+  cartas: Array<{ n: number; nome: string; sig: string; posicao: string }> | any;
+  texto: string;
+  created_at: string;
+};
+
+function HistoricoLeituras({
+  loading,
+  readings,
+  openId,
+  setOpenId,
+  onDelete,
+  onNew,
+}: {
+  loading: boolean;
+  readings: ReadingRow[];
+  openId: string | null;
+  setOpenId: (id: string | null) => void;
+  onDelete: (id: string) => Promise<void>;
+  onNew: () => void;
+}) {
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+
+  const copy = async (r: ReadingRow) => {
+    try {
+      await navigator.clipboard.writeText(r.texto);
+      setCopiedId(r.id);
+      setTimeout(() => setCopiedId((v) => (v === r.id ? null : v)), 2000);
+    } catch {
+      // ignore
+    }
+  };
+
+  if (loading) {
+    return (
+      <section className="px-6 pb-16 animate-oo-enter">
+        <div className="flex items-center gap-2 text-oo-offwhite/70 text-sm">
+          <Loader2 className="size-4 animate-spin" /> buscando suas leituras…
+        </div>
+      </section>
+    );
+  }
+
+  if (readings.length === 0) {
+    return (
+      <section className="px-6 pb-16 animate-oo-enter">
+        <div className="bg-oo-burgundy rounded-[24px] ring-1 ring-white/10 p-6 text-center">
+          <BookOpen className="size-6 text-oo-gold mx-auto mb-3" />
+          <p className="font-display text-lg text-oo-gold mb-1">Nenhuma leitura ainda</p>
+          <p className="text-sm text-oo-offwhite/70 mb-4 leading-relaxed">
+            Assim que a Nadja fizer sua primeira leitura, ela fica guardada aqui pra você revisitar.
+          </p>
+          <button
+            type="button"
+            onClick={onNew}
+            className="inline-flex items-center gap-2 bg-oo-gold text-oo-burgundy px-4 py-2.5 rounded-full text-[11px] font-bold uppercase tracking-[0.2em]"
+          >
+            <Sparkles className="size-4" />
+            tirar uma leitura
+          </button>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="px-6 pb-16 animate-oo-enter space-y-3">
+      {readings.map((r) => {
+        const open = openId === r.id;
+        return (
+          <div
+            key={r.id}
+            className="bg-oo-burgundy rounded-[20px] ring-1 ring-white/10 overflow-hidden"
+          >
+            <button
+              type="button"
+              onClick={() => setOpenId(open ? null : r.id)}
+              className="w-full flex items-center gap-3 p-4 text-left"
+            >
+              <div className="size-10 rounded-2xl bg-white/10 flex items-center justify-center text-oo-gold shrink-0">
+                <Layers className="size-4" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-display font-bold text-sm leading-tight text-oo-gold truncate">
+                  {r.spread_title}
+                </p>
+                <p className="text-[11px] text-oo-offwhite/60 mt-0.5">
+                  {formatDate(r.created_at)}
+                </p>
+                {r.pergunta ? (
+                  <p className="text-[12px] text-oo-offwhite/80 mt-1 line-clamp-1 italic">
+                    “{r.pergunta}”
+                  </p>
+                ) : null}
+              </div>
+              {open ? (
+                <ChevronUp className="size-4 text-oo-gold/70 shrink-0" />
+              ) : (
+                <ChevronDown className="size-4 text-oo-gold/70 shrink-0" />
+              )}
+            </button>
+
+            {open && (
+              <div className="px-4 pb-4 animate-oo-enter">
+                {Array.isArray(r.cartas) && r.cartas.length > 0 && (
+                  <ul className="flex flex-wrap gap-1.5 mb-3">
+                    {r.cartas.map((c: any, i: number) => (
+                      <li
+                        key={i}
+                        className="text-[10px] font-bold uppercase tracking-[0.15em] bg-white/5 ring-1 ring-white/10 text-oo-offwhite/80 px-2 py-1 rounded-full"
+                      >
+                        {c.n}. {c.nome}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <div className="bg-slate-950/50 rounded-2xl p-4 ring-1 ring-oo-gold/20">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-oo-gold/80 mb-2">
+                    a Nadja disse
+                  </p>
+                  <div className="text-oo-offwhite text-[14px] leading-[1.7] font-display whitespace-pre-wrap">
+                    {r.texto}
+                  </div>
+                </div>
+                <div className="mt-3 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => copy(r)}
+                    className="flex-1 inline-flex items-center justify-center gap-1.5 bg-oo-gold text-oo-burgundy py-2.5 rounded-full text-[10px] font-bold uppercase tracking-[0.2em]"
+                  >
+                    {copiedId === r.id ? (
+                      <>
+                        <Check className="size-3.5" />
+                        copiado
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="size-3.5" />
+                        copiar texto
+                      </>
+                    )}
+                  </button>
+                  {confirmDelete === r.id ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          setConfirmDelete(null);
+                          await onDelete(r.id);
+                        }}
+                        className="inline-flex items-center gap-1.5 bg-red-500/90 text-white py-2.5 px-3 rounded-full text-[10px] font-bold uppercase tracking-[0.2em]"
+                      >
+                        <Trash2 className="size-3.5" /> apagar mesmo
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmDelete(null)}
+                        className="inline-flex items-center gap-1.5 bg-white/10 text-oo-offwhite py-2.5 px-3 rounded-full text-[10px] font-bold uppercase tracking-[0.2em]"
+                      >
+                        <ArrowLeft className="size-3.5" /> cancelar
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmDelete(r.id)}
+                      className="inline-flex items-center gap-1.5 bg-white/10 ring-1 ring-white/10 text-oo-offwhite py-2.5 px-3 rounded-full text-[10px] font-bold uppercase tracking-[0.2em]"
+                    >
+                      <Trash2 className="size-3.5" />
+                      apagar
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </section>
   );
 }
 
