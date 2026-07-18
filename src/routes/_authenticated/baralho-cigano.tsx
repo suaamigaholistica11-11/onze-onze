@@ -7,7 +7,6 @@ import {
   ChevronUp,
   Layers,
   Shuffle,
-  RotateCcw,
   Sparkles,
   Loader2,
   Copy,
