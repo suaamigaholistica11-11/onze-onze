@@ -702,46 +702,5 @@ function HistoricoLeituras({
 }
 
 function MetodosDetalhados() {
-  const [open, setOpen] = useState(false);
-  return (
-    <section className="px-6 pb-16 animate-oo-enter">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="w-full flex items-center justify-between bg-oo-burgundy rounded-2xl px-4 py-3 ring-1 ring-white/10"
-      >
-        <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-oo-gold">
-          como ler cada método
-        </span>
-        {open ? (
-          <ChevronUp className="size-4 text-oo-gold/70" />
-        ) : (
-          <ChevronDown className="size-4 text-oo-gold/70" />
-        )}
-      </button>
-      {open && (
-        <div className="mt-3 space-y-3">
-          {SPREADS.map((s) => (
-            <div
-              key={s.id}
-              className="bg-oo-burgundy rounded-2xl ring-1 ring-white/10 p-4"
-            >
-              <p className="font-display font-bold text-base mb-1 text-oo-gold">{s.titulo}</p>
-              <p className="text-sm text-oo-offwhite/70 mb-2">{s.resumo}</p>
-              <ol className="text-sm text-oo-offwhite space-y-1 list-decimal list-inside">
-                {s.posicoes.slice(0, 10).map((p, i) => (
-                  <li key={i}>{p}</li>
-                ))}
-                {s.posicoes.length > 10 && (
-                  <li className="list-none text-oo-offwhite/50 italic">
-                    … e mais {s.posicoes.length - 10} casas.
-                  </li>
-                )}
-              </ol>
-            </div>
-          ))}
-        </div>
-      )}
-    </section>
-  );
+  return null;
 }
