@@ -109,11 +109,11 @@ function HomePage() {
 
       {/* Mensagem do dia */}
       <section className="px-6 mb-6 animate-oo-enter [animation-delay:80ms]">
-        <div className="bg-yellow-candy/70 p-6 rounded-[28px] ring-1 ring-black/5 relative overflow-hidden">
-          <span className="absolute -right-2 -top-2 font-display text-6xl opacity-20">
+        <div className="bg-yellow-candy text-oo-offwhite p-6 rounded-[28px] ring-1 ring-black/5 relative overflow-hidden">
+          <span className="absolute -right-2 -top-2 font-display text-6xl opacity-30">
             ✨
           </span>
-          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50 mb-3">
+          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-oo-offwhite/80 mb-3">
             Mensagem do dia
           </p>
           <p className="font-display text-lg leading-relaxed text-pretty min-h-[3rem] whitespace-pre-line">
@@ -174,14 +174,14 @@ function CurrentMoonCard({
 }) {
   if (!data) {
     return (
-      <div className="bg-gradient-to-br from-lilac/60 to-sky/40 p-5 rounded-[28px] ring-1 ring-black/5 h-32" />
+      <div className="bg-lilac p-5 rounded-[28px] ring-1 ring-black/5 h-32" />
     );
   }
   const img = MOON_IMAGES[data.fase];
   const label = PHASE_LABEL[data.fase];
   const meaning = PHASE_MEANING[data.fase];
   return (
-    <div className="bg-gradient-to-br from-lilac/60 to-sky/40 p-5 rounded-[28px] relative overflow-hidden ring-1 ring-black/5">
+    <div className="bg-lilac text-oo-offwhite p-5 rounded-[28px] relative overflow-hidden ring-1 ring-black/5">
       <div className="absolute -right-6 -top-8 size-40 bg-white/40 blur-2xl rounded-full" />
       <div className="relative z-10">
         <div className="flex items-start gap-4">
@@ -201,19 +201,19 @@ function CurrentMoonCard({
             <h3 className="font-display text-lg font-bold leading-tight">
               {label} em {data.signo}
             </h3>
-            <p className="text-[13px] text-ink/75 leading-relaxed mt-2">
+            <p className="text-[13px] text-oo-offwhite/90 leading-relaxed mt-2">
               {meaning}
             </p>
           </div>
         </div>
         {data.observacao && (
-          <p className="text-[12px] text-ink/70 leading-relaxed mt-3 italic">
+          <p className="text-[12px] text-oo-offwhite/85 leading-relaxed mt-3 italic">
             {data.observacao}
           </p>
         )}
         <Link
           to="/ritualzinho"
-          className="mt-4 inline-flex items-center gap-2 bg-ink text-white px-4 py-2 rounded-full text-[11px] font-bold uppercase tracking-[0.15em] hover:bg-ink/90 transition-colors"
+          className="mt-4 inline-flex items-center gap-2 bg-oo-offwhite text-ink px-4 py-2 rounded-full text-[11px] font-bold uppercase tracking-[0.15em] hover:bg-oo-offwhite/90 transition-colors"
         >
           <Moon className="size-3.5" />
           Ver ritualzinho
