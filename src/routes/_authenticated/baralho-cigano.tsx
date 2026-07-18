@@ -24,6 +24,7 @@ import {
   deleteNadjaReading,
 } from "@/lib/nadja.functions";
 import ciganaImg from "@/assets/cigana.png";
+import { VoiceInput } from "@/components/VoiceInput";
 
 export const Route = createFileRoute("/_authenticated/baralho-cigano")({
   head: () => ({
@@ -350,13 +351,11 @@ function BaralhoCiganoPage() {
                 <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-oo-gold/80 block mb-2">
                   conta pra Nadja o que te trouxe aqui (opcional)
                 </label>
-                <textarea
+                <VoiceInput
                   value={pergunta}
-                  onChange={(e) => setPergunta(e.target.value)}
-                  maxLength={1000}
-                  rows={3}
+                  onChange={(v) => setPergunta(v.slice(0, 1000))}
+                  multiline
                   placeholder="Ex: estou naquela situação indefinida com alguém e não sei se espero mais ou sigo…"
-                  className="w-full bg-slate-950/60 text-oo-offwhite placeholder:text-oo-offwhite/40 text-sm rounded-xl p-3 ring-1 ring-white/10 focus:ring-oo-gold/50 outline-none resize-none"
                 />
               </div>
               <p className="text-sm text-oo-offwhite/80 leading-relaxed mb-3">
@@ -368,9 +367,6 @@ function BaralhoCiganoPage() {
               </p>
               <div className="relative rounded-[32px] bg-gradient-to-br from-purple-950/90 via-indigo-950/90 to-slate-950/90 p-5 border border-purple-300/20 shadow-[0_0_60px_-12px_rgba(139,92,246,0.25)] backdrop-blur-sm">
                 <div className="rounded-[24px] bg-slate-950/60 border border-oo-gold/20 p-4 shadow-inner">
-                  <p className="text-center text-[10px] font-bold uppercase tracking-[0.25em] text-oo-gold/60 mb-3">
-                    área das cartas
-                  </p>
                   {shuffling && <ShufflingDeckOverlay />}
                   <div
                     className={`grid gap-2 ${
