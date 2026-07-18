@@ -13,6 +13,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as ApiTranscribeRouteImport } from './routes/api/transcribe'
 import { Route as AuthenticatedRitualzinhoRouteImport } from './routes/_authenticated/ritualzinho'
 import { Route as AuthenticatedPlanoDeFundoRouteImport } from './routes/_authenticated/plano-de-fundo'
 import { Route as AuthenticatedPiramideRouteImport } from './routes/_authenticated/piramide'
@@ -40,6 +41,11 @@ const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AuthenticatedRoute,
+} as any)
+const ApiTranscribeRoute = ApiTranscribeRouteImport.update({
+  id: '/api/transcribe',
+  path: '/api/transcribe',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRitualzinhoRoute =
   AuthenticatedRitualzinhoRouteImport.update({
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/piramide': typeof AuthenticatedPiramideRoute
   '/plano-de-fundo': typeof AuthenticatedPlanoDeFundoRoute
   '/ritualzinho': typeof AuthenticatedRitualzinhoRoute
+  '/api/transcribe': typeof ApiTranscribeRoute
   '/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
 }
 export interface FileRoutesByTo {
@@ -110,6 +117,7 @@ export interface FileRoutesByTo {
   '/piramide': typeof AuthenticatedPiramideRoute
   '/plano-de-fundo': typeof AuthenticatedPlanoDeFundoRoute
   '/ritualzinho': typeof AuthenticatedRitualzinhoRoute
+  '/api/transcribe': typeof ApiTranscribeRoute
   '/': typeof AuthenticatedIndexRoute
   '/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
 }
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/_authenticated/piramide': typeof AuthenticatedPiramideRoute
   '/_authenticated/plano-de-fundo': typeof AuthenticatedPlanoDeFundoRoute
   '/_authenticated/ritualzinho': typeof AuthenticatedRitualzinhoRoute
+  '/api/transcribe': typeof ApiTranscribeRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/mapa-astral/$id': typeof AuthenticatedMapaAstralIdRoute
 }
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/piramide'
     | '/plano-de-fundo'
     | '/ritualzinho'
+    | '/api/transcribe'
     | '/mapa-astral/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -153,6 +163,7 @@ export interface FileRouteTypes {
     | '/piramide'
     | '/plano-de-fundo'
     | '/ritualzinho'
+    | '/api/transcribe'
     | '/'
     | '/mapa-astral/$id'
   id:
@@ -167,6 +178,7 @@ export interface FileRouteTypes {
     | '/_authenticated/piramide'
     | '/_authenticated/plano-de-fundo'
     | '/_authenticated/ritualzinho'
+    | '/api/transcribe'
     | '/_authenticated/'
     | '/_authenticated/mapa-astral/$id'
   fileRoutesById: FileRoutesById
@@ -175,6 +187,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ApiTranscribeRoute: typeof ApiTranscribeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -206,6 +219,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthenticatedIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/api/transcribe': {
+      id: '/api/transcribe'
+      path: '/api/transcribe'
+      fullPath: '/api/transcribe'
+      preLoaderRoute: typeof ApiTranscribeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/ritualzinho': {
       id: '/_authenticated/ritualzinho'
@@ -310,6 +330,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ApiTranscribeRoute: ApiTranscribeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
