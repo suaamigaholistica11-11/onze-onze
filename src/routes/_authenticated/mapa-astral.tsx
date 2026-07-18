@@ -262,7 +262,7 @@ function MapaAstralListPage() {
           <div className="bg-lilac/40 rounded-[28px] p-6 ring-1 ring-black/5 text-center">
             <Lock className="size-6 mx-auto mb-2" />
             <p className="font-display text-lg font-bold leading-snug">
-              ops! Acho que você já criou e excluiu muito mapas por aqui. Amanhã tem mais.
+              ops! Acho que você já criou e excluiu muitos mapas por aqui. Amanhã tem mais.
             </p>
           </div>
         ) : limiteAtingido ? (
