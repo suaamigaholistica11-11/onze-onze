@@ -143,7 +143,7 @@ function HomePage() {
             ) : (
               <Sun className="size-3.5" />
             )}
-            {theme === "dark" ? "Tema escuro" : "Tema claro"}
+            {theme === "dark" ? "Voltar ao tema claro" : "Ativar tema escuro"}
           </button>
         </div>
       </section>
