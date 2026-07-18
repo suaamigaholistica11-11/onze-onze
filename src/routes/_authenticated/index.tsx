@@ -11,7 +11,7 @@ import { useAuth } from "@/lib/auth";
 import { getTransitsForToday } from "@/lib/transits.functions";
 import { buildDailyEnergy } from "@/lib/daily-energy";
 import {
-  getCurrentMoonPhase,
+  getCurrentMoon,
   PHASE_LABEL,
   PHASE_MEANING,
   type MoonPhaseGroup,
@@ -87,9 +87,9 @@ function HomePage() {
     ? buildDailyEnergy(transitsData.transits)
     : null;
 
-  const [moonPhase, setMoonPhase] = useState<ReturnType<typeof getCurrentMoonPhase> | null>(null);
+  const [moonPhase, setMoonPhase] = useState<ReturnType<typeof getCurrentMoon> | null>(null);
   useEffect(() => {
-    setMoonPhase(getCurrentMoonPhase());
+    setMoonPhase(getCurrentMoon());
   }, []);
 
   return (
@@ -124,7 +124,7 @@ function HomePage() {
 
       {/* Lua */}
       <section className="px-6 mb-6 animate-oo-enter [animation-delay:160ms]">
-        <CurrentMoonCard data={moonPhase?.current ?? null} />
+        <CurrentMoonCard data={moonPhase} />
       </section>
 
       {/* Energia do Dia */}
@@ -169,7 +169,7 @@ function CurrentMoonCard({
   data: {
     fase: MoonPhaseGroup;
     signo: string;
-    observacao: string;
+    observacao?: string;
   } | null;
 }) {
   if (!data) {
@@ -206,9 +206,11 @@ function CurrentMoonCard({
             </p>
           </div>
         </div>
-        <p className="text-[12px] text-ink/70 leading-relaxed mt-3 italic">
-          {data.observacao}
-        </p>
+        {data.observacao && (
+          <p className="text-[12px] text-ink/70 leading-relaxed mt-3 italic">
+            {data.observacao}
+          </p>
+        )}
         <Link
           to="/ritualzinho"
           className="mt-4 inline-flex items-center gap-2 bg-ink text-white px-4 py-2 rounded-full text-[11px] font-bold uppercase tracking-[0.15em] hover:bg-ink/90 transition-colors"
