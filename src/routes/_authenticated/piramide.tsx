@@ -984,3 +984,141 @@ function TriadeRadarImpl({ themes, progress }: { themes: string[]; progress: Pro
     </svg>
   );
 }
+
+const MESES_ABREV = [
+  "Jan", "Fev", "Mar", "Abr", "Mai", "Jun",
+  "Jul", "Ago", "Set", "Out", "Nov", "Dez",
+] as const;
+
+function EvolutionHistoryDialog({
+  open,
+  onClose,
+  progress,
+  themes,
+}: {
+  open: boolean;
+  onClose: () => void;
+  progress: ProgressRow[];
+  themes: string[];
+}) {
+  // Agrupa entradas por ano-mês.
+  const byMonth = new Map<string, ProgressRow[]>();
+  for (const p of progress) {
+    const d = new Date(p.entry_date + "T00:00:00");
+    const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, "0")}`;
+    const arr = byMonth.get(key);
+    if (arr) arr.push(p);
+    else byMonth.set(key, [p]);
+  }
+
+  // Ordena por data crescente (Jan, Fev, Mar...).
+  const monthKeys = [...byMonth.keys()].sort();
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      <DialogContent className="rounded-[28px] max-h-[85vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="font-display text-2xl">Histórico da Evolução</DialogTitle>
+          <DialogDescription className="text-sm text-ink/70 leading-relaxed">
+            Seus check-ins organizados mês a mês. Cada bolinha é um dia.
+          </DialogDescription>
+        </DialogHeader>
+
+        {monthKeys.length === 0 ? (
+          <p className="text-sm text-ink/50 italic text-center py-6">
+            Ainda não tem check-in por aqui. Comece pelo primeiro passinho ✨
+          </p>
+        ) : (
+          <div className="space-y-5 pt-2">
+            {monthKeys.map((key) => {
+              const [yy, mm] = key.split("-").map(Number);
+              const label = `${MESES_ABREV[mm]} ${yy}`;
+              const rows = byMonth.get(key)!;
+              const daysInMonth = new Date(yy, mm + 1, 0).getDate();
+
+              // Descobre temas presentes nesse mês (prioriza os 3 atuais).
+              const monthThemes = Array.from(
+                new Set([
+                  ...themes.filter((t) => rows.some((r) => r.theme === t)),
+                  ...rows.map((r) => r.theme),
+                ]),
+              );
+
+              return (
+                <div key={key} className="bg-white rounded-[24px] ring-1 ring-black/5 p-4">
+                  <p className="font-display text-base font-bold mb-3">{label}</p>
+                  <div className="space-y-3">
+                    {monthThemes.map((tid) => {
+                      const t = TEMAS.find((x) => x.id === tid);
+                      const nome = t?.nome ?? tid;
+                      const emoji = t?.emoji ?? "•";
+                      const byDay = new Map<number, number>();
+                      rows
+                        .filter((r) => r.theme === tid)
+                        .forEach((r) => {
+                          const d = new Date(r.entry_date + "T00:00:00");
+                          byDay.set(d.getDate(), r.value);
+                        });
+                      return (
+                        <div key={tid}>
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="text-xs font-display font-bold">
+                              <span className="mr-1">{emoji}</span>
+                              {nome}
+                            </span>
+                            <span className="text-[10px] text-ink/50">
+                              {byDay.size} check-in{byDay.size === 1 ? "" : "s"}
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-1">
+                            {Array.from({ length: daysInMonth }, (_, i) => {
+                              const day = i + 1;
+                              const value = byDay.get(day);
+                              const filled = !!value;
+                              return (
+                                <div
+                                  key={day}
+                                  className="size-3.5 rounded-full transition-all"
+                                  style={{
+                                    backgroundColor: filled
+                                      ? BAR_COLORS[value! - 1]
+                                      : "var(--ink)",
+                                    opacity: filled ? 1 : 0.15,
+                                  }}
+                                  title={
+                                    value
+                                      ? `Dia ${day}: ${value}/5`
+                                      : `Dia ${day}: sem check-in`
+                                  }
+                                />
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+
+            <div className="flex flex-wrap gap-2 pt-2 border-t border-ink/5">
+              {BAR_COLORS.map((c, i) => (
+                <div key={i} className="flex items-center gap-1.5">
+                  <span
+                    className="size-3 rounded-sm"
+                    style={{ backgroundColor: c }}
+                    aria-hidden
+                  />
+                  <span className="text-[10px] text-ink/60">
+                    {i + 1} {BAR_LABELS[i]}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}
