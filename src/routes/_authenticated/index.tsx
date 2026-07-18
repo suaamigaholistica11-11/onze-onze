@@ -4,14 +4,18 @@ import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { AppShell } from "@/components/AppShell";
-import { Countdown } from "@/components/Countdown";
 import { SIGNS } from "@/lib/onze-data";
 import { getCachedDailyMessage } from "@/lib/daily-message";
 import { getSaudacao } from "@/lib/greeting";
 import { useAuth } from "@/lib/auth";
-import { getTransitsForToday, getMoonForToday } from "@/lib/transits.functions";
+import { getTransitsForToday } from "@/lib/transits.functions";
 import { buildDailyEnergy } from "@/lib/daily-energy";
-import { groupFromPhase, PHASE_GROUP_LABEL } from "@/lib/rituals";
+import {
+  getCurrentMoonPhase,
+  PHASE_LABEL,
+  PHASE_MEANING,
+  type MoonPhaseGroup,
+} from "@/lib/moon-calendar";
 import moonNewImg from "@/assets/moon-new.png";
 import moonCrescentImg from "@/assets/moon-crescent.png";
 import moonFullImg from "@/assets/moon-full.png";
@@ -83,38 +87,10 @@ function HomePage() {
     ? buildDailyEnergy(transitsData.transits)
     : null;
 
-  const fetchMoon = useServerFn(getMoonForToday);
-  const { data: moonData } = useQuery({
-    queryKey: ["moon-today"],
-    queryFn: () => fetchMoon(),
-    staleTime: 1000 * 60 * 60,
-  });
-
-  // Banner de notificação quando entramos em Lua Nova ou Lua Cheia.
-  const [showRitualBanner, setShowRitualBanner] = useState(false);
-  const [ritualBannerText, setRitualBannerText] = useState("");
+  const [moonPhase, setMoonPhase] = useState<ReturnType<typeof getCurrentMoonPhase> | null>(null);
   useEffect(() => {
-    if (!moonData) return;
-    const group = groupFromPhase(moonData.fase.key);
-    if (group !== "nova" && group !== "cheia") return;
-    const sig = `${group}:${moonData.signo}`;
-    try {
-      const seen = localStorage.getItem("oo:ritual-phase-notif");
-      if (seen === sig) return;
-      setRitualBannerText(
-        `${PHASE_GROUP_LABEL[group]} em ${moonData.signo} chegou! Tem ritualzinho novo esperando por você 🌙`,
-      );
-      setShowRitualBanner(true);
-    } catch {}
-  }, [moonData]);
-  const dismissRitualBanner = () => {
-    if (!moonData) return;
-    const group = groupFromPhase(moonData.fase.key);
-    try {
-      localStorage.setItem("oo:ritual-phase-notif", `${group}:${moonData.signo}`);
-    } catch {}
-    setShowRitualBanner(false);
-  };
+    setMoonPhase(getCurrentMoonPhase());
+  }, []);
 
   return (
     <AppShell glyph={signoUsuario.glyph}>
@@ -137,34 +113,6 @@ function HomePage() {
         </p>
       </header>
 
-      {showRitualBanner && (
-        <section className="px-6 mb-4 animate-oo-enter">
-          <div className="bg-gradient-to-br from-lilac/70 to-peach/60 p-4 rounded-[24px] ring-1 ring-black/5 flex items-start gap-3">
-            <div className="size-9 rounded-full bg-white/70 flex items-center justify-center shrink-0">
-              <Moon className="size-4 text-ink" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm leading-relaxed text-ink/90 mb-2">{ritualBannerText}</p>
-              <Link
-                to="/ritualzinho"
-                onClick={dismissRitualBanner}
-                className="inline-flex items-center gap-1.5 bg-ink text-white px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-[0.15em] hover:bg-ink/90 transition-colors"
-              >
-                Ver ritual
-              </Link>
-            </div>
-            <button
-              type="button"
-              onClick={dismissRitualBanner}
-              className="p-1 rounded-full hover:bg-white/40 transition-colors shrink-0"
-              aria-label="Dispensar"
-            >
-              <X className="size-4 text-ink/60" />
-            </button>
-          </div>
-        </section>
-      )}
-
       {/* Mensagem do dia */}
       <section className="px-6 mb-6 animate-oo-enter [animation-delay:80ms]">
         <div className="bg-yellow-candy/70 p-6 rounded-[28px] ring-1 ring-black/5 relative overflow-hidden">
@@ -182,7 +130,7 @@ function HomePage() {
 
       {/* Lua */}
       <section className="px-6 mb-6 animate-oo-enter [animation-delay:160ms]">
-        <MoonPanel proximas={moonData?.proximas ?? null} />
+        <CurrentMoonCard data={moonPhase?.current ?? null} />
       </section>
 
       {/* Energia do Dia */}
@@ -223,38 +171,40 @@ function HomePage() {
 
 type ShortcutBg = "sky" | "mint" | "yellow-candy" | "peach";
 
-type MoonPhaseKey = "Lua Nova" | "Quarto Crescente" | "Lua Cheia" | "Quarto Minguante";
-
-const MOON_IMAGES: Record<MoonPhaseKey, string> = {
-  "Lua Nova": moonNewImg,
-  "Quarto Crescente": moonCrescentImg,
-  "Lua Cheia": moonFullImg,
-  "Quarto Minguante": moonWaningImg,
+const MOON_IMAGES: Record<MoonPhaseGroup, string> = {
+  nova: moonNewImg,
+  crescente: moonCrescentImg,
+  cheia: moonFullImg,
+  minguante: moonWaningImg,
 };
 
-function MoonPanel({
-  proximas,
+function CurrentMoonCard({
+  data,
 }: {
-  proximas:
-    | Array<{ nome: string; glyph: string; dataISO: string; diasRestantes: number }>
-    | null;
+  data: {
+    fase: MoonPhaseGroup;
+    signo: string;
+    observacao: string;
+  } | null;
 }) {
-  // A próxima fase é a mais próxima em dias restantes.
-  const next = proximas
-    ? [...proximas].sort((a, b) => a.diasRestantes - b.diasRestantes)[0]
-    : null;
-  const img = next ? MOON_IMAGES[next.nome as MoonPhaseKey] : null;
-
+  if (!data) {
+    return (
+      <div className="bg-gradient-to-br from-lilac/60 to-sky/40 p-5 rounded-[28px] ring-1 ring-black/5 h-32" />
+    );
+  }
+  const img = MOON_IMAGES[data.fase];
+  const label = PHASE_LABEL[data.fase];
+  const meaning = PHASE_MEANING[data.fase];
   return (
     <div className="bg-gradient-to-br from-lilac/60 to-sky/40 p-5 rounded-[28px] relative overflow-hidden ring-1 ring-black/5">
       <div className="absolute -right-6 -top-8 size-40 bg-white/40 blur-2xl rounded-full" />
-      <div className="relative z-10 flex items-center gap-4">
-        {img && (
+      <div className="relative z-10">
+        <div className="flex items-start gap-4">
           <div className="relative shrink-0">
             <div className="absolute inset-0 -m-4 rounded-full bg-white/50 blur-2xl" aria-hidden />
             <img
               src={img}
-              alt={`Imagem realista de ${next!.nome.toLowerCase()}`}
+              alt={`Imagem realista de ${label.toLowerCase()}`}
               width={512}
               height={512}
               className="relative size-24 object-contain drop-shadow-[0_4px_18px_rgba(0,0,0,0.3)]"
@@ -262,28 +212,28 @@ function MoonPanel({
             <span aria-hidden className="absolute top-2 left-3 size-1.5 rounded-full bg-white shadow-[0_0_6px_2px_rgba(255,255,255,0.85)] animate-oo-twinkle-a" />
             <span aria-hidden className="absolute bottom-3 right-3 size-1 rounded-full bg-white shadow-[0_0_5px_2px_rgba(255,255,255,0.7)] animate-oo-twinkle-c" />
           </div>
-        )}
-        <div className="flex-1 min-w-0">
-          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50 mb-1">
-            Próxima lunação
-          </p>
-          <h3 className="font-display text-base font-bold leading-tight mb-2">
-            {next ? next.nome : "Ciclo lunar"}
-          </h3>
-          {next && (
-            <>
-              <Countdown target={new Date(next.dataISO)} />
-              <p className="text-[11px] text-ink/60 mt-2">
-                {new Date(next.dataISO).toLocaleString("pt-BR", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-            </>
-          )}
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50 mb-1">
+              Fase de agora
+            </p>
+            <h3 className="font-display text-lg font-bold leading-tight">
+              {label} em {data.signo}
+            </h3>
+            <p className="text-[13px] text-ink/75 leading-relaxed mt-2">
+              {meaning}
+            </p>
+          </div>
         </div>
+        <p className="text-[12px] text-ink/70 leading-relaxed mt-3 italic">
+          {data.observacao}
+        </p>
+        <Link
+          to="/ritualzinho"
+          className="mt-4 inline-flex items-center gap-2 bg-ink text-white px-4 py-2 rounded-full text-[11px] font-bold uppercase tracking-[0.15em] hover:bg-ink/90 transition-colors"
+        >
+          <Moon className="size-3.5" />
+          Ver ritualzinho
+        </Link>
       </div>
     </div>
   );
