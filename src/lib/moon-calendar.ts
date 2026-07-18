@@ -19,6 +19,8 @@ function e(y: number, m: number, d: number, fase: MoonPhaseGroup, signo: string,
 
 export const MOON_CALENDAR: MoonCalendarEntry[] = [
   // 2026
+  e(2026, 7, 14, "nova", "Câncer", "Superlua em Câncer. Momento fértil pra plantar intenções ligadas ao lar, família e cuidado emocional."),
+  e(2026, 7, 18, "crescente", "Virgem", "A energia começa a crescer. Organize a rotina e dê os primeiros passos práticos no que você plantou."),
   e(2026, 7, 21, "crescente", "Libra", "Foque em parcerias e diplomacia nos projetos."),
   e(2026, 7, 29, "cheia", "Aquário", "Clímax em projetos coletivos e ideias inovadoras."),
   e(2026, 8, 5, "minguante", "Touro", "Silencie e desapegue de teimosias ou gastos desnecessários."),

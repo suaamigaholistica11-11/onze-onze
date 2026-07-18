@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Sparkles, Triangle, Star, Moon } from "lucide-react";
+import { Moon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -102,15 +102,9 @@ function HomePage() {
         />
       )}
       <header className="px-6 pt-10 pb-6 animate-oo-enter">
-        <p className="text-xs font-medium uppercase tracking-[0.25em] text-ink/40 mb-2">
-          {saudacao.periodo}
-        </p>
         <h1 className="font-display text-3xl font-bold tracking-tight">
           {saudacao.titulo}
         </h1>
-        <p className="font-display text-2xl italic text-ink/70 mt-1">
-          {saudacao.subtitulo}
-        </p>
       </header>
 
       {/* Mensagem do dia */}
@@ -158,18 +152,9 @@ function HomePage() {
         </div>
       </section>
 
-      {/* Atalhos */}
-      <section className="px-6 grid grid-cols-2 gap-3 animate-oo-enter [animation-delay:320ms]">
-        <Shortcut to="/mapa-astral" bg="sky" label="Mapa Astral" Icon={Star} />
-        <Shortcut to="/ceu-hoje" bg="peach" label="O Céu Hoje" Icon={Sparkles} />
-        <Shortcut to="/piramide" bg="mint" label="Pirâmide" Icon={Triangle} />
-        <Shortcut to="/ritualzinho" bg="yellow-candy" label="Bora de ritualzinho?" Icon={Moon} />
-      </section>
     </AppShell>
   );
 }
-
-type ShortcutBg = "sky" | "mint" | "yellow-candy" | "peach";
 
 const MOON_IMAGES: Record<MoonPhaseGroup, string> = {
   nova: moonNewImg,
@@ -213,9 +198,6 @@ function CurrentMoonCard({
             <span aria-hidden className="absolute bottom-3 right-3 size-1 rounded-full bg-white shadow-[0_0_5px_2px_rgba(255,255,255,0.7)] animate-oo-twinkle-c" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/50 mb-1">
-              Fase de agora
-            </p>
             <h3 className="font-display text-lg font-bold leading-tight">
               {label} em {data.signo}
             </h3>
@@ -236,35 +218,5 @@ function CurrentMoonCard({
         </Link>
       </div>
     </div>
-  );
-}
-
-function Shortcut({
-  to,
-  bg,
-  label,
-  Icon,
-}: {
-  to: string;
-  bg: ShortcutBg;
-  label: string;
-  Icon: typeof Sparkles;
-}) {
-  const bgClass: Record<ShortcutBg, string> = {
-    sky: "bg-sky",
-    mint: "bg-mint",
-    "yellow-candy": "bg-yellow-candy",
-    peach: "bg-peach",
-  };
-  return (
-    <Link
-      to={to}
-      className={`${bgClass[bg]} p-4 rounded-3xl aspect-square flex flex-col justify-between ring-1 ring-black/5 hover:scale-[1.02] transition-transform`}
-    >
-      <div className="size-9 bg-white/70 rounded-xl flex items-center justify-center">
-        <Icon className="size-4 text-ink" />
-      </div>
-      <span className="font-display font-bold text-base">{label}</span>
-    </Link>
   );
 }
