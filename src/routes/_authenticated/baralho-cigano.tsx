@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -17,8 +17,7 @@ import {
 } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { CIGANO_CARDS, shuffle, type CiganoCard } from "@/lib/cigano-cards";
-import { startShuffleSound, stopShuffleSound } from "@/lib/shuffle-sound";
-import ciganaShufflingImg from "@/assets/cigana-shuffling.png";
+import { preloadShuffleSound, startShuffleSound, stopShuffleSound } from "@/lib/shuffle-sound";
 import {
   gerarLeituraNadja,
   listNadjaReadings,
@@ -121,26 +120,29 @@ function BaralhoCiganoPage() {
     staleTime: 30_000,
   });
 
-  useEffect(() => () => stopShuffleSound(), []);
+  useEffect(() => {
+    preloadShuffleSound();
+    return () => stopShuffleSound();
+  }, []);
 
   const startShuffle = () => {
     setPicked([]);
     setShuffling(true);
     startShuffleSound();
-    // embaralha várias vezes com som e animação (~2.6s)
-    const rounds = 12;
+    // embaralha várias vezes com som e animação visível
+    const rounds = 18;
     let i = 0;
     const step = () => {
       setDeck((d) => shuffle(d));
       i++;
       if (i < rounds) {
-        shuffleTimer.current = window.setTimeout(step, 220);
+        shuffleTimer.current = window.setTimeout(step, 180);
       } else {
         stopShuffleSound();
         setShuffling(false);
       }
     };
-    shuffleTimer.current = window.setTimeout(step, 220);
+    shuffleTimer.current = window.setTimeout(step, 180);
   };
 
   const pickCard = (idx: number) => {
@@ -311,6 +313,7 @@ function BaralhoCiganoPage() {
             <div className="flex gap-2">
               <button
                 type="button"
+                onPointerDown={preloadShuffleSound}
                 onClick={startShuffle}
                 disabled={shuffling}
                 className="inline-flex items-center gap-1.5 bg-oo-gold text-oo-burgundy px-3 py-2 rounded-full text-[10px] font-bold uppercase tracking-[0.18em] disabled:opacity-50"
@@ -368,23 +371,7 @@ function BaralhoCiganoPage() {
                   <p className="text-center text-[10px] font-bold uppercase tracking-[0.25em] text-oo-gold/60 mb-3">
                     área das cartas
                   </p>
-                  {shuffling && (
-                    <div className="absolute inset-0 z-20 flex items-center justify-center rounded-[32px] overflow-hidden pointer-events-none">
-                      <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm" />
-                      <img
-                        src={ciganaShufflingImg}
-                        alt="Cigana Nadja embaralhando as cartas"
-                        width={1024}
-                        height={1024}
-                        loading="eager"
-                        decoding="sync"
-                        className="relative z-10 w-[85%] max-w-[380px] rounded-2xl ring-1 ring-oo-gold/40 shadow-[0_0_60px_-8px_rgba(201,154,68,0.55)] animate-oo-shuffle"
-                      />
-                      <p className="absolute bottom-6 z-10 text-[10px] font-bold uppercase tracking-[0.3em] text-oo-gold/90 animate-pulse">
-                        embaralhando…
-                      </p>
-                    </div>
-                  )}
+                  {shuffling && <ShufflingDeckOverlay />}
                   <div
                     className={`grid gap-2 ${
                       shuffling ? "animate-pulse" : ""
@@ -515,6 +502,58 @@ function BaralhoCiganoPage() {
         </>
       )}
     </AppShell>
+  );
+}
+
+const SHUFFLE_ANIMATED_CARDS = Array.from({ length: 18 }, (_, i) => i);
+
+function ShufflingDeckOverlay() {
+  return (
+    <div className="absolute inset-0 z-20 rounded-[32px] overflow-hidden pointer-events-none" aria-live="polite">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_38%,rgba(201,154,68,0.22),transparent_42%),linear-gradient(135deg,rgba(15,23,42,0.88),rgba(46,16,101,0.9),rgba(15,23,42,0.92))] backdrop-blur-[2px]" />
+
+      <div className="absolute inset-x-4 top-8 bottom-14 rounded-[28px] border border-oo-gold/25 bg-slate-950/35 shadow-inner" />
+
+      <div className="absolute left-5 top-[42%] h-20 w-24 rounded-full bg-oo-offwhite/12 blur-[1px] animate-oo-hand-left" />
+      <div className="absolute right-5 top-[42%] h-20 w-24 rounded-full bg-oo-offwhite/12 blur-[1px] animate-oo-hand-right" />
+
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="relative h-56 w-full max-w-[330px]">
+          {SHUFFLE_ANIMATED_CARDS.map((card) => {
+            const lane = card % 6;
+            const fromLeft = card % 2 === 0;
+            const animationClass = fromLeft ? "animate-oo-card-shuffle-left" : "animate-oo-card-shuffle-right";
+            return (
+              <span
+                key={card}
+                className={`absolute left-1/2 top-1/2 block h-24 w-16 rounded-xl border border-oo-gold/40 shadow-[0_14px_28px_rgba(0,0,0,0.36)] ${animationClass}`}
+                style={{
+                  marginLeft: -32,
+                  marginTop: -48,
+                  animationDelay: `${card * 70}ms`,
+                  zIndex: card,
+                  ["--oo-card-x" as string]: `${(lane - 2.5) * 17}px`,
+                  ["--oo-card-y" as string]: `${((card % 4) - 1.5) * 8}px`,
+                  background:
+                    "repeating-linear-gradient(45deg, #6b4a8b 0 7px, #8c65aa 7px 14px), radial-gradient(circle at 50% 50%, rgba(250,245,236,0.22), transparent 58%)",
+                  backgroundBlendMode: "overlay",
+                }}
+              >
+                <span className="flex h-full w-full items-center justify-center rounded-xl border border-white/25 text-oo-offwhite/80 font-display text-lg">
+                  ✦
+                </span>
+              </span>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-slate-950/70 px-4 py-2 ring-1 ring-oo-gold/30">
+        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-oo-gold animate-pulse">
+          embaralhando…
+        </p>
+      </div>
+    </div>
   );
 }
 

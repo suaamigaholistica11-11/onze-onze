@@ -305,3 +305,34 @@
   100% { transform: translate(0,0) rotate(0deg); }
 }
 .animate-oo-shuffle { animation: oo-shuffle 0.45s ease-in-out infinite; }
+
+@keyframes oo-card-shuffle-left {
+  0%   { opacity: 0; transform: translate(calc(-132px + var(--oo-card-x, 0px)), calc(-12px + var(--oo-card-y, 0px))) rotate(-17deg) scale(0.96); }
+  12%  { opacity: 1; }
+  35%  { transform: translate(calc(-56px + var(--oo-card-x, 0px)), calc(-42px + var(--oo-card-y, 0px))) rotate(10deg) scale(1.04); }
+  62%  { transform: translate(calc(28px + var(--oo-card-x, 0px)), calc(18px + var(--oo-card-y, 0px))) rotate(-6deg) scale(1); }
+  100% { opacity: 1; transform: translate(calc(95px + var(--oo-card-x, 0px)), calc(4px + var(--oo-card-y, 0px))) rotate(16deg) scale(0.98); }
+}
+
+@keyframes oo-card-shuffle-right {
+  0%   { opacity: 0; transform: translate(calc(132px + var(--oo-card-x, 0px)), calc(12px + var(--oo-card-y, 0px))) rotate(17deg) scale(0.96); }
+  12%  { opacity: 1; }
+  35%  { transform: translate(calc(56px + var(--oo-card-x, 0px)), calc(-38px + var(--oo-card-y, 0px))) rotate(-10deg) scale(1.04); }
+  62%  { transform: translate(calc(-28px + var(--oo-card-x, 0px)), calc(20px + var(--oo-card-y, 0px))) rotate(6deg) scale(1); }
+  100% { opacity: 1; transform: translate(calc(-95px + var(--oo-card-x, 0px)), calc(2px + var(--oo-card-y, 0px))) rotate(-16deg) scale(0.98); }
+}
+
+@keyframes oo-hand-left {
+  0%, 100% { transform: translate(-18px, 12px) rotate(12deg); opacity: 0.5; }
+  45%      { transform: translate(58px, -8px) rotate(-5deg); opacity: 0.72; }
+}
+
+@keyframes oo-hand-right {
+  0%, 100% { transform: translate(18px, 12px) rotate(-12deg); opacity: 0.5; }
+  45%      { transform: translate(-58px, -8px) rotate(5deg); opacity: 0.72; }
+}
+
+.animate-oo-card-shuffle-left { animation: oo-card-shuffle-left 0.95s cubic-bezier(0.36, 0, 0.2, 1) infinite alternate; }
+.animate-oo-card-shuffle-right { animation: oo-card-shuffle-right 0.95s cubic-bezier(0.36, 0, 0.2, 1) infinite alternate; }
+.animate-oo-hand-left { animation: oo-hand-left 0.95s ease-in-out infinite; }
+.animate-oo-hand-right { animation: oo-hand-right 0.95s ease-in-out infinite; }
