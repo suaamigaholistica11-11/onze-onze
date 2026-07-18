@@ -738,21 +738,20 @@ function CheckinDialog({
             <label className="text-sm text-ink/80 block mb-2">
               Um passo que posso dar amanhã
             </label>
-            <Input
+            <VoiceInput
               value={nextStep}
-              onChange={(e) => setNextStep(e.target.value)}
-              placeholder='ex.: "Ligar pra pessoa X", "Andar 15 min", "Estudar 30 min"'
-              className="rounded-xl"
+              onChange={setNextStep}
+              placeholder='digite ou grave um áudio: "Ligar pra pessoa X", "Andar 15 min"...'
             />
           </div>
 
           <div>
             <label className="text-sm text-ink/80 block mb-2">Observações rápidas (opcional)</label>
-            <Textarea
+            <VoiceInput
+              multiline
               value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Como você se sentiu hoje?"
-              className="rounded-xl min-h-[80px]"
+              onChange={setComment}
+              placeholder="Como você se sentiu hoje? Escreve ou manda um áudio..."
             />
           </div>
 
