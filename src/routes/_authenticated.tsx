@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useAuth } from "@/lib/auth";
 import { PlanetsLoader } from "@/components/PlanetsLoader";
 import { useTheme } from "@/lib/bg-preference";
+import { HiddenPlayer } from "@/components/HiddenPlayer";
 
 export const Route = createFileRoute("/_authenticated")({
   component: AuthGuard,
@@ -23,5 +24,10 @@ function AuthGuard() {
     return <PlanetsLoader />;
   }
 
-  return <Outlet />;
+  return (
+    <>
+      <HiddenPlayer />
+      <Outlet />
+    </>
+  );
 }
