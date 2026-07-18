@@ -8,10 +8,19 @@ export function startShuffleSound(): () => void {
   if (!audioEl) {
     audioEl = new Audio(shuffleUrl);
     audioEl.loop = true;
-    audioEl.volume = 0.7;
+    audioEl.volume = 0.75;
+    audioEl.preload = "auto";
+    // força a carga do arquivo
+    try { audioEl.load(); } catch {}
   }
-  audioEl.currentTime = 0;
-  void audioEl.play().catch(() => {});
+  try { audioEl.currentTime = 0; } catch {}
+  const p = audioEl.play();
+  if (p && typeof p.catch === "function") {
+    p.catch((err) => {
+      // eslint-disable-next-line no-console
+      console.warn("[shuffle-sound] play falhou:", err);
+    });
+  }
   return stopShuffleSound;
 }
 
