@@ -182,6 +182,14 @@ function HomePage() {
               </span>
             ))}
           </div>
+          <a
+            href="https://masatraologico-gabiastral.netlify.app/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-5 inline-flex items-center gap-2 bg-ink text-white px-5 py-3 rounded-full text-[11px] font-bold uppercase tracking-[0.15em] hover:bg-ink/90 transition-colors"
+          >
+            Quero saber quais são minhas energias astrais
+          </a>
         </div>
       </section>
 
