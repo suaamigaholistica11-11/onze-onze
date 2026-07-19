@@ -40,6 +40,7 @@ function LoginPage() {
   const [name, setName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (!loading && session) navigate({ to: "/" });
@@ -153,7 +154,7 @@ function LoginPage() {
           <h1 className="font-display text-3xl font-bold tracking-tight">
             onze<span className="text-lilac">·</span>onze
           </h1>
-          <p className="text-sm text-ink/60 mt-2">do universo pra você ✨</p>
+          <p className="text-sm text-ink/60 mt-2 text-center">Do universo pra você ✨</p>
         </div>
 
         <div className="flex bg-ink/5 rounded-full p-1 mb-6">
@@ -212,15 +213,25 @@ function LoginPage() {
             required
             className="w-full bg-white border border-black/10 rounded-2xl px-4 py-3 text-sm outline-none focus:border-lilac"
           />
-          <input
-            type="password"
-            placeholder="Senha"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            className="w-full bg-white border border-black/10 rounded-2xl px-4 py-3 text-sm outline-none focus:border-lilac"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              className="w-full bg-white border border-black/10 rounded-2xl px-4 py-3 pr-11 text-sm outline-none focus:border-lilac"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+              className="absolute inset-y-0 right-3 flex items-center text-ink/50 hover:text-ink"
+            >
+              {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+            </button>
+          </div>
 
           <button
             type="submit"
