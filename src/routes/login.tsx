@@ -74,20 +74,30 @@ function LoginPage() {
           },
         });
         if (error) {
-          toast.error(error.message);
+          const msg = /already|registered|exists/i.test(error.message)
+            ? "Esse e-mail já tem conta. Faz o login ✨"
+            : error.message;
+          toast.error(msg);
         } else {
           const userId = signUpData.user?.id;
-          if (userId) {
-            await supabase
+          if (userId && signUpData.session) {
+            const { error: upErr } = await supabase
               .from("profiles")
-              .update({
+              .upsert({
+                user_id: userId,
+                display_name: parsed.data.name,
                 birth_date: parsed.data.birthDate,
                 signo_solar: signo,
-              })
-              .eq("user_id", userId);
+              }, { onConflict: "user_id" });
+            if (upErr) console.error("profile upsert error", upErr);
           }
-          toast.success("Conta criada! ✨");
-          navigate({ to: "/completar-perfil" });
+          if (!signUpData.session) {
+            toast.success("Confere seu e-mail pra confirmar a conta ✉️");
+            setMode("signin");
+          } else {
+            toast.success("Conta criada! ✨");
+            navigate({ to: "/completar-perfil" });
+          }
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
