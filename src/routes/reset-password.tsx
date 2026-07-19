@@ -14,6 +14,7 @@ export const Route = createFileRoute("/reset-password")({
 function ResetPasswordPage() {
   const navigate = useNavigate();
   const [ready, setReady] = useState(false);
+  const [linkError, setLinkError] = useState<string | null>(null);
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
@@ -22,15 +23,28 @@ function ResetPasswordPage() {
 
   // Supabase coloca os tokens no hash da URL no fluxo de recovery
   useEffect(() => {
-    const hash = window.location.hash;
-    if (hash.includes("type=recovery") || hash.includes("access_token")) {
-      setReady(true);
-    } else {
-      // Pode também ser um deep link de uma sessão já ativa de recovery
-      void supabase.auth.getSession().then(({ data }) => {
-        setReady(!!data.session);
-      });
+    const hash = window.location.hash.startsWith("#")
+      ? window.location.hash.slice(1)
+      : window.location.hash;
+    const params = new URLSearchParams(hash);
+    const errCode = params.get("error_code") || params.get("error");
+    if (errCode) {
+      if (/otp_expired|expired/i.test(errCode)) {
+        setLinkError("Esse link de recuperação expirou. Pede um novo lá no login 💛");
+      } else {
+        setLinkError("Esse link é inválido ou já foi usado. Pede um novo lá no login.");
+      }
+      return;
     }
+    if (params.get("type") === "recovery" || params.get("access_token")) {
+      setReady(true);
+      return;
+    }
+    // Deep link com sessão de recovery já ativa
+    void supabase.auth.getSession().then(({ data }) => {
+      if (data.session) setReady(true);
+      else setLinkError("Esse link parece inválido ou expirado. Pede um novo lá no login.");
+    });
   }, []);
 
   const handleSubmit = async (e: FormEvent) => {
@@ -60,11 +74,19 @@ function ResetPasswordPage() {
         <h1 className="font-display text-2xl font-bold mb-2">
           Redefinir senha
         </h1>
-        {!ready ? (
-          <p className="text-sm text-ink/60">
-            Esse link parece inválido ou expirado. Volte e peça um novo link de
-            recuperação.
-          </p>
+        {linkError ? (
+          <div className="space-y-4">
+            <p className="text-sm text-ink/70">{linkError}</p>
+            <button
+              type="button"
+              onClick={() => navigate({ to: "/login" })}
+              className="w-full bg-ink text-white py-3 rounded-full text-xs font-bold uppercase tracking-[0.2em]"
+            >
+              Voltar pro login
+            </button>
+          </div>
+        ) : !ready ? (
+          <p className="text-sm text-ink/60">Carregando…</p>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-3">
             <p className="text-sm text-ink/60 mb-3">
