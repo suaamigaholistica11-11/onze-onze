@@ -58,12 +58,14 @@ const THEME_OPTIONS: { value: Theme; label: string; icon: typeof Sun }[] = [
 ];
 
 function ConfiguracoesPage() {
-  const { user, profile, signOut } = useAuth();
+  const { user, profile, signOut, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState(profile?.display_name ?? "");
-  const [gender, setGender] = useState<Gender>("Prefiro não dizer");
+  const [gender, setGender] = useState<Gender>(
+    (profile?.gender as Gender) ?? "Prefiro não dizer",
+  );
   const [avatarPreview, setAvatarPreview] = useState<string | null>(
     profile?.avatar_url ?? null,
   );
@@ -80,7 +82,8 @@ function ConfiguracoesPage() {
     setBgOn(!getBgDisabled());
     setName(profile?.display_name ?? "");
     setAvatarPreview(profile?.avatar_url ?? null);
-  }, [profile?.display_name, profile?.avatar_url]);
+    if (profile?.gender) setGender(profile.gender as Gender);
+  }, [profile?.display_name, profile?.avatar_url, profile?.gender]);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -116,9 +119,11 @@ function ConfiguracoesPage() {
         .update({
           display_name: name.trim(),
           avatar_url: avatarUrl,
+          gender,
         })
         .eq("user_id", user.id);
       if (error) throw error;
+      await refreshProfile();
       toast.success("Perfil salvo ✨");
     } catch {
       toast.error("Não conseguimos salvar. Tenta de novo.");

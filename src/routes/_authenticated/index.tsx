@@ -76,7 +76,7 @@ function HomePage() {
   const signoGlifo = glifoDoSigno(profile?.signo_solar);
 
   const saudacao = mounted
-    ? getSaudacao(nome)
+    ? getSaudacao(nome, new Date(), profile?.gender as never)
     : { titulo: `Oi, ${nome}!`, subtitulo: "Lindo dia pra você!", periodo: "manhã" as const };
   const signoUsuario = SIGNS.leao;
 

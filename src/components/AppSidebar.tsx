@@ -24,8 +24,6 @@ import {
   SidebarHeader,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/lib/auth";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 
 type MenuItem = {
   to: string;
@@ -69,17 +67,7 @@ export function AppSidebar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const { signOut, user, profile } = useAuth();
   const navigate = useNavigate();
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!user) return;
-    void supabase
-      .from("profiles")
-      .select("avatar_url")
-      .eq("user_id", user.id)
-      .maybeSingle()
-      .then(({ data }) => setAvatarUrl(data?.avatar_url ?? null));
-  }, [user]);
+  const avatarUrl = profile?.avatar_url ?? null;
 
   const initial = (profile?.display_name ?? user?.email ?? "?")
     .charAt(0)
