@@ -479,13 +479,14 @@ function InlineMapaRender({ id, name, data }: { id: string; name: string; data: 
             icon={<ArrowUpRight className="size-5" />}
             bg="bg-peach"
           />
-          <Link
-            to="/mapa-astral/$id"
-            params={{ id }}
+          <a
+            href="https://masatraologico-gabiastral.netlify.app/"
+            target="_blank"
+            rel="noopener noreferrer"
             className="mt-1 block text-center text-xs font-bold uppercase tracking-[0.2em] text-lilac"
           >
             Ver leitura completa →
-          </Link>
+          </a>
         </div>
       )}
     </section>
