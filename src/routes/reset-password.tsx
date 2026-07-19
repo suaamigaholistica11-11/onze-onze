@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react";
 
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
@@ -16,6 +17,8 @@ function ResetPasswordPage() {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [busy, setBusy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   // Supabase coloca os tokens no hash da URL no fluxo de recovery
   useEffect(() => {
@@ -67,24 +70,44 @@ function ResetPasswordPage() {
             <p className="text-sm text-ink/60 mb-3">
               Crie uma nova senha pra sua conta.
             </p>
-            <input
-              type="password"
-              placeholder="Nova senha"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              minLength={6}
-              required
-              className="pill-input"
-            />
-            <input
-              type="password"
-              placeholder="Confirmar senha"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-              minLength={6}
-              required
-              className="pill-input"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Nova senha"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                minLength={6}
+                required
+                className="pill-input pr-11"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
+                className="absolute inset-y-0 right-3 flex items-center text-ink/50 hover:text-ink"
+              >
+                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </button>
+            </div>
+            <div className="relative">
+              <input
+                type={showConfirm ? "text" : "password"}
+                placeholder="Confirmar senha"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                minLength={6}
+                required
+                className="pill-input pr-11"
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm((v) => !v)}
+                aria-label={showConfirm ? "Ocultar senha" : "Mostrar senha"}
+                className="absolute inset-y-0 right-3 flex items-center text-ink/50 hover:text-ink"
+              >
+                {showConfirm ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+              </button>
+            </div>
             <button
               type="submit"
               disabled={busy}
