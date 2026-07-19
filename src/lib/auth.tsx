@@ -6,6 +6,7 @@ interface Profile {
   display_name: string | null;
   signo_solar: string | null;
   avatar_url: string | null;
+  gender: string | null;
 }
 
 interface AuthContextValue {
@@ -14,6 +15,7 @@ interface AuthContextValue {
   profile: Profile | null;
   loading: boolean;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -22,6 +24,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const fetchProfile = async (userId: string) => {
+    const { data } = await supabase
+      .from("profiles")
+      .select("display_name, signo_solar, avatar_url, gender")
+      .eq("user_id", userId)
+      .maybeSingle();
+    return (data ?? null) as Profile | null;
+  };
 
   useEffect(() => {
     let mounted = true;
@@ -32,12 +43,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (s?.user) {
         // defer profile fetch to avoid potential deadlocks
         setTimeout(async () => {
-          const { data } = await supabase
-            .from("profiles")
-            .select("display_name, signo_solar, avatar_url")
-            .eq("user_id", s.user.id)
-            .maybeSingle();
-          if (mounted) setProfile(data ?? null);
+          const p = await fetchProfile(s.user.id);
+          if (mounted) setProfile(p);
         }, 0);
       } else {
         setProfile(null);
@@ -60,9 +67,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
   };
 
+  const refreshProfile = async () => {
+    if (!session?.user) return;
+    const p = await fetchProfile(session.user.id);
+    setProfile(p);
+  };
+
   return (
     <AuthContext.Provider
-      value={{ session, user: session?.user ?? null, profile, loading, signOut }}
+      value={{ session, user: session?.user ?? null, profile, loading, signOut, refreshProfile }}
     >
       {children}
     </AuthContext.Provider>
