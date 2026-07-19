@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { ChevronDown } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import {
   getTransitsForToday,
@@ -7,7 +8,7 @@ import {
   type TransitItem,
   type MoonNowInfo,
 } from "@/lib/transits.functions";
-import { SIGN_GLYPHS } from "@/lib/transit-copy";
+import { SIGN_GLYPHS, longMeaning, type PlanetPt } from "@/lib/transit-copy";
 import solarSystem from "@/assets/solar-system.png";
 import { useBgDisabled } from "@/lib/bg-preference";
 
@@ -108,34 +109,55 @@ function CeuHojePage() {
             consultando o céu…
           </div>
         )}
-        {transits?.map((t) => (
-          <div
-            key={t.planeta}
-            className="bg-white p-4 rounded-2xl ring-1 ring-black/5 flex items-start gap-4"
-          >
-            <div className="size-12 bg-lilac/40 rounded-2xl flex items-center justify-center font-display text-2xl shrink-0">
-              {t.glyph}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-baseline gap-x-2 gap-y-1 flex-wrap">
-                <span className="font-display font-bold">{t.planeta}</span>
-                <span className="text-xs text-ink/50">em</span>
-                <span className="text-sm font-medium">{t.signo}</span>
-                <span className="font-display text-base text-ink/40">
-                  {SIGN_GLYPHS[t.signo] ?? ""}
-                </span>
-                <span className="text-[10px] text-ink/40">{t.grau}°</span>
-                {t.retrograde && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-peach/60 text-ink/70 font-medium">
-                    ℞ retrógrado
-                  </span>
-                )}
-              </div>
-              <p className="text-sm text-ink/70 mt-1 leading-snug break-words">{t.texto}</p>
-            </div>
-          </div>
-        ))}
+        {transits?.map((t) => <TransitCard key={t.planeta} t={t} />)}
       </section>
     </AppShell>
+  );
+}
+
+function TransitCard({ t }: { t: TransitItem }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="bg-white rounded-2xl ring-1 ring-black/5 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full p-4 flex items-start gap-4 text-left hover:bg-ink/5 transition-colors"
+        aria-expanded={open}
+      >
+        <div className="size-12 bg-lilac/40 rounded-2xl flex items-center justify-center font-display text-2xl shrink-0">
+          {t.glyph}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-baseline gap-x-2 gap-y-1 flex-wrap">
+            <span className="font-display font-bold text-base">{t.planeta}</span>
+            <span className="text-xs text-ink/50">em</span>
+            <span className="text-base font-medium">{t.signo}</span>
+            <span className="font-display text-lg text-ink/40">
+              {SIGN_GLYPHS[t.signo] ?? ""}
+            </span>
+            <span className="text-[11px] text-ink/40">{t.grau}°</span>
+            {t.retrograde && (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-peach/60 text-ink/70 font-medium">
+                ℞ retrógrado
+              </span>
+            )}
+          </div>
+          <p className="text-[15px] text-ink/80 mt-1.5 leading-relaxed break-words">
+            {t.texto}
+          </p>
+        </div>
+        <ChevronDown
+          className={`size-4 text-ink/50 shrink-0 mt-3 transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+      {open && (
+        <div className="px-4 pb-4 pl-[4.5rem]">
+          <p className="text-[15px] text-ink/85 leading-relaxed">
+            {longMeaning(t.planeta as PlanetPt, t.signo, t.retrograde)}
+          </p>
+        </div>
+      )}
+    </div>
   );
 }
