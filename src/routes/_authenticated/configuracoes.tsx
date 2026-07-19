@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 import {
   User,
   Palette,
-  Volume2,
   Image as ImageIcon,
   Lock,
   LogOut,
@@ -24,8 +23,6 @@ import {
   setTheme,
   getBgDisabled,
   setBgDisabled,
-  getSoundEnabled,
-  setSoundEnabled,
   type Theme,
 } from "@/lib/bg-preference";
 
@@ -72,13 +69,11 @@ function ConfiguracoesPage() {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
 
   const [theme, setThemeState] = useState<Theme>("system");
-  const [soundOn, setSoundOn] = useState(true);
   const [bgOn, setBgOn] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     setThemeState(getTheme());
-    setSoundOn(getSoundEnabled());
     setBgOn(!getBgDisabled());
     setName(profile?.display_name ?? "");
     setAvatarPreview(profile?.avatar_url ?? null);
@@ -272,28 +267,6 @@ function ConfiguracoesPage() {
                 </button>
               );
             })}
-          </div>
-        </section>
-
-        {/* 3. Som */}
-        <section className="bg-card rounded-[24px] ring-1 ring-border p-5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Volume2 className="size-5 text-primary" />
-              <div>
-                <h2 className="font-display text-lg font-semibold">Som</h2>
-                <p className="text-[11px] text-muted-foreground">
-                  Efeitos sonoros no app
-                </p>
-              </div>
-            </div>
-            <Switch
-              checked={soundOn}
-              onCheckedChange={(checked) => {
-                setSoundOn(checked);
-                setSoundEnabled(checked);
-              }}
-            />
           </div>
         </section>
 
