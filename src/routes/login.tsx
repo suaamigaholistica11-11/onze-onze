@@ -140,17 +140,10 @@ function LoginPage() {
 
       <div className="relative w-full max-w-sm bg-white/80 backdrop-blur-md p-8 rounded-[28px] ring-1 ring-black/5 shadow-xl">
         <div className="text-center mb-6">
-          <p className="text-[11px] uppercase tracking-[0.3em] text-ink/40 mb-1">
-            bem-vinda
-          </p>
           <h1 className="font-display text-3xl font-bold tracking-tight">
             onze<span className="text-lilac">·</span>onze
           </h1>
-          <p className="text-sm text-ink/60 mt-2">
-            {mode === "signin"
-              ? "Entra pra ver sua energia do dia ✨"
-              : "Cria sua conta e descubra seu céu ✨"}
-          </p>
+          <p className="text-sm text-ink/60 mt-2">do universo pra você ✨</p>
         </div>
 
         <div className="flex bg-ink/5 rounded-full p-1 mb-6">
