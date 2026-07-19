@@ -114,6 +114,7 @@ export type Database = {
           deletion_blocked_until: string | null
           deletion_count: number | null
           display_name: string | null
+          gender: string | null
           id: string
           lgpd_consent: boolean | null
           lgpd_consent_at: string | null
@@ -133,6 +134,7 @@ export type Database = {
           deletion_blocked_until?: string | null
           deletion_count?: number | null
           display_name?: string | null
+          gender?: string | null
           id?: string
           lgpd_consent?: boolean | null
           lgpd_consent_at?: string | null
@@ -152,6 +154,7 @@ export type Database = {
           deletion_blocked_until?: string | null
           deletion_count?: number | null
           display_name?: string | null
+          gender?: string | null
           id?: string
           lgpd_consent?: boolean | null
           lgpd_consent_at?: string | null
