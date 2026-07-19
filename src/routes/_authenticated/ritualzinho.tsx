@@ -76,7 +76,7 @@ function Content({ group, signo }: { group: MoonPhaseGroup; signo: string }) {
           ritualzinhos faz toda a diferença, é onde a mágica começa a tomar forma. 📓✨
         </p>
         <a
-          href="https://lojinha1111.com"
+          href="https://collshp.com/lojinjaonzeonze?view=storefront"
           target="_blank"
           rel="noreferrer"
           className="inline-flex items-center gap-2 text-xs font-medium text-ink/70 underline underline-offset-4 hover:text-ink"
