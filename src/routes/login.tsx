@@ -75,11 +75,22 @@ function LoginPage() {
             data: { display_name: parsed.data.name },
           },
         });
-        if (error) {
-          const msg = /already|registered|exists/i.test(error.message)
-            ? "Esse e-mail já tem conta. Faz o login ✨"
-            : error.message;
-          toast.error(msg);
+        // Supabase com confirmação de e-mail ativa NÃO retorna erro pra e-mail
+        // já cadastrado (proteção contra enumeração). Ele devolve um user
+        // fictício com identities vazio. Precisamos detectar isso.
+        const identities = signUpData?.user?.identities;
+        const alreadyRegistered =
+          !error && signUpData?.user && Array.isArray(identities) && identities.length === 0;
+
+        if (error || alreadyRegistered) {
+          if (alreadyRegistered || (error && /already|registered|exists/i.test(error.message))) {
+            toast.error("Esse e-mail já tem conta. Faz o login ✨");
+            setMode("signin");
+          } else if (error && /rate.?limit|too many/i.test(error.message)) {
+            toast.error("Muitas tentativas. Espera um minutinho e tenta de novo.");
+          } else {
+            toast.error(error?.message ?? "Não conseguimos criar a conta. Tenta de novo.");
+          }
         } else {
           const userId = signUpData.user?.id;
           if (userId && signUpData.session) {
@@ -106,7 +117,15 @@ function LoginPage() {
           email: parsed.data.email,
           password: parsed.data.password,
         });
-        if (error) toast.error("E-mail ou senha incorretos");
+        if (error) {
+          if (/email.?not.?confirmed/i.test(error.message)) {
+            toast.error("Confirma seu e-mail antes de entrar ✉️");
+          } else if (/rate.?limit|too many/i.test(error.message)) {
+            toast.error("Muitas tentativas. Espera um minutinho.");
+          } else {
+            toast.error("E-mail ou senha incorretos");
+          }
+        }
       }
     } finally {
       setBusy(false);
