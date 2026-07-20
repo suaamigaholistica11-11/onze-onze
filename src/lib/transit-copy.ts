@@ -208,3 +208,27 @@ export function copyFor(planet: PlanetPt, sign: string, retrograde: boolean): st
   const base = TRANSIT_COPY[planet]?.[sign] ?? "Energia em movimento.";
   return retrograde ? `${base} (em retrógrado: revisitar é a vibe)` : base;
 }
+
+// Explicação longa por planeta + signo — usada quando a pessoa clica pra abrir
+// o card do trânsito no Céu Hoje.
+export const PLANET_ROLE: Record<PlanetPt, string> = {
+  Sol: "O Sol fala de identidade, propósito e de onde você brilha no mundo.",
+  Lua: "A Lua rege emoção, memória e o que te faz sentir em casa.",
+  Mercúrio: "Mercúrio comanda pensamento, fala e a forma como você troca ideia.",
+  Vênus: "Vênus mostra como você ama, o que te dá prazer e o que acha bonito.",
+  Marte: "Marte é ação, coragem e a forma como você vai atrás do que quer.",
+  Júpiter: "Júpiter traz expansão, sorte e as áreas onde a vida pede pra crescer.",
+  Saturno: "Saturno é maturidade, tempo e onde a vida pede estrutura.",
+  Urano: "Urano é liberdade, ruptura e o que precisa mudar de repente.",
+  Netuno: "Netuno é sonho, sensibilidade e conexão com algo maior.",
+  Plutão: "Plutão é transformação profunda, poder e o que precisa morrer pra renascer.",
+};
+
+export function longMeaning(planet: PlanetPt, sign: string, retrograde: boolean): string {
+  const role = PLANET_ROLE[planet];
+  const short = TRANSIT_COPY[planet]?.[sign] ?? "";
+  const retro = retrograde
+    ? ` Como está retrógrado, é hora de revisitar temas de ${planet.toLowerCase()} em vez de acelerar: volta, revê, refaz.`
+    : "";
+  return `${role} Com ${planet} em ${sign}, essa energia ganha o tempero do signo: ${short.toLowerCase()} Observe onde na sua vida esse tema aparece hoje, é ali que o céu está pedindo atenção.${retro}`;
+}

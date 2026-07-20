@@ -162,21 +162,21 @@ function HomePage() {
 
       {/* Energia do Dia */}
       <section className="px-6 mb-6 animate-oo-enter [animation-delay:240ms]">
-        <div className="bg-white p-6 rounded-[28px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5">
+        <div className="bg-ink text-oo-offwhite p-6 rounded-[28px] shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/10">
           <div className="flex items-center gap-2 mb-3">
             <span className="size-2 rounded-full bg-peach animate-oo-pulse" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/60">
+            <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-oo-offwhite/70">
               Energia do Dia
             </span>
           </div>
-          <p className="font-display text-base leading-relaxed text-pretty">
+          <p className="font-display text-base leading-relaxed text-pretty text-oo-offwhite">
             {energia?.texto ?? "Lendo o céu de hoje…"}
           </p>
           <div className="flex flex-wrap gap-2 mt-5">
             {(energia?.highlights ?? []).map((h) => (
               <span
                 key={h}
-                className="text-[11px] px-3 py-1 rounded-full bg-mint/60 text-ink/70 font-medium"
+                className="text-[11px] px-3 py-1 rounded-full bg-oo-offwhite/10 text-oo-offwhite/90 font-medium ring-1 ring-oo-offwhite/15"
               >
                 {h}
               </span>
@@ -186,7 +186,7 @@ function HomePage() {
             href="https://masatraologico-gabiastral.netlify.app/"
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-5 inline-flex items-center gap-2 bg-ink text-white px-5 py-3 rounded-full text-[11px] font-bold uppercase tracking-[0.15em] hover:bg-ink/90 transition-colors"
+            className="mt-5 inline-flex items-center gap-2 bg-oo-offwhite text-ink px-5 py-3 rounded-full text-[11px] font-bold uppercase tracking-[0.15em] hover:bg-oo-offwhite/90 transition-colors"
           >
             Quero saber quais são minhas energias astrais
           </a>

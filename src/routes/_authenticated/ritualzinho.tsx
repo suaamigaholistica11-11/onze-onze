@@ -73,7 +73,7 @@ function Content({ group, signo }: { group: MoonPhaseGroup; signo: string }) {
       <section className="mt-4 bg-cream/70 p-5 rounded-[28px] ring-1 ring-black/5 animate-oo-enter [animation-delay:140ms]">
         <p className="text-sm text-ink/80 leading-relaxed mb-3">
           Antes de escolher seu banho, que tal anotar sua intenção? Um caderninho só pros seus
-          ritualzinhos faz toda a diferença, é onde a mágica começa a tomar forma. 📓✨
+          rituaizinhos faz toda a diferença, é onde a mágica começa a tomar forma. 📓✨
         </p>
         <a
           href="https://collshp.com/lojinjaonzeonze?view=storefront"
