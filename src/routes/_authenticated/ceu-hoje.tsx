@@ -98,9 +98,6 @@ function CeuHojePage() {
       )}
 
       <section className="px-6 mb-8 space-y-3 animate-oo-enter [animation-delay:120ms]">
-        <p className="text-[10px] uppercase tracking-[0.25em] text-ink/50 mb-1">
-          trânsitos planetários
-        </p>
         {error && (
           <div className="text-sm text-ink/60 italic text-center py-6">{error}</div>
         )}
@@ -143,12 +140,9 @@ function TransitCard({ t }: { t: TransitItem }) {
               </span>
             )}
           </div>
-          <p className="text-[15px] text-ink/80 mt-1.5 leading-relaxed break-words">
-            {t.texto}
-          </p>
         </div>
         <ChevronDown
-          className={`size-4 text-ink/50 shrink-0 mt-3 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`size-4 text-ink/50 shrink-0 self-center transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
       {open && (
