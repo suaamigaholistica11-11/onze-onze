@@ -203,17 +203,55 @@
   background-color: var(--card) !important;
   color: var(--foreground) !important;
 }
-.dark .text-ink,
-.dark .text-ink\/80,
-.dark .text-ink\/70,
-.dark .text-ink\/60,
-.dark .text-ink\/50 {
-  color: var(--foreground) !important;
-}
+.dark .text-ink { color: var(--foreground) !important; }
+.dark .text-ink\/90 { color: color-mix(in oklab, var(--foreground) 95%, transparent) !important; }
+.dark .text-ink\/85,
+.dark .text-ink\/80 { color: color-mix(in oklab, var(--foreground) 90%, transparent) !important; }
+.dark .text-ink\/70 { color: color-mix(in oklab, var(--foreground) 82%, transparent) !important; }
+.dark .text-ink\/60 { color: color-mix(in oklab, var(--foreground) 75%, transparent) !important; }
+.dark .text-ink\/50 { color: color-mix(in oklab, var(--foreground) 68%, transparent) !important; }
+.dark .text-ink\/40 { color: color-mix(in oklab, var(--foreground) 60%, transparent) !important; }
+.dark .text-ink\/30 { color: color-mix(in oklab, var(--foreground) 55%, transparent) !important; }
 .dark .ring-black\/5,
 .dark .ring-black\/10 {
   --tw-ring-color: color-mix(in oklab, var(--foreground) 10%, transparent);
 }
+
+/* Pastéis translúcidos ficam ilegíveis no dark; força fundo escuro sólido. */
+.dark [class*="bg-lilac/"],
+.dark [class*="bg-peach/"],
+.dark [class*="bg-mint/"],
+.dark [class*="bg-sky/"],
+.dark [class*="bg-yellow-candy/"] {
+  background-color: var(--card) !important;
+}
+.dark .bg-lilac,
+.dark .bg-peach,
+.dark .bg-mint,
+.dark .bg-sky,
+.dark .bg-yellow-candy { color: var(--foreground); }
+
+/* Gradientes pastel: neutraliza para o fundo do card no dark. */
+.dark [class*="from-lilac"],
+.dark [class*="from-peach"],
+.dark [class*="from-mint"],
+.dark [class*="from-sky"],
+.dark [class*="from-yellow-candy"],
+.dark [class*="from-cream"] {
+  --tw-gradient-from: var(--card) !important;
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to, transparent) !important;
+}
+.dark [class*="to-lilac"],
+.dark [class*="to-peach"],
+.dark [class*="to-mint"],
+.dark [class*="to-sky"],
+.dark [class*="to-yellow-candy"],
+.dark [class*="to-cream"] {
+  --tw-gradient-to: color-mix(in oklab, var(--card) 92%, var(--accent)) !important;
+}
+
+/* Fundos "bg-ink" em componentes claros já são escuros; garante texto claro. */
+.dark .bg-ink { background-color: var(--card) !important; color: var(--foreground) !important; }
 
 @keyframes oo-float {
   0%, 100% { transform: translateY(0); }
