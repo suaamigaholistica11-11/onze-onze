@@ -1,5 +1,17 @@
 // Calendário oficial das Luas de 2026 (Brasília, UTC-3).
 // Fonte: material enviado pela usuária (Luas_2026.md).
+import { Body, Ecliptic, GeoVector } from "astronomy-engine";
+
+const SIGN_ORDER = [
+  "Áries", "Touro", "Gêmeos", "Câncer", "Leão", "Virgem",
+  "Libra", "Escorpião", "Sagitário", "Capricórnio", "Aquário", "Peixes",
+] as const;
+
+function moonSignAt(date: Date): string {
+  const ecl = Ecliptic(GeoVector(Body.Moon, date, true));
+  const lon = ((ecl.elon % 360) + 360) % 360;
+  return SIGN_ORDER[Math.floor(lon / 30) % 12];
+}
 
 export type MoonPhaseGroup = "nova" | "crescente" | "cheia" | "minguante";
 
@@ -165,16 +177,9 @@ export function getCurrentMoon(now: Date = new Date()): {
     else break;
   }
 
-  let signo = phase.signo;
-  let lastAnchor = new Date(phase.date).getTime();
-  for (const ing of MOON_SIGN_INGRESSES) {
-    const it = new Date(ing.date).getTime();
-    if (it <= t && it >= lastAnchor) {
-      signo = ing.signo;
-      lastAnchor = it;
-    }
-  }
-
+  // Signo calculado por efeméride real (astronomy-engine) pra bater
+  // com a Lua de verdade, independente da tabela de ingressos.
+  const signo = moonSignAt(now);
   return { fase: phase.fase, signo, observacao: phase.observacao };
 }
 
