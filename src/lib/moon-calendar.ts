@@ -177,3 +177,23 @@ export function getCurrentMoon(now: Date = new Date()): {
 
   return { fase: phase.fase, signo, observacao: phase.observacao };
 }
+
+/** Próximos N dias com fase + signo da Lua vigentes ao meio-dia (BRT) daquele dia. */
+export function getMoonWeek(
+  start: Date = new Date(),
+  days = 7,
+): Array<{ date: Date; fase: MoonPhaseGroup; signo: string }> {
+  const out: Array<{ date: Date; fase: MoonPhaseGroup; signo: string }> = [];
+  const base = new Date(start);
+  base.setHours(0, 0, 0, 0);
+  for (let i = 0; i < days; i++) {
+    const d = new Date(base);
+    d.setDate(base.getDate() + i);
+    // meio-dia local pra evitar oscilação em ingressos noturnos
+    const noon = new Date(d);
+    noon.setHours(12, 0, 0, 0);
+    const { fase, signo } = getCurrentMoon(noon);
+    out.push({ date: d, fase, signo });
+  }
+  return out;
+}
