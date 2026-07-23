@@ -13,7 +13,6 @@ import { getTransitsForToday } from "@/lib/transits.functions";
 import { buildDailyEnergy } from "@/lib/daily-energy";
 import {
   getCurrentMoon,
-  getMoonWeek,
   PHASE_LABEL,
   PHASE_MEANING,
   type MoonPhaseGroup,
@@ -92,10 +91,8 @@ function HomePage() {
     : null;
 
   const [moonPhase, setMoonPhase] = useState<ReturnType<typeof getCurrentMoon> | null>(null);
-  const [moonWeek, setMoonWeek] = useState<ReturnType<typeof getMoonWeek>>([]);
   useEffect(() => {
     setMoonPhase(getCurrentMoon());
-    setMoonWeek(getMoonWeek(new Date(), 7));
   }, []);
 
   return (
@@ -162,50 +159,6 @@ function HomePage() {
       <section className="px-6 mb-6 animate-oo-enter [animation-delay:160ms]">
         <CurrentMoonCard data={moonPhase} />
       </section>
-
-      {/* Luas da semana */}
-      {moonWeek.length > 0 && (
-        <section className="px-6 mb-6 animate-oo-enter [animation-delay:200ms]">
-          <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-ink/60 mb-3 px-1">
-            Luas da semana
-          </p>
-          <div className="flex gap-2 overflow-x-auto pb-2 -mx-6 px-6 snap-x">
-            {moonWeek.map((m, i) => {
-              const isToday = i === 0;
-              const dia = m.date.toLocaleDateString("pt-BR", { weekday: "short" }).replace(".", "");
-              const num = m.date.getDate();
-              return (
-                <div
-                  key={m.date.toISOString()}
-                  className={`snap-start shrink-0 w-32 rounded-2xl p-3 ring-1 ring-black/5 ${
-                    isToday ? "bg-ink text-oo-offwhite" : "bg-lilac/50 text-ink"
-                  }`}
-                >
-                  <div className="flex items-baseline justify-between mb-2">
-                    <span className={`text-[10px] uppercase tracking-[0.2em] ${isToday ? "text-oo-offwhite/70" : "text-ink/60"}`}>
-                      {isToday ? "hoje" : dia}
-                    </span>
-                    <span className={`text-xs font-semibold ${isToday ? "text-oo-offwhite/80" : "text-ink/60"}`}>
-                      {num}
-                    </span>
-                  </div>
-                  <img
-                    src={MOON_IMAGES[m.fase]}
-                    alt={PHASE_LABEL[m.fase]}
-                    className="size-10 object-contain mb-2 drop-shadow"
-                  />
-                  <p className="text-[11px] font-display leading-tight">
-                    {PHASE_LABEL[m.fase]}
-                  </p>
-                  <p className={`text-[11px] leading-tight ${isToday ? "text-oo-offwhite/80" : "text-ink/70"}`}>
-                    em {m.signo}
-                  </p>
-                </div>
-              );
-            })}
-          </div>
-        </section>
-      )}
 
       {/* Energia do Dia */}
       <section className="px-6 mb-6 animate-oo-enter [animation-delay:240ms]">
